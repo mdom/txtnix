@@ -39,4 +39,19 @@ sub follow {
     return;
 }
 
+sub unfollow {
+    my ( $self, $whom, $url ) = @_;
+    delete $self->config->{following}->{$whom};
+    print "You've unfollowed $whom.\n";
+    return;
+}
+
+sub following {
+    my ( $self, $whom, $url ) = @_;
+    for my $user ( keys %{ $self->config->{following} } ) {
+        print "$user \@ " . $self->config->{following}->{$user} . "\n";
+    }
+    return;
+}
+
 1;
