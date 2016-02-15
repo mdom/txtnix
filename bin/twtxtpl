@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::twtxtpl;
+
+exit App::twtxtpl->new()->run(@ARGV);
