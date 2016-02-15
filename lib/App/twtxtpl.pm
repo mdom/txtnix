@@ -20,19 +20,19 @@ sub _build_config {
         $self->config_file->parent->mkpath;
         $self->config_file->touch;
     }
-    my $config = Config::Tiny->read( $self->config_file->stringify );
+    my $config   = Config::Tiny->read( $self->config_file->stringify );
     my %defaults = (
-	    check_following => 1,
-	    use_pager => 1,
-	    use_cache => 1,
-	    disclose_identity => 0,
-	    limit_timeline => 20,
-	    timeout => 5,
-	    sorting => 'descending',
-	    time_format => '%F %H:%M',
-	    twtfile     => path('~/twtxt'),
+        check_following   => 1,
+        use_pager         => 1,
+        use_cache         => 1,
+        disclose_identity => 0,
+        limit_timeline    => 20,
+        timeout           => 5,
+        sorting           => 'descending',
+        time_format       => '%F %H:%M',
+        twtfile           => path('~/twtxt'),
     );
-    $config->{twtxt} = { %defaults, %{ $config->{twtxt}||{} } };
+    $config->{twtxt} = { %defaults, %{ $config->{twtxt} || {} } };
     return $config;
 }
 
@@ -48,24 +48,24 @@ sub run {
 
 sub timeline {
     my $self = shift;
-    my $ua = Mojo::UserAgent->new();
+    my $ua   = Mojo::UserAgent->new();
     $ua->request_timeout( $self->config->{twtxt}->{timeout} );
     my @tweets;
     Mojo::IOLoop->delay(
         sub {
             my $delay = shift;
-	    while ( my ($user, $url) = each %{ $self->config->{following} } ) {
-		$delay->pass($user);
+            while ( my ( $user, $url ) = each %{ $self->config->{following} } )
+            {
+                $delay->pass($user);
                 $ua->get( $url => $delay->begin );
             }
         },
         sub {
             my ( $delay, @results ) = @_;
-            while ( my ($user, $tx ) = splice(@results,0,2) ) {
-                push @tweets,
-                  map {
+            while ( my ( $user, $tx ) = splice( @results, 0, 2 ) ) {
+                push @tweets, map {
                     App::twtxtpl::Tweet->new(
-		        user      => $user,
+                        user      => $user,
                         timestamp => $_->[0],
                         text      => $_->[1]
                       )
@@ -76,32 +76,32 @@ sub timeline {
         }
     )->wait;
     @tweets = sort {
-        $self->config->{twtxt}->{sorting} eq 'descending'
+            $self->config->{twtxt}->{sorting} eq 'descending'
           ? $a->timestamp cmp $b->timestamp
           : $b->timestamp cmp $a->timestamp
     } @tweets;
     my $fh;
     if ( $self->config->{twtxt}->{use_pager} ) {
-	   IO::Pager->new($fh);
+        IO::Pager->new($fh);
     }
     else {
-	   $fh = \*STDOUT;
+        $fh = \*STDOUT;
     }
     my $limit = $self->config->{twtxt}->{limit_timeline} - 1;
-    for my $tweet (@tweets[0..$limit]) {
-            printf {$fh} "%s %s: %s\n",
-              $tweet->strftime( $self->config->{twtxt}->{time_format} ),
-              $tweet->user, $tweet->text;
+    for my $tweet ( @tweets[ 0 .. $limit ] ) {
+        printf {$fh} "%s %s: %s\n",
+          $tweet->strftime( $self->config->{twtxt}->{time_format} ),
+          $tweet->user, $tweet->text;
     }
 }
 
 sub tweet {
-	my ( $self, $text ) = @_;
-	my $tweet = App::twtxtpl::Tweet->new(text => $text);
-	my $file = path( $self->config->{twtxt}->{twtfile} );
-	$file->touch unless $file->exists;
-	$file->append_utf8( $tweet->to_string . "\n" );
-	return;
+    my ( $self, $text ) = @_;
+    my $tweet = App::twtxtpl::Tweet->new( text => $text );
+    my $file = path( $self->config->{twtxt}->{twtfile} );
+    $file->touch unless $file->exists;
+    $file->append_utf8( $tweet->to_string . "\n" );
+    return;
 }
 
 sub follow {
