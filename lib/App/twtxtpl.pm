@@ -8,6 +8,7 @@ use Path::Tiny;
 use Mojo::UserAgent;
 use Moo;
 use App::twtxtpl::Tweet;
+use IO::Pager;
 
 has config => ( is => 'lazy' );
 has config_file =>
@@ -72,8 +73,15 @@ sub timeline {
         }
     )->wait;
     @tweets = sort { $a->timestamp cmp $b->timestamp } @tweets;
+    my $fh;
+    if ( $self->config->{twtxt}->{use_pager} ) {
+	   IO::Pager->new($fh);
+    }
+    else {
+	   $fh = \*STDOUT;
+    }
     for my $tweet (@tweets) {
-	    printf "%s %s: %s\n", $tweet->timestamp, $tweet->user, $tweet->text;
+	    printf {$fh} "%s %s: %s\n", $tweet->timestamp, $tweet->user, $tweet->text;
     }
 }
 
