@@ -24,8 +24,7 @@ sub _build_config {
 
 sub run {
     my ( $self, $subcommand ) = splice( @_, 0, 2 );
-    no strict 'refs';
-    if ( defined &{$subcommand} ) {
+    if ( $self->can($subcommand) ) {
         $self->$subcommand(@_);
     }
     $self->config->write( $self->config_file, 'utf8' );
