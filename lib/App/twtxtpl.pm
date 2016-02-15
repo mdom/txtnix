@@ -87,7 +87,8 @@ sub timeline {
     else {
 	   $fh = \*STDOUT;
     }
-    for my $tweet (@tweets) {
+    my $limit = $self->config->{twtxt}->{limit_timeline} - 1;
+    for my $tweet (@tweets[0..$limit]) {
             printf {$fh} "%s %s: %s\n",
               $tweet->strftime( $self->config->{twtxt}->{time_format} ),
               $tweet->user, $tweet->text;
