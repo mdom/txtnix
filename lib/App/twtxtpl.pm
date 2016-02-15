@@ -74,7 +74,11 @@ sub timeline {
             }
         }
     )->wait;
-    @tweets = sort { $a->timestamp cmp $b->timestamp } @tweets;
+    @tweets = sort {
+        $self->config->{twtxt}->{sorting} eq 'descending'
+          ? $a->timestamp cmp $b->timestamp
+          : $b->timestamp cmp $a->timestamp
+    } @tweets;
     my $fh;
     if ( $self->config->{twtxt}->{use_pager} ) {
 	   IO::Pager->new($fh);
