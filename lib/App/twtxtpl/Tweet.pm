@@ -1,4 +1,4 @@
-package App::twtxt::Tweet;
+package App::twtxtpl::Tweet;
 use strict;
 use warnings;
 use Moo;
