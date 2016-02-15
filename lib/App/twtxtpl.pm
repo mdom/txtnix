@@ -29,6 +29,7 @@ sub _build_config {
 	    limit_timeline => 20,
 	    timeout => 5,
 	    sorting => 'descending',
+	    time_format => '%F %H:%M',
     );
     $config->{twtxt} = { %defaults, %{ $config->{twtxt}||{} } };
     return $config;
@@ -81,7 +82,9 @@ sub timeline {
 	   $fh = \*STDOUT;
     }
     for my $tweet (@tweets) {
-	    printf {$fh} "%s %s: %s\n", $tweet->timestamp, $tweet->user, $tweet->text;
+            printf {$fh} "%s %s: %s\n",
+              $tweet->strftime( $self->config->{twtxt}->{time_format} ),
+              $tweet->user, $tweet->text;
     }
 }
 
