@@ -30,6 +30,7 @@ sub _build_config {
 	    timeout => 5,
 	    sorting => 'descending',
 	    time_format => '%F %H:%M',
+	    twtfile     => path('~/twtxt'),
     );
     $config->{twtxt} = { %defaults, %{ $config->{twtxt}||{} } };
     return $config;
@@ -91,6 +92,15 @@ sub timeline {
               $tweet->strftime( $self->config->{twtxt}->{time_format} ),
               $tweet->user, $tweet->text;
     }
+}
+
+sub tweet {
+	my ( $self, $text ) = @_;
+	my $tweet = App::twtxtpl::Tweet->new(text => $text);
+	my $file = path( $self->config->{twtxt}->{twtfile} );
+	$file->touch unless $file->exists;
+	$file->append_utf8( $tweet->to_string . "\n" );
+	return;
 }
 
 sub follow {
