@@ -33,6 +33,40 @@ sub run {
 
 }
 
+sub timeline {
+    my $self = shift;
+    my $ua   = Mojo::UserAgent->new();
+    my @tweets;
+    Mojo::IOLoop->delay(
+        sub {
+            my $delay = shift;
+	    while ( my ($user, $url) = each %{ $self->config->{following} } ) {
+		$delay->pass($user);
+                $ua->get( $url => $delay->begin );
+            }
+        },
+        sub {
+            my ( $delay, @results ) = @_;
+            while ( my ($user, $tx ) = splice(@results,0,2) ) {
+                push @tweets,
+                  map {
+                    App::twtxtpl::Tweet->new(
+		        user      => $user,
+                        timestamp => $_->[0],
+                        text      => $_->[1]
+                      )
+                  }
+                  map { [ split /\t/, $_, 2 ] }
+                  split( /\n/, $tx->res->body );
+            }
+        }
+    )->wait;
+    @tweets = sort { $a->timestamp cmp $b->timestamp } @tweets;
+    for my $tweet (@tweets) {
+	    printf "%s %s: %s\n", $tweet->timestamp, $tweet->user, $tweet->text;
+    }
+}
+
 sub follow {
     my ( $self, $whom, $url ) = @_;
     $self->config->{following}->{$whom} = $url;
