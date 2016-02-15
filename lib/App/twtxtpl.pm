@@ -19,7 +19,18 @@ sub _build_config {
         $self->config_file->parent->mkpath;
         $self->config_file->touch;
     }
-    return Config::Tiny->read( $self->config_file->stringify );
+    my $config = Config::Tiny->read( $self->config_file->stringify );
+    my %defaults = (
+	    check_following => 1,
+	    use_pager => 1,
+	    use_cache => 1,
+	    disclose_identity => 0,
+	    limit_timeline => 20,
+	    timeout => 5,
+	    sorting => 'descending',
+    );
+    $config->{twtxt} = { %defaults, %{ $config->{twtxt}||{} } };
+    return $config;
 }
 
 sub run {
