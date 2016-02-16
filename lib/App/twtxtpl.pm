@@ -8,6 +8,7 @@ use Path::Tiny;
 use Mojo::UserAgent;
 use Moo;
 use App::twtxtpl::Tweet;
+use App::twtxtpl::Cache;
 use IO::Pager;
 use String::ShellQuote;
 use File::Basename qw(basename);
@@ -19,6 +20,7 @@ has config => ( is => 'lazy' );
 has config_file =>
   ( is => 'ro', default => sub { path('~/.config/twtxt/config') } );
 has ua => ( is => 'lazy' );
+has cache => ( is => 'ro', default => sub { App::twtxtpl::Cache->new() } );
 
 sub _build_ua {
     my $self = shift;
@@ -62,6 +64,11 @@ sub run {
 
 }
 
+sub url_for_user {
+    my ( $self, $user ) = @_;
+    return $self->config->{following}->{$user};
+}
+
 sub _get_tweets {
     my ( $self, $who ) = @_;
     my @tweets;
@@ -71,23 +78,33 @@ sub _get_tweets {
             $following = { $who => $self->config->{following}->{$who} };
         }
         else {
-            return undef;
+            return;
         }
     }
     Mojo::IOLoop->delay(
         sub {
             my $delay = shift;
             while ( my ( $user, $url ) = each %{$following} ) {
-                $delay->pass($user);
-                $self->ua->get( $url => $delay->begin );
+                my $cache = $self->cache->get($url);
+                $delay->pass( $user, $cache );
+                my $params =
+                  $cache
+                  ? { "If-Modified-Since" => $cache->{last_modified} }
+                  : {};
+                $self->ua->get( $url => $params => $delay->begin );
             }
         },
         sub {
             my ( $delay, @results ) = @_;
-            while ( my ( $user, $tx ) = splice( @results, 0, 2 ) ) {
+            while ( my ( $user, $cache, $tx ) = splice( @results, 0, 3 ) ) {
 
                 if ( my $res = $tx->success ) {
-                    push @tweets, $self->parse_twtfile( $user, $res->body );
+                    my $body = $res->code == 304 ? $cache->{body} : $res->body;
+                    if ( $res->code != 304 and $res->headers->last_modified ) {
+                        $self->cache->set( $self->url_for_user($user),
+                            $res->headers->last_modified, $body );
+                    }
+                    push @tweets, $self->parse_twtfile( $user, $body );
                 }
                 else {
                     my $err = $tx->error;
