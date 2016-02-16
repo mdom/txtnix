@@ -18,6 +18,13 @@ has name => ( is => 'ro', default => sub { basename $0 } );
 has config => ( is => 'lazy' );
 has config_file =>
   ( is => 'ro', default => sub { path('~/.config/twtxt/config') } );
+has ua => ( is => 'lazy' );
+
+sub _build_ua {
+    my $self = shift;
+    return Mojo::UserAgent->new()
+      ->request_timeout( $self->config->{twtxt}->{timeout} )->max_redirects(5);
+}
 
 sub _build_config {
     my ($self) = @_;
@@ -57,9 +64,6 @@ sub run {
 
 sub _get_tweets {
     my ( $self, $who ) = @_;
-    my $ua = Mojo::UserAgent->new();
-    $ua->request_timeout( $self->config->{twtxt}->{timeout} );
-    $ua->max_redirects(5);
     my @tweets;
     my $following = $self->config->{following};
     if ($who) {
@@ -75,7 +79,7 @@ sub _get_tweets {
             my $delay = shift;
             while ( my ( $user, $url ) = each %{$following} ) {
                 $delay->pass($user);
-                $ua->get( $url => $delay->begin );
+                $self->ua->get( $url => $delay->begin );
             }
         },
         sub {
