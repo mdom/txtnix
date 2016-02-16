@@ -73,15 +73,28 @@ sub timeline {
         sub {
             my ( $delay, @results ) = @_;
             while ( my ( $user, $tx ) = splice( @results, 0, 2 ) ) {
-                push @tweets, map {
-                    App::twtxtpl::Tweet->new(
-                        user      => $user,
-                        timestamp => $_->[0],
-                        text      => $_->[1]
-                      )
-                  }
-                  map { [ split /\t/, $_, 2 ] }
-                  split( /\n/, $tx->res->body );
+
+                if ( my $res = $tx->success ) {
+                    push @tweets, map {
+                        App::twtxtpl::Tweet->new(
+                            user      => $user,
+                            timestamp => $_->[0],
+                            text      => $_->[1]
+                          )
+                      }
+                      map { [ split /\t/, $_, 2 ] }
+                      split( /\n/, $res->body );
+                }
+                else {
+                    my $err = $tx->error;
+                    warn "Failing to get tweets for $user: "
+                      . (
+                        $err->{code}
+                        ? "$err->{code} response: $err->{message}"
+                        : "Connection error: $err->{message}"
+                      ) . "\n";
+
+                }
             }
         }
     )->wait;

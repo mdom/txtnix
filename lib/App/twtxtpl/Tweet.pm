@@ -1,7 +1,7 @@
 package App::twtxtpl::Tweet;
 use strict;
 use warnings;
-use Mojo::Date;
+use HTTP::Date 'str2time';
 use POSIX ();
 use Moo;
 
