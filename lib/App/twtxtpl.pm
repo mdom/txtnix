@@ -59,6 +59,7 @@ sub timeline {
     my $self = shift;
     my $ua   = Mojo::UserAgent->new();
     $ua->request_timeout( $self->config->{twtxt}->{timeout} );
+    $ua->max_redirects(5);
     my @tweets;
     Mojo::IOLoop->delay(
         sub {
