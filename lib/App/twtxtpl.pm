@@ -45,7 +45,6 @@ sub run {
     if ( $subcommands{$subcommand} and $self->can($subcommand) ) {
         $self->$subcommand(@_);
     }
-    $self->config->write( $self->config_file, 'utf8' );
     else {
         die $self->name . ": Unknown subcommand $subcommand.\n";
     }
@@ -114,12 +113,14 @@ sub tweet {
 sub follow {
     my ( $self, $whom, $url ) = @_;
     $self->config->{following}->{$whom} = $url;
+    $self->config->write( $self->config_file, 'utf8' );
     return;
 }
 
 sub unfollow {
     my ( $self, $whom, $url ) = @_;
     delete $self->config->{following}->{$whom};
+    $self->config->write( $self->config_file, 'utf8' );
     print "You've unfollowed $whom.\n";
     return;
 }
