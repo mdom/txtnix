@@ -100,8 +100,8 @@ sub timeline {
     )->wait;
     @tweets = sort {
             $self->config->{twtxt}->{sorting} eq 'descending'
-          ? $a->timestamp cmp $b->timestamp
-          : $b->timestamp cmp $a->timestamp
+          ? $b->timestamp cmp $a->timestamp
+          : $a->timestamp cmp $b->timestamp
     } @tweets;
     my $fh;
     if ( $self->config->{twtxt}->{use_pager} ) {
