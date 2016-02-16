@@ -87,15 +87,7 @@ sub _get_tweets {
             while ( my ( $user, $tx ) = splice( @results, 0, 2 ) ) {
 
                 if ( my $res = $tx->success ) {
-                    push @tweets, map {
-                        App::twtxtpl::Tweet->new(
-                            user      => $user,
-                            timestamp => $_->[0],
-                            text      => $_->[1]
-                          )
-                      }
-                      map { [ split /\t/, $_, 2 ] }
-                      split( /\n/, $res->body );
+                    push @tweets, $self->parse_twtfile( $user, $res->body );
                 }
                 else {
                     my $err = $tx->error;
@@ -117,6 +109,19 @@ sub _get_tweets {
     } @tweets;
     my $limit = $self->config->{twtxt}->{limit_timeline} - 1;
     return @tweets[ 0 .. $limit ];
+}
+
+sub parse_twtfile {
+    my ( $self, $user, $string ) = @_;
+    return map {
+        App::twtxtpl::Tweet->new(
+            user      => $user,
+            timestamp => $_->[0],
+            text      => $_->[1]
+          )
+      }
+      map { [ split /\t/, $_, 2 ] }
+      split( /\n/, $string );
 }
 
 sub _display_tweets {
