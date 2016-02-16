@@ -55,17 +55,25 @@ sub run {
 
 }
 
-sub timeline {
-    my $self = shift;
-    my $ua   = Mojo::UserAgent->new();
+sub _get_tweets {
+    my ( $self, $who ) = @_;
+    my $ua = Mojo::UserAgent->new();
     $ua->request_timeout( $self->config->{twtxt}->{timeout} );
     $ua->max_redirects(5);
     my @tweets;
+    my $following = $self->config->{following};
+    if ($who) {
+        if ( exists $self->config->{following}->{$who} ) {
+            $following = { $who => $self->config->{following}->{$who} };
+        }
+        else {
+            return undef;
+        }
+    }
     Mojo::IOLoop->delay(
         sub {
             my $delay = shift;
-            while ( my ( $user, $url ) = each %{ $self->config->{following} } )
-            {
+            while ( my ( $user, $url ) = each %{$following} ) {
                 $delay->pass($user);
                 $ua->get( $url => $delay->begin );
             }
@@ -103,6 +111,12 @@ sub timeline {
           ? $b->timestamp->epoch <=> $a->timestamp->epoch
           : $a->timestamp->epoch <=> $b->timestamp->epoch
     } @tweets;
+    my $limit = $self->config->{twtxt}->{limit_timeline} - 1;
+    return @tweets[ 0 .. $limit ];
+}
+
+sub _display_tweets {
+    my ( $self, @tweets ) = @_;
     my $fh;
     if ( $self->config->{twtxt}->{use_pager} ) {
         IO::Pager->new($fh);
@@ -110,12 +124,12 @@ sub timeline {
     else {
         $fh = \*STDOUT;
     }
-    my $limit = $self->config->{twtxt}->{limit_timeline} - 1;
-    for my $tweet ( @tweets[ 0 .. $limit ] ) {
+    for my $tweet (@tweets) {
         printf {$fh} "%s %s: %s\n",
           $tweet->strftime( $self->config->{twtxt}->{time_format} ),
           $tweet->user, $tweet->text;
     }
+    return;
 }
 
 sub tweet {
@@ -125,6 +139,21 @@ sub tweet {
     $file->touch unless $file->exists;
     $file->append_utf8( $tweet->to_string . "\n" );
     return;
+}
+
+sub timeline {
+    my $self   = shift;
+    my @tweets = $self->_get_tweets();
+    $self->_display_tweets(@tweets);
+}
+
+sub view {
+    my ( $self, $who ) = @_;
+    if ( !$who ) {
+        die $self->name . ": Missing name for view.\n";
+    }
+    my @tweets = $self->_get_tweets($who);
+    $self->_display_tweets(@tweets);
 }
 
 sub follow {
