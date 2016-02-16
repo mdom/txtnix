@@ -108,8 +108,8 @@ sub _get_tweets {
     )->wait;
     @tweets = sort {
             $self->config->{twtxt}->{sorting} eq 'descending'
-          ? $b->timestamp->epoch <=> $a->timestamp->epoch
-          : $a->timestamp->epoch <=> $b->timestamp->epoch
+          ? $b->timestamp <=> $a->timestamp
+          : $a->timestamp <=> $b->timestamp
     } @tweets;
     my $limit = $self->config->{twtxt}->{limit_timeline} - 1;
     return @tweets[ 0 .. $limit ];

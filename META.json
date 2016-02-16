@@ -37,7 +37,6 @@
             "Getopt::Long" : "0",
             "HTTP::Date" : "0",
             "IO::Pager" : "0",
-            "Mojo::Date" : "0",
             "Mojo::UserAgent" : "0",
             "Moo" : "0",
             "POSIX" : "0",
