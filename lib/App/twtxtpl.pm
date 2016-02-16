@@ -9,7 +9,9 @@ use Mojo::UserAgent;
 use Moo;
 use App::twtxtpl::Tweet;
 use IO::Pager;
+use File::Basename qw(basename);
 
+has name => ( is => 'ro', default => sub { basename $0 } );
 has config => ( is => 'lazy' );
 has config_file =>
   ( is => 'ro', default => sub { path('~/.config/twtxt/config') } );
@@ -38,10 +40,15 @@ sub _build_config {
 
 sub run {
     my ( $self, $subcommand ) = splice( @_, 0, 2 );
-    if ( $self->can($subcommand) ) {
+    my %subcommands =
+      map { $_ => 1 } qw(timeline follow unfollow following tweet view );
+    if ( $subcommands{$subcommand} and $self->can($subcommand) ) {
         $self->$subcommand(@_);
     }
     $self->config->write( $self->config_file, 'utf8' );
+    else {
+        die $self->name . ": Unknown subcommand $subcommand.\n";
+    }
     return 0;
 
 }
