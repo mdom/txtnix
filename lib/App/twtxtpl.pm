@@ -10,7 +10,7 @@ use Moo;
 use App::twtxtpl::Tweet;
 use App::twtxtpl::Cache;
 use IO::Pager;
-use String::ShellQuote;
+use String::ShellQuote qw(shell_quote);
 use File::Basename qw(basename);
 
 our $VERSION = '0.01';
@@ -163,7 +163,20 @@ sub tweet {
     my $tweet = App::twtxtpl::Tweet->new( text => $text );
     my $file = path( $self->config->{twtxt}->{twtfile} );
     $file->touch unless $file->exists;
+
+    my $pre_hook  = $self->config->{twtxt}->{pre_tweet_hook};
+    my $post_hook = $self->config->{twtxt}->{post_tweet_hook};
+    my $twtfile   = shell_quote( $self->config->{twtxt}->{twtfile} );
+    if ($pre_hook) {
+        $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
+        system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
+    }
     $file->append_utf8( $tweet->to_string . "\n" );
+    if ($post_hook) {
+        $post_hook =~ s/\Q{twtfile}/$twtfile/ge;
+        system($post_hook) == 0
+          or die "Can't call post_tweet_hook $post_hook.\n";
+    }
     return;
 }
 
