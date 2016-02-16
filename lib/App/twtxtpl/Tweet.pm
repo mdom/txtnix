@@ -1,6 +1,7 @@
 package App::twtxtpl::Tweet;
 use strict;
 use warnings;
+use Mojo::Date;
 use HTTP::Date 'str2time';
 use POSIX ();
 use Moo;
@@ -14,13 +15,13 @@ has timestamp => (
 has text => ( is => 'ro' );
 
 sub to_timestamp {
-    return ref $_[0] eq 'Mojo::Date' ? $_[0] : Mojo::Date->new( $_[0] );
+    return
+      ref $_[0] eq 'Mojo::Date' ? $_[0] : Mojo::Date->new( str2time( $_[0] ) );
 }
 
 sub strftime {
     my ( $self, $format ) = @_;
-    $DB::single = 1;
-    return POSIX::strftime( $format, gmtime shift->timestamp->epoch );
+    return POSIX::strftime( $format, gmtime $self->timestamp->epoch );
 }
 
 sub to_string {
