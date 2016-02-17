@@ -57,7 +57,7 @@ sub _build_ua {
 sub BUILDARGS {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
-    my $config_file = path('~/.config/twtxt/config');
+    my $config_file = path( $args->{config_file} || '~/.config/twtxt/config' );
 
     my $cli = {};
     GetOptionsFromArray(
