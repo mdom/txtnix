@@ -12,70 +12,120 @@ use App::twtxtpl::Cache;
 use IO::Pager;
 use String::ShellQuote qw(shell_quote);
 use File::Basename qw(basename);
+use Pod::Usage qw(pod2usage);
+use Scalar::Util qw( refaddr );
+
+my %commands;
+
+sub MODIFY_CODE_ATTRIBUTES {
+    my ( $package, $addr, @attrs ) = @_;
+    my %attrs = map { $_ => 1 } @attrs;
+    $commands{ refaddr $_[1] } = 1 if $attrs{Command};
+    return;
+}
 
 our $VERSION = '0.01';
 
-has name => ( is => 'ro', default => sub { basename $0 } );
-has config => ( is => 'lazy' );
-has config_file =>
-  ( is => 'ro', default => sub { path('~/.config/twtxt/config') } );
-has ua => ( is => 'lazy' );
+has config_file => ( is => 'ro' );
+has ua          => ( is => 'lazy' );
+has name        => ( is => 'ro', default => sub { basename $0 } );
 has cache => ( is => 'ro', default => sub { App::twtxtpl::Cache->new() } );
+
+has use_pager         => ( is => 'ro', default => sub { 1 } );
+has twtfile           => ( is => 'ro', default => sub { path('~/twtxt') } );
+has sorting           => ( is => 'ro', default => sub { 'descending' } );
+has timeout           => ( is => 'ro', default => sub { 5 } );
+has use_cache         => ( is => 'ro', default => sub { 1 } );
+has limit_timeline    => ( is => 'ro', default => sub { 20 } );
+has time_format       => ( is => 'ro', default => sub { '%F %H:%M' } );
+has disclose_identity => ( is => 'ro', default => sub { 0 } );
+has check_following   => ( is => 'ro', default => sub { 1 } );
+has users             => ( is => 'ro' );
+has pre_tweet_hook    => ( is => 'ro' );
+has post_tweet_hook   => ( is => 'ro' );
 
 sub _build_ua {
     my $self = shift;
-    return Mojo::UserAgent->new()
-      ->request_timeout( $self->config->{twtxt}->{timeout} )->max_redirects(5);
+    return Mojo::UserAgent->new()->request_timeout( $self->timeout )
+      ->max_redirects(5);
 }
 
-sub _build_config {
+sub BUILDARGS {
+    my ( $class, @args ) = @_;
+    my $args = ref $args[0] ? $args[0] : {@args};
+    my $config_file = path('~/.config/twtxt/config');
+
+    my $cli = {};
+    GetOptionsFromArray(
+        \@ARGV,
+        'cache!'        => sub { $cli->{use_cache}      = $_[1]; },
+        'pager!'        => sub { $cli->{use_pager}      = $_[1]; },
+        'ascending'     => sub { $cli->{sorting}        = "$_[0]"; },
+        'descending'    => sub { $cli->{sorting}        = "$_[0]"; },
+        'sorting=s'     => sub { $cli->{sorting}        = $_[1]; },
+        'timeout=i'     => sub { $cli->{timeout}        = $_[1]; },
+        'twtfile|f=s'   => sub { $cli->{twtfile}        = $_[1]; },
+        'limit|l=i'     => sub { $cli->{limit_timeline} = $_[1]; },
+        'time-format=s' => sub { $cli->{time_format}    = $_[1]; },
+        'config|c=s'    => sub {
+            $config_file = path( $_[1] );
+            die "Configuration file $_[1] does not exists\n"
+              unless $config_file->exists;
+        }
+    ) or pod2usage(2);
+
+    $args->{config_file} = $config_file;
+
+    if ( $config_file->exists ) {
+        my $config = Config::Tiny->read( "$config_file", 'utf8' );
+        die "Could not read configuration file: " . $config->errstr . "\n"
+          if $config->errstr;
+        if ( $config->{twtxt} ) {
+            $args = { %{ $config->{twtxt} }, %$args };
+        }
+        if ( $config->{following} ) {
+            $args->{users} = $config->{following};
+        }
+    }
+
+    return { %$args, %$cli };
+}
+
+sub sync_followers {
     my ($self) = @_;
-    unless ( $self->config_file->exists ) {
+    if ( !$self->config_file->exists ) {
         $self->config_file->parent->mkpath;
         $self->config_file->touch;
     }
-    my $config   = Config::Tiny->read( $self->config_file->stringify );
-    my %defaults = (
-        check_following   => 1,
-        use_pager         => 1,
-        use_cache         => 1,
-        disclose_identity => 0,
-        limit_timeline    => 20,
-        timeout           => 5,
-        sorting           => 'descending',
-        time_format       => '%F %H:%M',
-        twtfile           => path('~/twtxt'),
-    );
-    $config->{twtxt} = { %defaults, %{ $config->{twtxt} || {} } };
-    return $config;
+    my $config = Config::Tiny->read( $self->config_file->stringify, 'utf8' );
+    die "Could not read configuration file: " . $config->errstr . "\n"
+      if $config->errstr;
+    $config->{following} = $self->users;
+    $config->write( $self->config_file, 'utf8' );
+    return;
 }
 
 sub run {
     my ( $self, $subcommand ) = splice( @_, 0, 2 );
-    my %subcommands =
-      map { $_ => 1 } qw(timeline follow unfollow following tweet view );
-    if ( $subcommands{$subcommand} and $self->can($subcommand) ) {
-        $self->$subcommand(@_);
+
+    my $method = $self->can($subcommand);
+    if ( $method && $commands{ refaddr $method} ) {
+        $self->$method(@_);
     }
     else {
-        die $self->name . ": Unknown subcommand $subcommand.\n";
+        pod2usage( -exitval => 1, -message => "Unknown command" );
     }
     return 0;
 
 }
 
-sub url_for_user {
-    my ( $self, $user ) = @_;
-    return $self->config->{following}->{$user};
-}
-
 sub _get_tweets {
     my ( $self, $who ) = @_;
     my @tweets;
-    my $following = $self->config->{following};
+    my $following = $self->users;
     if ($who) {
-        if ( exists $self->config->{following}->{$who} ) {
-            $following = { $who => $self->config->{following}->{$who} };
+        if ( exists $self->users->{$who} ) {
+            $following = { $who => $self->users->{$who} };
         }
         else {
             return;
@@ -101,7 +151,7 @@ sub _get_tweets {
                 if ( my $res = $tx->success ) {
                     my $body = $res->code == 304 ? $cache->{body} : $res->body;
                     if ( $res->code != 304 and $res->headers->last_modified ) {
-                        $self->cache->set( $self->url_for_user($user),
+                        $self->cache->set( $self->users->{$user},
                             $res->headers->last_modified, $body );
                     }
                     push @tweets, $self->parse_twtfile( $user, $body );
@@ -120,11 +170,11 @@ sub _get_tweets {
         }
     )->wait;
     @tweets = sort {
-            $self->config->{twtxt}->{sorting} eq 'descending'
+            $self->sorting eq 'descending'
           ? $b->timestamp <=> $a->timestamp
           : $a->timestamp <=> $b->timestamp
     } @tweets;
-    my $limit = $self->config->{twtxt}->{limit_timeline} - 1;
+    my $limit = $self->limit_timeline - 1;
     return @tweets[ 0 .. $limit ];
 }
 
@@ -144,7 +194,7 @@ sub parse_twtfile {
 sub _display_tweets {
     my ( $self, @tweets ) = @_;
     my $fh;
-    if ( $self->config->{twtxt}->{use_pager} ) {
+    if ( $self->use_pager ) {
         IO::Pager->new($fh);
     }
     else {
@@ -152,21 +202,21 @@ sub _display_tweets {
     }
     for my $tweet (@tweets) {
         printf {$fh} "%s %s: %s\n",
-          $tweet->strftime( $self->config->{twtxt}->{time_format} ),
+          $tweet->strftime( $self->time_format ),
           $tweet->user, $tweet->text;
     }
     return;
 }
 
-sub tweet {
+sub tweet : Command {
     my ( $self, $text ) = @_;
     my $tweet = App::twtxtpl::Tweet->new( text => $text );
-    my $file = path( $self->config->{twtxt}->{twtfile} );
+    my $file = path( $self->twtfile );
     $file->touch unless $file->exists;
 
-    my $pre_hook  = $self->config->{twtxt}->{pre_tweet_hook};
-    my $post_hook = $self->config->{twtxt}->{post_tweet_hook};
-    my $twtfile   = shell_quote( $self->config->{twtxt}->{twtfile} );
+    my $pre_hook  = $self->pre_tweet_hook;
+    my $post_hook = $self->post_tweet_hook;
+    my $twtfile   = shell_quote( $self->twtfile );
     if ($pre_hook) {
         $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
         system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
@@ -180,13 +230,13 @@ sub tweet {
     return;
 }
 
-sub timeline {
+sub timeline : Command {
     my $self   = shift;
     my @tweets = $self->_get_tweets();
     $self->_display_tweets(@tweets);
 }
 
-sub view {
+sub view : Command {
     my ( $self, $who ) = @_;
     if ( !$who ) {
         die $self->name . ": Missing name for view.\n";
@@ -195,25 +245,25 @@ sub view {
     $self->_display_tweets(@tweets);
 }
 
-sub follow {
+sub follow : Command {
     my ( $self, $whom, $url ) = @_;
-    $self->config->{following}->{$whom} = $url;
-    $self->config->write( $self->config_file, 'utf8' );
+    $self->users->{$whom} = $url;
+    $self->sync_followers;
     return;
 }
 
-sub unfollow {
-    my ( $self, $whom, $url ) = @_;
-    delete $self->config->{following}->{$whom};
-    $self->config->write( $self->config_file, 'utf8' );
+sub unfollow : Command {
+    my ( $self, $whom ) = @_;
+    delete $self->users->{$whom};
+    $self->sync_followers;
     print "You've unfollowed $whom.\n";
     return;
 }
 
-sub following {
+sub following : Command {
     my ( $self, $whom, $url ) = @_;
-    for my $user ( keys %{ $self->config->{following} } ) {
-        print "$user \@ " . $self->config->{following}->{$user} . "\n";
+    for my $user ( keys %{ $self->users } ) {
+        print "$user \@ " . $self->users->{$user} . "\n";
     }
     return;
 }

@@ -5,3 +5,28 @@ use warnings;
 use App::twtxtpl;
 
 exit App::twtxtpl->new()->run(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+twtxtpl - Decentralised, minimalist microblogging service for hackers
+
+=head1 SYNOPSIS
+
+twtxtpl [OPTIONS] COMMAND
+
+  Commands: tweet, timeline, view, follow, unfollow, following
+
+  Options:
+    --cache/--no-cache Cache remote twtxt files locally. (Default: True)
+    --timeout          Maximum time requests are allowed to take. (Default: 5.0)
+    --pager/--no-pager Use a pager to display content. (Default: False)
+    --ascending        Sort timeline in ascending order.
+    --descending       Sort timeline in descending order. (Default)
+    --time_format      Format to display timestamps. (Default: %F %H:%M)
+    --twtfile | -f     Location of your twtxt file. (Default: twtxt.txt)
+    --limit   | -l     Limit total number of shown tweets. (Default: 20)
+    --config  | -c     Specify a custom config file location.
