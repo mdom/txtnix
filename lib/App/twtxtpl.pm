@@ -41,7 +41,7 @@ has limit_timeline    => ( is => 'ro', default => sub { 20 } );
 has time_format       => ( is => 'ro', default => sub { '%F %H:%M' } );
 has disclose_identity => ( is => 'ro', default => sub { 0 } );
 has check_following   => ( is => 'ro', default => sub { 1 } );
-has users             => ( is => 'ro' );
+has users             => ( is => 'ro', default => sub { {} } );
 has pre_tweet_hook    => ( is => 'ro' );
 has post_tweet_hook   => ( is => 'ro' );
 
