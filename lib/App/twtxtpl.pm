@@ -6,6 +6,7 @@ use Getopt::Long qw(GetOptionsFromArray);
 use Config::Tiny;
 use Path::Tiny;
 use Mojo::UserAgent;
+use Mojo::ByteStream 'b';
 use Moo;
 use App::twtxtpl::Tweet;
 use App::twtxtpl::Cache;
@@ -213,7 +214,7 @@ sub _display_tweets {
 
 sub tweet : Command {
     my ( $self, $text ) = @_;
-    my $tweet = App::twtxtpl::Tweet->new( text => $text );
+    my $tweet = App::twtxtpl::Tweet->new( text => b($text)->decode );
     my $file = path( $self->twtfile );
     $file->touch unless $file->exists;
 
