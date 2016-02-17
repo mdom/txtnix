@@ -46,8 +46,11 @@ has post_tweet_hook   => ( is => 'ro' );
 
 sub _build_ua {
     my $self = shift;
-    return Mojo::UserAgent->new()->request_timeout( $self->timeout )
+    my $ua   = Mojo::UserAgent->new()->request_timeout( $self->timeout )
       ->max_redirects(5);
+    $ua->transactor->name(
+        "https://github.com/mdom/twtxtpl (Mojo/Perl) $VERSION");
+    return $ua;
 }
 
 sub BUILDARGS {
