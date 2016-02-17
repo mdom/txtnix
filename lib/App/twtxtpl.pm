@@ -86,8 +86,8 @@ sub BUILDARGS {
         if ( $config->{twtxt} ) {
             $args = { %{ $config->{twtxt} }, %$args };
         }
-        if ( $config->{following} ) {
-            $args->{users} = $config->{following};
+        if ( $config->{followings} ) {
+            $args->{users} = $config->{followings};
         }
     }
 
@@ -103,7 +103,7 @@ sub sync_followers {
     my $config = Config::Tiny->read( $self->config_file->stringify, 'utf8' );
     die "Could not read configuration file: " . $config->errstr . "\n"
       if $config->errstr;
-    $config->{following} = $self->users;
+    $config->{followings} = $self->users;
     $config->write( $self->config_file, 'utf8' );
     return;
 }
