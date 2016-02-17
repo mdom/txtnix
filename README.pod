@@ -6,7 +6,7 @@ twtxtpl - Decentralised, minimalist microblogging service for hackers
 
 =head1 SYNOPSIS
 
-twtxtpl [OPTIONS] COMMAND
+  twtxtpl [OPTIONS] COMMAND
 
   Commands: tweet, timeline, view, follow, unfollow, following
 
