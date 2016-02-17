@@ -205,6 +205,8 @@ sub _display_tweets {
         $fh = \*STDOUT;
     }
     for my $tweet (@tweets) {
+        my $text = $tweet->text;
+        $text = $self->collapse_mentions($text);
         printf {$fh} "%s %s: %s\n",
           $tweet->strftime( $self->time_format ),
           $tweet->user, $tweet->text;
@@ -212,17 +214,40 @@ sub _display_tweets {
     return;
 }
 
-sub format_mention {
+sub collapse_mentions {
+    my ( $self, $text ) = @_;
+    $text =~ s/\@<(?:(\w+) )?([^>]+)>/$self->collapse_mention($1,$2)/ge;
+    return $text;
+}
+
+sub collapse_mention {
+    my ( $self, $user, $url ) = @_;
+    my %urls = map { $self->users->{$_} => $_ } keys %{ $self->users };
+    if ( $urls{$url} ) {
+        return "\@$urls{$url}";
+    }
+    else {
+        return "\@<$user $url>";
+    }
+}
+
+sub expand_mentions {
+    my ( $self, $text ) = @_;
+    $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
+    return $text;
+}
+
+sub expand_mention {
     my ( $self, $user ) = @_;
-    return $self->users->{$1}
-      ? ( "\@<$user " . $self->users->{$1} . ">" )
+    return $self->users->{$user}
+      ? ( "\@<$user " . $self->users->{$user} . ">" )
       : "\@$user";
 }
 
 sub tweet : Command {
     my ( $self, $text ) = @_;
     $text = b($text)->decode;
-    $text =~ s/\@(\w+)/$self->format_mention($1)/ge;
+    $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
     my $tweet = App::twtxtpl::Tweet->new( text => $text );
     my $file = path( $self->twtfile );
     $file->touch unless $file->exists;
