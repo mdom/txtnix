@@ -212,9 +212,18 @@ sub _display_tweets {
     return;
 }
 
+sub format_mention {
+    my ( $self, $user ) = @_;
+    return $self->users->{$1}
+      ? ( "\@<$user " . $self->users->{$1} . ">" )
+      : "\@$user";
+}
+
 sub tweet : Command {
     my ( $self, $text ) = @_;
-    my $tweet = App::twtxtpl::Tweet->new( text => b($text)->decode );
+    $text = b($text)->decode;
+    $text =~ s/\@(\w+)/$self->format_mention($1)/ge;
+    my $tweet = App::twtxtpl::Tweet->new( text => $text );
     my $file = path( $self->twtfile );
     $file->touch unless $file->exists;
 
