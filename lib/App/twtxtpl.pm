@@ -149,12 +149,15 @@ sub _get_tweets {
         sub {
             my $delay = shift;
             while ( my ( $user, $url ) = each %{$following} ) {
-                my $cache = $self->cache->get($url);
+                my ( $cache, $params );
+                if ( $self->use_cache ) {
+                    $cache = $self->cache->get($url);
+                    if ($cache) {
+                        $params =
+                          { "If-Modified-Since" => $cache->{last_modified} };
+                    }
+                }
                 $delay->pass( $user, $cache );
-                my $params =
-                  $cache
-                  ? { "If-Modified-Since" => $cache->{last_modified} }
-                  : {};
                 $self->ua->get( $url => $params => $delay->begin );
             }
         },
@@ -166,8 +169,20 @@ sub _get_tweets {
 
                     $self->check_for_moved_url( $tx, $user );
 
-                    my $body = $res->code == 304 ? $cache->{body} : $res->body;
-                    if ( $res->code != 304 and $res->headers->last_modified ) {
+                    my $body = $res->body;
+                    if ( $res->code == 304 && $cache ) {
+                        $body = $cache->{body};
+                    }
+
+                    if ( !$body ) {
+                        warn "No $body for $user. Ignoring\n";
+                        next;
+                    }
+
+                    if (   $self->use_cache
+                        && $res->code == 200
+                        && $res->headers->last_modified )
+                    {
                         $self->cache->set( $self->users->{$user},
                             $res->headers->last_modified, $body );
                     }
