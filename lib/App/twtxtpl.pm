@@ -40,6 +40,7 @@ has use_cache         => ( is => 'rw', default => sub { 1 } );
 has limit_timeline    => ( is => 'rw', default => sub { 20 } );
 has time_format       => ( is => 'rw', default => sub { '%F %H:%M' } );
 has disclose_identity => ( is => 'rw', default => sub { 0 } );
+has embed_names       => ( is => 'rw', default => sub { 1 } );
 has check_following   => ( is => 'rw', default => sub { 1 } );
 has users             => ( is => 'rw', default => sub { {} } );
 has pre_tweet_hook    => ( is => 'rw' );
@@ -239,9 +240,15 @@ sub expand_mentions {
 
 sub expand_mention {
     my ( $self, $user ) = @_;
-    return $self->users->{$user}
-      ? ( "\@<$user " . $self->users->{$user} . ">" )
-      : "\@$user";
+    if ( $self->users->{$user} ) {
+        if ( $self->embed_names ) {
+            return "\@<$user " . $self->users->{$user} . ">";
+        }
+        else {
+            return '@<' . $self->users->{$user} . '>';
+        }
+    }
+    return "\@$user";
 }
 
 sub tweet : Command {
