@@ -32,18 +32,18 @@ has ua          => ( is => 'lazy' );
 has name        => ( is => 'ro', default => sub { basename $0 } );
 has cache => ( is => 'ro', default => sub { App::twtxtpl::Cache->new() } );
 
-has use_pager         => ( is => 'ro', default => sub { 1 } );
-has twtfile           => ( is => 'ro', default => sub { path('~/twtxt') } );
-has sorting           => ( is => 'ro', default => sub { 'descending' } );
-has timeout           => ( is => 'ro', default => sub { 5 } );
-has use_cache         => ( is => 'ro', default => sub { 1 } );
-has limit_timeline    => ( is => 'ro', default => sub { 20 } );
-has time_format       => ( is => 'ro', default => sub { '%F %H:%M' } );
-has disclose_identity => ( is => 'ro', default => sub { 0 } );
-has check_following   => ( is => 'ro', default => sub { 1 } );
-has users             => ( is => 'ro', default => sub { {} } );
-has pre_tweet_hook    => ( is => 'ro' );
-has post_tweet_hook   => ( is => 'ro' );
+has use_pager         => ( is => 'rw', default => sub { 1 } );
+has twtfile           => ( is => 'rw', default => sub { path('~/twtxt') } );
+has sorting           => ( is => 'rw', default => sub { 'descending' } );
+has timeout           => ( is => 'rw', default => sub { 5 } );
+has use_cache         => ( is => 'rw', default => sub { 1 } );
+has limit_timeline    => ( is => 'rw', default => sub { 20 } );
+has time_format       => ( is => 'rw', default => sub { '%F %H:%M' } );
+has disclose_identity => ( is => 'rw', default => sub { 0 } );
+has check_following   => ( is => 'rw', default => sub { 1 } );
+has users             => ( is => 'rw', default => sub { {} } );
+has pre_tweet_hook    => ( is => 'rw' );
+has post_tweet_hook   => ( is => 'rw' );
 
 sub _build_ua {
     my $self = shift;
