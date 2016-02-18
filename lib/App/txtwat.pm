@@ -247,12 +247,12 @@ sub tweet : Command {
     $text = b($text)->decode;
     $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
     my $tweet = App::txtwat::Tweet->new( text => $text );
-    my $file = path( $self->twtfile );
+    my $file = path( $self->config->twtfile );
     $file->touch unless $file->exists;
 
     my $pre_hook  = $self->config->pre_tweet_hook;
     my $post_hook = $self->config->post_tweet_hook;
-    my $twtfile   = shell_quote( $self->twtfile );
+    my $twtfile   = shell_quote( $self->config->twtfile );
     if ($pre_hook) {
         $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
         system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
