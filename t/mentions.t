@@ -14,7 +14,7 @@ is( $twtxt->expand_mentions('@foo'),
     '@<foo https://example.com/foo/twtxt.txt>' );
 is( $twtxt->expand_mentions('@bar'), '@bar' );
 
-$twtxt->embed_names(0);
+$twtxt->config->embed_names(0);
 is( $twtxt->expand_mentions('@foo'), '@<https://example.com/foo/twtxt.txt>' );
 
 done_testing;

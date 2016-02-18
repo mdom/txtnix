@@ -2,7 +2,6 @@ package App::twtxtpl;
 
 use strict;
 use warnings;
-use Getopt::Long qw(GetOptionsFromArray);
 use Config::Tiny;
 use Path::Tiny;
 use Mojo::UserAgent;
@@ -10,6 +9,7 @@ use Mojo::ByteStream 'b';
 use Moo;
 use App::twtxtpl::Tweet;
 use App::twtxtpl::Cache;
+use App::twtxtpl::Config;
 use IO::Pager;
 use String::ShellQuote qw(shell_quote);
 use File::Basename qw(basename);
@@ -27,40 +27,22 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 our $VERSION = '0.01';
 
-has config_file => ( is => 'ro' );
-has ua          => ( is => 'lazy' );
-has name        => ( is => 'ro', default => sub { basename $0 } );
-has cache => ( is => 'ro', default => sub { App::twtxtpl::Cache->new() } );
-
-has twtfile => (
-    is      => 'rw',
-    default => sub { path('~/twtxt') },
-    coerce  => sub { ref $_[0] ? $_[0] : path( $_[0] ) }
-);
-
-has use_pager         => ( is => 'rw', default => sub { 1 } );
-has sorting           => ( is => 'rw', default => sub { 'descending' } );
-has timeout           => ( is => 'rw', default => sub { 5 } );
-has use_cache         => ( is => 'rw', default => sub { 1 } );
-has limit_timeline    => ( is => 'rw', default => sub { 20 } );
-has time_format       => ( is => 'rw', default => sub { '%F %H:%M' } );
-has disclose_identity => ( is => 'rw', default => sub { 0 } );
-has rewrite_urls      => ( is => 'rw', default => sub { 1 } );
-has embed_names       => ( is => 'rw', default => sub { 1 } );
-has check_following   => ( is => 'rw', default => sub { 1 } );
-has users             => ( is => 'rw', default => sub { {} } );
-has nick              => ( is => 'rw' );
-has twturl            => ( is => 'rw' );
-has pre_tweet_hook    => ( is => 'rw' );
-has post_tweet_hook   => ( is => 'rw' );
+has config => ( is => 'ro' );
+has ua     => ( is => 'lazy' );
+has name   => ( is => 'ro', default => sub { basename $0 } );
+has cache  => ( is => 'ro', default => sub { App::twtxtpl::Cache->new() } );
 
 sub _build_ua {
     my $self = shift;
-    my $ua   = Mojo::UserAgent->new()->request_timeout( $self->timeout )
+    my $ua   = Mojo::UserAgent->new()->request_timeout( $self->config->timeout )
       ->max_redirects(5);
     my $ua_string = "twtxtpl/$VERSION";
-    if ( $self->disclose_identity && $self->nick && $self->twturl ) {
-        $ua_string .= ' (+' . $self->twturl . '; @' . $self->nick . ')';
+    if (   $self->config->disclose_identity
+        && $self->config->nick
+        && $self->config->twturl )
+    {
+        $ua_string .=
+          ' (+' . $self->config->twturl . '; @' . $self->config->nick . ')';
     }
     $ua->transactor->name($ua_string);
     return $ua;
@@ -69,59 +51,7 @@ sub _build_ua {
 sub BUILDARGS {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
-    my $config_file = path( $args->{config_file} || '~/.config/twtxt/config' );
-
-    my $cli = {};
-    GetOptionsFromArray(
-        \@ARGV,
-        'cache!'        => sub { $cli->{use_cache}      = $_[1]; },
-        'pager!'        => sub { $cli->{use_pager}      = $_[1]; },
-        'rewrite-urls!' => sub { $cli->{rewrite_urls}   = $_[1]; },
-        'ascending'     => sub { $cli->{sorting}        = "$_[0]"; },
-        'descending'    => sub { $cli->{sorting}        = "$_[0]"; },
-        'sorting=s'     => sub { $cli->{sorting}        = $_[1]; },
-        'timeout=i'     => sub { $cli->{timeout}        = $_[1]; },
-        'twtfile|f=s'   => sub { $cli->{twtfile}        = $_[1]; },
-        'twturl=s'      => sub { $cli->{twturl}         = $_[1]; },
-        'nick=s'        => sub { $cli->{nick}           = $_[1]; },
-        'limit|l=i'     => sub { $cli->{limit_timeline} = $_[1]; },
-        'time-format=s' => sub { $cli->{time_format}    = $_[1]; },
-        'config|c=s'    => sub {
-            $config_file = path( $_[1] );
-            die "Configuration file $_[1] does not exists\n"
-              unless $config_file->exists;
-        }
-    ) or pod2usage(2);
-
-    $args->{config_file} = $config_file;
-
-    if ( $config_file->exists ) {
-        my $config = Config::Tiny->read( "$config_file", 'utf8' );
-        die "Could not read configuration file: " . $config->errstr . "\n"
-          if $config->errstr;
-        if ( $config->{twtxt} ) {
-            $args = { %{ $config->{twtxt} }, %$args };
-        }
-        if ( $config->{following} ) {
-            $args->{users} = $config->{following};
-        }
-    }
-
-    return { %$args, %$cli };
-}
-
-sub sync_followers {
-    my ($self) = @_;
-    if ( !$self->config_file->exists ) {
-        $self->config_file->parent->mkpath;
-        $self->config_file->touch;
-    }
-    my $config = Config::Tiny->read( $self->config_file->stringify, 'utf8' );
-    die "Could not read configuration file: " . $config->errstr . "\n"
-      if $config->errstr;
-    $config->{following} = $self->users;
-    $config->write( $self->config_file, 'utf8' );
-    return;
+    return { config => App::twtxtpl::Config->new($args) };
 }
 
 sub run {
@@ -141,10 +71,10 @@ sub run {
 sub _get_tweets {
     my ( $self, $who ) = @_;
     my @tweets;
-    my $following = $self->users;
+    my $following = $self->config->users;
     if ($who) {
-        if ( exists $self->users->{$who} ) {
-            $following = { $who => $self->users->{$who} };
+        if ( exists $self->config->users->{$who} ) {
+            $following = { $who => $self->config->users->{$who} };
         }
         else {
             return;
@@ -155,7 +85,7 @@ sub _get_tweets {
             my $delay = shift;
             while ( my ( $user, $url ) = each %{$following} ) {
                 my ( $cache, $params );
-                if ( $self->use_cache ) {
+                if ( $self->config->use_cache ) {
                     $cache = $self->cache->get($url);
                     if ($cache) {
                         $params =
@@ -184,11 +114,11 @@ sub _get_tweets {
                         next;
                     }
 
-                    if (   $self->use_cache
+                    if (   $self->config->use_cache
                         && $res->code == 200
                         && $res->headers->last_modified )
                     {
-                        $self->cache->set( $self->users->{$user},
+                        $self->cache->set( $self->config->users->{$user},
                             $res->headers->last_modified, $body );
                     }
                     push @tweets, $self->parse_twtfile( $user, $body );
@@ -207,35 +137,37 @@ sub _get_tweets {
         }
     )->wait;
 
-    if ( $self->twtfile->exists ) {
+    if ( $self->config->twtfile->exists ) {
         push @tweets,
-          $self->parse_twtfile( $self->nick || $ENV{USER},
-            $self->twtfile->slurp_utf8 );
+          $self->parse_twtfile(
+            $self->config->nick || $ENV{USER},
+            $self->config->twtfile->slurp_utf8
+          );
     }
 
-    $self->cache->clean if $self->use_cache;
+    $self->cache->clean if $self->config->use_cache;
 
     @tweets = sort {
-            $self->sorting eq 'descending'
+            $self->config->sorting eq 'descending'
           ? $b->timestamp <=> $a->timestamp
           : $a->timestamp <=> $b->timestamp
     } @tweets;
-    my $limit = $self->limit_timeline - 1;
+    my $limit = $self->config->limit_timeline - 1;
     return @tweets[ 0 .. $limit ];
 }
 
 sub check_for_moved_url {
     my ( $self, $tx, $user ) = @_;
     my $redirect = $tx->redirects->[0];
-    if ( $redirect && $self->rewrite_urls ) {
+    if ( $redirect && $self->config->rewrite_urls ) {
         my $res = $redirect->res;
         if ( $res->code == 301 && $res->headers->location ) {
             warn 'Rewrite url from '
               . $redirect->req->url . ' to '
               . $res->headers->location
               . " after 301.\n";
-            $self->users->{$user} = $res->headers->location;
-            $self->sync_followers;
+            $self->config->users->{$user} = $res->headers->location;
+            $self->config->sync;
         }
     }
     return;
@@ -257,7 +189,7 @@ sub parse_twtfile {
 sub _display_tweets {
     my ( $self, @tweets ) = @_;
     my $fh;
-    if ( $self->use_pager ) {
+    if ( $self->config->use_pager ) {
         IO::Pager->new($fh);
     }
     else {
@@ -267,7 +199,7 @@ sub _display_tweets {
         my $text = $tweet->text;
         $text = $self->collapse_mentions($text);
         printf {$fh} "%s %s: %s\n",
-          $tweet->strftime( $self->time_format ),
+          $tweet->strftime( $self->config->time_format ),
           $tweet->user, $tweet->text;
     }
     return;
@@ -281,7 +213,8 @@ sub collapse_mentions {
 
 sub collapse_mention {
     my ( $self, $user, $url ) = @_;
-    my %urls = map { $self->users->{$_} => $_ } keys %{ $self->users };
+    my %urls =
+      map { $self->config->users->{$_} => $_ } keys %{ $self->config->users };
     if ( $urls{$url} ) {
         return "\@$urls{$url}";
     }
@@ -298,12 +231,12 @@ sub expand_mentions {
 
 sub expand_mention {
     my ( $self, $user ) = @_;
-    if ( $self->users->{$user} ) {
-        if ( $self->embed_names ) {
-            return "\@<$user " . $self->users->{$user} . ">";
+    if ( $self->config->users->{$user} ) {
+        if ( $self->config->embed_names ) {
+            return "\@<$user " . $self->config->users->{$user} . ">";
         }
         else {
-            return '@<' . $self->users->{$user} . '>';
+            return '@<' . $self->config->users->{$user} . '>';
         }
     }
     return "\@$user";
@@ -317,8 +250,8 @@ sub tweet : Command {
     my $file = path( $self->twtfile );
     $file->touch unless $file->exists;
 
-    my $pre_hook  = $self->pre_tweet_hook;
-    my $post_hook = $self->post_tweet_hook;
+    my $pre_hook  = $self->config->pre_tweet_hook;
+    my $post_hook = $self->config->post_tweet_hook;
     my $twtfile   = shell_quote( $self->twtfile );
     if ($pre_hook) {
         $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
@@ -350,19 +283,19 @@ sub view : Command {
 
 sub follow : Command {
     my ( $self, $whom, $url ) = @_;
-    $self->users->{$whom} = $url;
-    $self->sync_followers;
+    $self->config->users->{$whom} = $url;
+    $self->config->sync;
     return;
 }
 
 sub unfollow : Command {
     my ( $self, $whom ) = @_;
-    if ( not $self->users->{$whom} ) {
+    if ( not $self->config->users->{$whom} ) {
         print "You're not following $whom\n";
     }
     else {
-        delete $self->users->{$whom};
-        $self->sync_followers;
+        delete $self->config->users->{$whom};
+        $self->config->sync;
         print "You've unfollowed $whom.\n";
     }
     return;
@@ -370,8 +303,9 @@ sub unfollow : Command {
 
 sub following : Command {
     my ( $self, $whom, $url ) = @_;
-    for my $user ( keys %{ $self->users } ) {
-        print "$user \@ " . $self->users->{$user} . "\n";
+    my %following = %{ $self->config->users };
+    for my $user ( keys %following ) {
+        print "$user \@ " . $following{$user} . "\n";
     }
     return;
 }
