@@ -309,9 +309,14 @@ sub follow : Command {
 
 sub unfollow : Command {
     my ( $self, $whom ) = @_;
-    delete $self->users->{$whom};
-    $self->sync_followers;
-    print "You've unfollowed $whom.\n";
+    if ( not $self->users->{$whom} ) {
+        print "You're not following $whom\n";
+    }
+    else {
+        delete $self->users->{$whom};
+        $self->sync_followers;
+        print "You've unfollowed $whom.\n";
+    }
     return;
 }
 
