@@ -30,4 +30,13 @@ sub set {
         encode_json( { last_modified => $last_modified, body => $body } ) );
 }
 
+sub clean {
+    my ( $self, @valid_keys ) = @_;
+    my %valid_id = map { b($_)->b64_encode('') => 1 } @valid_keys;
+    for my $file ( $self->cache_dir->children ) {
+        $file->remove if not $valid_id{ $file->basename };
+    }
+    return;
+}
+
 1;

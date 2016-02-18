@@ -181,6 +181,9 @@ sub _get_tweets {
             }
         }
     )->wait;
+
+    $self->cache->clean if $self->use_cache;
+
     @tweets = sort {
             $self->sorting eq 'descending'
           ? $b->timestamp <=> $a->timestamp
