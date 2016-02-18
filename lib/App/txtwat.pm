@@ -1,4 +1,4 @@
-package App::twtxtpl;
+package App::txtwat;
 
 use strict;
 use warnings;
@@ -7,9 +7,9 @@ use Path::Tiny;
 use Mojo::UserAgent;
 use Mojo::ByteStream 'b';
 use Moo;
-use App::twtxtpl::Tweet;
-use App::twtxtpl::Cache;
-use App::twtxtpl::Config;
+use App::txtwat::Tweet;
+use App::txtwat::Cache;
+use App::txtwat::Config;
 use IO::Pager;
 use String::ShellQuote qw(shell_quote);
 use File::Basename qw(basename);
@@ -30,13 +30,13 @@ our $VERSION = '0.01';
 has config => ( is => 'ro' );
 has ua     => ( is => 'lazy' );
 has name   => ( is => 'ro', default => sub { basename $0 } );
-has cache  => ( is => 'ro', default => sub { App::twtxtpl::Cache->new() } );
+has cache  => ( is => 'ro', default => sub { App::txtwat::Cache->new() } );
 
 sub _build_ua {
     my $self = shift;
     my $ua   = Mojo::UserAgent->new()->request_timeout( $self->config->timeout )
       ->max_redirects(5);
-    my $ua_string = "twtxtpl/$VERSION";
+    my $ua_string = "txtwat/$VERSION";
     if (   $self->config->disclose_identity
         && $self->config->nick
         && $self->config->twturl )
@@ -51,7 +51,7 @@ sub _build_ua {
 sub BUILDARGS {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
-    return { config => App::twtxtpl::Config->new($args) };
+    return { config => App::txtwat::Config->new($args) };
 }
 
 sub run {
@@ -176,7 +176,7 @@ sub check_for_moved_url {
 sub parse_twtfile {
     my ( $self, $user, $string ) = @_;
     return map {
-        App::twtxtpl::Tweet->new(
+        App::txtwat::Tweet->new(
             user      => $user,
             timestamp => $_->[0],
             text      => $_->[1]
@@ -246,7 +246,7 @@ sub tweet : Command {
     my ( $self, $text ) = @_;
     $text = b($text)->decode;
     $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
-    my $tweet = App::twtxtpl::Tweet->new( text => $text );
+    my $tweet = App::txtwat::Tweet->new( text => $text );
     my $file = path( $self->twtfile );
     $file->touch unless $file->exists;
 
@@ -318,7 +318,7 @@ __END__
 
 =head1 NAME
 
-twtxtpl - Decentralised, minimalist microblogging service for hackers
+txtwat - Decentralised, minimalist microblogging service for hackers
 
 =head1 COPYRIGHT AND LICENSE
 

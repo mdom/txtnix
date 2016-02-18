@@ -1,4 +1,4 @@
-package App::twtxtpl::Config;
+package App::txtwat::Config;
 use strict;
 use warnings;
 use Moo;

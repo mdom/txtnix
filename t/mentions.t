@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
-use App::twtxtpl;
+use App::txtwat;
 use FindBin qw($Bin);
 
-my $twtxt = App::twtxtpl->new( config_file => "$Bin/config" );
+my $twtxt = App::txtwat->new( config_file => "$Bin/config" );
 
 is( $twtxt->collapse_mentions('@<foo https://example.com/foo/twtxt.txt>'),
     '@foo' );

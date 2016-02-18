@@ -1,4 +1,4 @@
-package App::twtxtpl::Tweet;
+package App::txtwat::Tweet;
 use strict;
 use warnings;
 use HTTP::Date 'str2time';
