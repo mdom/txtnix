@@ -7,14 +7,14 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Decentralised, minimalist microblogging service for hackers",
+  "ABSTRACT" => "Client for txtwt, the minimalist microblogging service for hackers",
   "AUTHOR" => "Mario Domgoergen C<< <mario\@domgoergen.com> >>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "App-twtxtpl",
   "EXE_FILES" => [
-    "bin/twtxtpl"
+    "bin/txtwat"
   ],
   "LICENSE" => "gpl",
   "NAME" => "App::twtxtpl",
@@ -36,6 +36,10 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
+  "TEST_REQUIRES" => {
+    "FindBin" => 0,
+    "Test::More" => 0
+  },
   "VERSION" => "0.01",
   "test" => {
     "TESTS" => "t/*.t"
@@ -47,6 +51,7 @@ my %FallbackPrereqs = (
   "Config::Tiny" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Basename" => 0,
+  "FindBin" => 0,
   "Getopt::Long" => 0,
   "HTTP::Date" => 0,
   "IO::Pager" => 0,
@@ -59,6 +64,7 @@ my %FallbackPrereqs = (
   "Pod::Usage" => 0,
   "Scalar::Util" => 0,
   "String::ShellQuote" => 0,
+  "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0
 );

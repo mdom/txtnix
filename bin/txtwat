@@ -2,9 +2,9 @@
 
 use strict;
 use warnings;
-use App::twtxtpl;
+use App::txtwat;
 
-exit App::twtxtpl->new()->run(@ARGV);
+exit App::txtwat->new()->run(@ARGV);
 
 __END__
 
@@ -12,11 +12,11 @@ __END__
 
 =head1 NAME
 
-twtxtpl - Decentralised, minimalist microblogging service for hackers
+txtwat - Client for twtxt, the minimalist microblogging service for hackers
 
 =head1 SYNOPSIS
 
-  twtxtpl [OPTIONS] COMMAND
+  txtwat [OPTIONS] COMMAND
 
   Commands: tweet, timeline, view, follow, unfollow, following
 
@@ -30,6 +30,17 @@ twtxtpl - Decentralised, minimalist microblogging service for hackers
     --twtfile | -f     Location of your twtxt file. (Default: twtxt.txt)
     --limit   | -l     Limit total number of shown tweets. (Default: 20)
     --config  | -c     Specify a custom config file location.
+
+=head1 DESCRIPTION
+
+I<txtwat> is a client for the decentralised, minimalist microblogging
+service for hackers L<https://github.com/buckket/twtxt>.
+
+Until i found time to write some documentation,
+you should check the very good documentation over at
+I<http://twtxt.readthedocs.org/en/latest/index.html>. Although i don't
+plan to reimplement every feature identically, the configuration options
+and commands should behave very similar at the moment.
 
 =head1 COPYRIGHT AND LICENSE
 

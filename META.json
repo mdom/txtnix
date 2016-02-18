@@ -1,5 +1,5 @@
 {
-   "abstract" : "Decentralised, minimalist microblogging service for hackers",
+   "abstract" : "Client for txtwt, the minimalist microblogging service for hackers",
    "author" : [
       "Mario Domgoergen C<< <mario@domgoergen.com> >>"
    ],
@@ -49,18 +49,24 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mdom/twtxtpl/issues"
+         "web" : "https://github.com/mdom/txtwat/issues"
       },
-      "homepage" : "https://github.com/mdom/twtxtpl",
+      "homepage" : "https://github.com/mdom/txtwat",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/mdom/twtxtpl.git",
-         "web" : "https://github.com/mdom/twtxtpl"
+         "url" : "https://github.com/mdom/txtwat.git",
+         "web" : "https://github.com/mdom/txtwat"
       }
    },
    "version" : "0.01",

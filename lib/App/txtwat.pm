@@ -318,7 +318,7 @@ __END__
 
 =head1 NAME
 
-txtwat - Decentralised, minimalist microblogging service for hackers
+txtwat - Client for txtwt, the minimalist microblogging service for hackers
 
 =head1 COPYRIGHT AND LICENSE
 
