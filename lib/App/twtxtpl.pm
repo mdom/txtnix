@@ -43,6 +43,8 @@ has disclose_identity => ( is => 'rw', default => sub { 0 } );
 has embed_names       => ( is => 'rw', default => sub { 1 } );
 has check_following   => ( is => 'rw', default => sub { 1 } );
 has users             => ( is => 'rw', default => sub { {} } );
+has nick              => ( is => 'rw' );
+has twturl            => ( is => 'rw' );
 has pre_tweet_hook    => ( is => 'rw' );
 has post_tweet_hook   => ( is => 'rw' );
 
@@ -50,8 +52,11 @@ sub _build_ua {
     my $self = shift;
     my $ua   = Mojo::UserAgent->new()->request_timeout( $self->timeout )
       ->max_redirects(5);
-    $ua->transactor->name(
-        "https://github.com/mdom/twtxtpl (Mojo/Perl) $VERSION");
+    my $ua_string = "twtxtpl/$VERSION";
+    if ( $self->disclose_identity && $self->nick && $self->twturl ) {
+        $ua_string .= ' (+' . $self->twturl . '; @' . $self->nick . ')';
+    }
+    $ua->transactor->name($ua_string);
     return $ua;
 }
 
@@ -70,6 +75,8 @@ sub BUILDARGS {
         'sorting=s'     => sub { $cli->{sorting}        = $_[1]; },
         'timeout=i'     => sub { $cli->{timeout}        = $_[1]; },
         'twtfile|f=s'   => sub { $cli->{twtfile}        = $_[1]; },
+        'twturl=s'      => sub { $cli->{twturl}         = $_[1]; },
+        'nick=s'        => sub { $cli->{nick}           = $_[1]; },
         'limit|l=i'     => sub { $cli->{limit_timeline} = $_[1]; },
         'time-format=s' => sub { $cli->{time_format}    = $_[1]; },
         'config|c=s'    => sub {

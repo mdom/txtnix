@@ -1,2 +1,6 @@
 [following]
 foo=https://example.com/foo/twtxt.txt
+
+[twtxt]
+nick=mdom
+twturl=http://www.domgoergen.com/twtxt.txt
