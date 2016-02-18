@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Moo;
 use Path::Tiny;
+use Pod::Usage qw(pod2usage);
 use Getopt::Long qw(GetOptionsFromArray);
 
 has twtfile => (
@@ -36,19 +37,20 @@ sub BUILDARGS {
     my $cli = {};
     GetOptionsFromArray(
         \@ARGV,
-        'cache!'        => sub { $cli->{use_cache}      = $_[1]; },
-        'pager!'        => sub { $cli->{use_pager}      = $_[1]; },
-        'rewrite-urls!' => sub { $cli->{rewrite_urls}   = $_[1]; },
-        'ascending'     => sub { $cli->{sorting}        = "$_[0]"; },
-        'descending'    => sub { $cli->{sorting}        = "$_[0]"; },
-        'sorting=s'     => sub { $cli->{sorting}        = $_[1]; },
-        'timeout=i'     => sub { $cli->{timeout}        = $_[1]; },
-        'twtfile|f=s'   => sub { $cli->{twtfile}        = $_[1]; },
-        'twturl=s'      => sub { $cli->{twturl}         = $_[1]; },
-        'nick=s'        => sub { $cli->{nick}           = $_[1]; },
+        'help|h'        => sub { pod2usage(1) },
+        'cache!'        => sub { $cli->{use_cache} = $_[1]; },
+        'pager!'        => sub { $cli->{use_pager} = $_[1]; },
+        'rewrite-urls!' => sub { $cli->{rewrite_urls} = $_[1]; },
+        'ascending'     => sub { $cli->{sorting} = "$_[0]"; },
+        'descending'    => sub { $cli->{sorting} = "$_[0]"; },
+        'sorting=s'     => sub { $cli->{sorting} = $_[1]; },
+        'timeout=i'     => sub { $cli->{timeout} = $_[1]; },
+        'twtfile|f=s'   => sub { $cli->{twtfile} = $_[1]; },
+        'twturl=s'      => sub { $cli->{twturl} = $_[1]; },
+        'nick=s'        => sub { $cli->{nick} = $_[1]; },
         'limit|l=i'     => sub { $cli->{limit_timeline} = $_[1]; },
-        'time-format=s' => sub { $cli->{time_format}    = $_[1]; },
-        'config|c=s'    => sub {
+        'time-format=s' => sub { $cli->{time_format} = $_[1]; },
+        'config|c=s' => sub {
             $config_file = path( $_[1] );
             die "Configuration file $_[1] does not exists\n"
               unless $config_file->exists;
