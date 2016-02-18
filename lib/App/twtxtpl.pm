@@ -32,8 +32,13 @@ has ua          => ( is => 'lazy' );
 has name        => ( is => 'ro', default => sub { basename $0 } );
 has cache => ( is => 'ro', default => sub { App::twtxtpl::Cache->new() } );
 
+has twtfile => (
+    is      => 'rw',
+    default => sub { path('~/twtxt') },
+    coerce  => sub { ref $_[0] ? $_[0] : path( $_[0] ) }
+);
+
 has use_pager         => ( is => 'rw', default => sub { 1 } );
-has twtfile           => ( is => 'rw', default => sub { path('~/twtxt') } );
 has sorting           => ( is => 'rw', default => sub { 'descending' } );
 has timeout           => ( is => 'rw', default => sub { 5 } );
 has use_cache         => ( is => 'rw', default => sub { 1 } );
@@ -201,6 +206,12 @@ sub _get_tweets {
             }
         }
     )->wait;
+
+    if ( $self->twtfile->exists ) {
+        push @tweets,
+          $self->parse_twtfile( $self->nick || $ENV{USER},
+            $self->twtfile->slurp_utf8 );
+    }
 
     $self->cache->clean if $self->use_cache;
 
