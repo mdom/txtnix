@@ -40,6 +40,7 @@ has use_cache         => ( is => 'rw', default => sub { 1 } );
 has limit_timeline    => ( is => 'rw', default => sub { 20 } );
 has time_format       => ( is => 'rw', default => sub { '%F %H:%M' } );
 has disclose_identity => ( is => 'rw', default => sub { 0 } );
+has rewrite_urls      => ( is => 'rw', default => sub { 1 } );
 has embed_names       => ( is => 'rw', default => sub { 1 } );
 has check_following   => ( is => 'rw', default => sub { 1 } );
 has users             => ( is => 'rw', default => sub { {} } );
@@ -70,6 +71,7 @@ sub BUILDARGS {
         \@ARGV,
         'cache!'        => sub { $cli->{use_cache}      = $_[1]; },
         'pager!'        => sub { $cli->{use_pager}      = $_[1]; },
+        'rewrite-urls!' => sub { $cli->{rewrite_urls}   = $_[1]; },
         'ascending'     => sub { $cli->{sorting}        = "$_[0]"; },
         'descending'    => sub { $cli->{sorting}        = "$_[0]"; },
         'sorting=s'     => sub { $cli->{sorting}        = $_[1]; },
@@ -161,6 +163,9 @@ sub _get_tweets {
             while ( my ( $user, $cache, $tx ) = splice( @results, 0, 3 ) ) {
 
                 if ( my $res = $tx->success ) {
+
+                    $self->check_for_moved_url( $tx, $user );
+
                     my $body = $res->code == 304 ? $cache->{body} : $res->body;
                     if ( $res->code != 304 and $res->headers->last_modified ) {
                         $self->cache->set( $self->users->{$user},
@@ -191,6 +196,23 @@ sub _get_tweets {
     } @tweets;
     my $limit = $self->limit_timeline - 1;
     return @tweets[ 0 .. $limit ];
+}
+
+sub check_for_moved_url {
+    my ( $self, $tx, $user ) = @_;
+    my $redirect = $tx->redirects->[0];
+    if ( $redirect && $self->rewrite_urls ) {
+        my $res = $redirect->res;
+        if ( $res->code == 301 && $res->headers->location ) {
+            warn 'Rewrite url from '
+              . $redirect->req->url . ' to '
+              . $res->headers->location
+              . " after 301.\n";
+            $self->users->{$user} = $res->headers->location;
+            $self->sync_followers;
+        }
+    }
+    return;
 }
 
 sub parse_twtfile {
