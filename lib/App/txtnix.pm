@@ -154,10 +154,6 @@ sub _get_tweets {
           : $a->timestamp <=> $b->timestamp
     } @tweets;
 
-    if ( $self->config->limit_to_new ) {
-        @tweets = grep { $_->timestamp >= $self->config->last_fetch } @tweets;
-    }
-
     my $limit = $self->config->limit_timeline - 1;
     return @tweets[ 0 .. $limit ];
 }
