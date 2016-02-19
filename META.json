@@ -60,13 +60,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mdom/txtwat/issues"
+         "web" : "https://github.com/mdom/txtnix/issues"
       },
-      "homepage" : "https://github.com/mdom/txtwat",
+      "homepage" : "https://github.com/mdom/txtnix",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/mdom/txtwat.git",
-         "web" : "https://github.com/mdom/txtwat"
+         "url" : "https://github.com/mdom/txtnix.git",
+         "web" : "https://github.com/mdom/txtnix"
       }
    },
    "version" : "0.01",
