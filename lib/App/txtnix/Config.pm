@@ -1,4 +1,4 @@
-package App::txtwat::Config;
+package App::txtnix::Config;
 use strict;
 use warnings;
 use Moo;
@@ -40,6 +40,7 @@ sub BUILDARGS {
         'help|h'        => sub { pod2usage(1) },
         'cache!'        => sub { $cli->{use_cache} = $_[1]; },
         'pager!'        => sub { $cli->{use_pager} = $_[1]; },
+        'new'           => sub { $cli->{limit_to_new} = $_[1]; },
         'rewrite-urls!' => sub { $cli->{rewrite_urls} = $_[1]; },
         'ascending'     => sub { $cli->{sorting} = "$_[0]"; },
         'descending'    => sub { $cli->{sorting} = "$_[0]"; },

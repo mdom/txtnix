@@ -2,11 +2,11 @@
 
 =head1 NAME
 
-txtwat - Client for twtxt, the minimalist microblogging service for hackers
+txtnix - Client for twtxt, the minimalist microblogging service for hackers
 
 =head1 SYNOPSIS
 
-  txtwat [OPTIONS] COMMAND
+  txtnix [OPTIONS] COMMAND
 
   Commands: tweet, timeline, view, follow, unfollow, following
 
@@ -23,7 +23,7 @@ txtwat - Client for twtxt, the minimalist microblogging service for hackers
 
 =head1 DESCRIPTION
 
-I<txtwat> is a client for the decentralised, minimalist microblogging
+I<txtnix> is a client for the decentralised, minimalist microblogging
 service for hackers L<https://github.com/buckket/twtxt>.
 
 Until i found time to write some documentation,

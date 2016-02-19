@@ -1,4 +1,4 @@
-package App::txtwat::Cache;
+package App::txtnix::Cache;
 use strict;
 use warnings;
 use Moo;
@@ -9,7 +9,7 @@ use Mojo::JSON qw(encode_json decode_json);
 has cache_dir => ( is => 'lazy' );
 
 sub _build_cache_dir {
-    my $dir = path('~/.cache/txtwat/');
+    my $dir = path('~/.cache/txtnix/');
     $dir->mkpath if not $dir->exists;
     return $dir;
 }

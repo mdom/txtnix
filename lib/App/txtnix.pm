@@ -1,4 +1,4 @@
-package App::txtwat;
+package App::txtnix;
 
 use strict;
 use warnings;
@@ -7,9 +7,9 @@ use Path::Tiny;
 use Mojo::UserAgent;
 use Mojo::ByteStream 'b';
 use Moo;
-use App::txtwat::Tweet;
-use App::txtwat::Cache;
-use App::txtwat::Config;
+use App::txtnix::Tweet;
+use App::txtnix::Cache;
+use App::txtnix::Config;
 use IO::Pager;
 use String::ShellQuote qw(shell_quote);
 use File::Basename qw(basename);
@@ -30,13 +30,13 @@ our $VERSION = '0.01';
 has config => ( is => 'ro' );
 has ua     => ( is => 'lazy' );
 has name   => ( is => 'ro', default => sub { basename $0 } );
-has cache  => ( is => 'ro', default => sub { App::txtwat::Cache->new() } );
+has cache  => ( is => 'ro', default => sub { App::txtnix::Cache->new() } );
 
 sub _build_ua {
     my $self = shift;
     my $ua   = Mojo::UserAgent->new()->request_timeout( $self->config->timeout )
       ->max_redirects(5);
-    my $ua_string = "txtwat/$VERSION";
+    my $ua_string = "txtnix/$VERSION";
     if (   $self->config->disclose_identity
         && $self->config->nick
         && $self->config->twturl )
@@ -51,7 +51,7 @@ sub _build_ua {
 sub BUILDARGS {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
-    return { config => App::txtwat::Config->new($args) };
+    return { config => App::txtnix::Config->new($args) };
 }
 
 sub run {
@@ -131,7 +131,6 @@ sub _get_tweets {
                         ? "$err->{code} response: $err->{message}"
                         : "Connection error: $err->{message}"
                       ) . "\n";
-
                 }
             }
         }
@@ -147,11 +146,18 @@ sub _get_tweets {
 
     $self->cache->clean if $self->config->use_cache;
 
+    $self->config->sync;
+
     @tweets = sort {
             $self->config->sorting eq 'descending'
           ? $b->timestamp <=> $a->timestamp
           : $a->timestamp <=> $b->timestamp
     } @tweets;
+
+    if ( $self->config->limit_to_new ) {
+        @tweets = grep { $_->timestamp >= $self->config->last_fetch } @tweets;
+    }
+
     my $limit = $self->config->limit_timeline - 1;
     return @tweets[ 0 .. $limit ];
 }
@@ -167,7 +173,6 @@ sub check_for_moved_url {
               . $res->headers->location
               . " after 301.\n";
             $self->config->users->{$user} = $res->headers->location;
-            $self->config->sync;
         }
     }
     return;
@@ -176,7 +181,7 @@ sub check_for_moved_url {
 sub parse_twtfile {
     my ( $self, $user, $string ) = @_;
     return map {
-        App::txtwat::Tweet->new(
+        App::txtnix::Tweet->new(
             user      => $user,
             timestamp => $_->[0],
             text      => $_->[1]
@@ -246,7 +251,7 @@ sub tweet : Command {
     my ( $self, $text ) = @_;
     $text = b($text)->decode;
     $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
-    my $tweet = App::txtwat::Tweet->new( text => $text );
+    my $tweet = App::txtnix::Tweet->new( text => $text );
     my $file = path( $self->config->twtfile );
     $file->touch unless $file->exists;
 
@@ -318,7 +323,7 @@ __END__
 
 =head1 NAME
 
-txtwat - Client for txtwt, the minimalist microblogging service for hackers
+txtnix - Client for txtwt, the minimalist microblogging service for hackers
 
 =head1 COPYRIGHT AND LICENSE
 

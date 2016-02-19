@@ -12,12 +12,12 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
-  "DISTNAME" => "App-twtxtpl",
+  "DISTNAME" => "App-txtnix",
   "EXE_FILES" => [
-    "bin/txtwat"
+    "bin/txtnix"
   ],
   "LICENSE" => "gpl",
-  "NAME" => "App::twtxtpl",
+  "NAME" => "App::txtnix",
   "PREREQ_PM" => {
     "Config::Tiny" => 0,
     "File::Basename" => 0,
