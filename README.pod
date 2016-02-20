@@ -26,7 +26,7 @@ txtnix - Client for twtxt, the minimalist microblogging service for hackers
 I<txtnix> is a client for the decentralised, minimalist microblogging
 service for hackers L<https://github.com/buckket/twtxt>.
 
-Until i found time to write some documentation,
+Until i find the time to write some documentation,
 you should check the very good documentation over at
 I<http://twtxt.readthedocs.org/en/latest/index.html>. Although i don't
 plan to reimplement every feature identically, the configuration options
