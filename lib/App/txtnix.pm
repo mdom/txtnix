@@ -145,9 +145,14 @@ sub _get_tweets {
           );
     }
 
+    $self->config->sync;
+
     $self->cache->clean if $self->config->use_cache;
 
-    $self->config->sync;
+    @tweets = grep {
+             $_->timestamp >= $self->config->since
+          && $_->timestamp <= $self->config->until
+    } @tweets;
 
     @tweets = sort {
             $self->config->sorting eq 'descending'

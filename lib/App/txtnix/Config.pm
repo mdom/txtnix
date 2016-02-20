@@ -2,6 +2,7 @@ package App::txtnix::Config;
 use strict;
 use warnings;
 use Moo;
+use HTTP::Date;
 use Path::Tiny;
 use Pod::Usage qw(pod2usage);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -28,6 +29,8 @@ has twturl            => ( is => 'rw' );
 has pre_tweet_hook    => ( is => 'rw' );
 has post_tweet_hook   => ( is => 'rw' );
 has file              => ( is => 'rw' );
+has since => ( is => 'rw', default => sub { 0 }, coerce => \&to_epoch );
+has until => ( is => 'rw', default => sub { time }, coerce => \&to_epoch );
 
 sub BUILDARGS {
     my ( $class, @args ) = @_;
@@ -49,6 +52,8 @@ sub BUILDARGS {
         'twtfile|f=s'   => sub { $cli->{twtfile} = $_[1]; },
         'twturl=s'      => sub { $cli->{twturl} = $_[1]; },
         'nick=s'        => sub { $cli->{nick} = $_[1]; },
+        'since=s'       => sub { $cli->{since} = $_[1]; },
+        'until=s'       => sub { $cli->{until} = $_[1]; },
         'limit|l=i'     => sub { $cli->{limit_timeline} = $_[1]; },
         'time-format=s' => sub { $cli->{time_format} = $_[1]; },
         'config|c=s' => sub {
@@ -73,6 +78,10 @@ sub BUILDARGS {
     }
 
     return { %$args, %$cli };
+}
+
+sub to_epoch {
+    return $_[0] =~ /[^\d]/ ? str2time( $_[0] ) : $_[0];
 }
 
 sub sync {
