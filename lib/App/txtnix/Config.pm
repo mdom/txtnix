@@ -28,14 +28,15 @@ has nick              => ( is => 'rw' );
 has twturl            => ( is => 'rw' );
 has pre_tweet_hook    => ( is => 'rw' );
 has post_tweet_hook   => ( is => 'rw' );
-has file              => ( is => 'rw' );
+has config_file       => ( is => 'rw' );
 has since => ( is => 'rw', default => sub { 0 }, coerce => \&to_epoch );
 has until => ( is => 'rw', default => sub { time }, coerce => \&to_epoch );
 
 sub BUILDARGS {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
-    my $config_file = path( $args->{config_file} || '~/.config/twtxt/config' );
+    $args->{config_file} =
+      path( $args->{config_file} || '~/.config/twtxt/config' );
 
     GetOptionsFromArray(
         \@ARGV,
@@ -56,16 +57,15 @@ sub BUILDARGS {
         'limit|l=i'     => sub { $args->{limit_timeline} = $_[1]; },
         'time-format=s' => sub { $args->{time_format} = $_[1]; },
         'config|c=s' => sub {
-            $config_file = path( $_[1] );
+            $args->{config_file} = path( $_[1] );
             die "Configuration file $_[1] does not exists\n"
-              unless $config_file->exists;
+              unless $args->{config_file}->exists;
         }
     ) or pod2usage(2);
 
-    $args->{file} = $config_file;
-
-    if ( $config_file->exists ) {
-        my $config = Config::Tiny->read( "$config_file", 'utf8' );
+    if ( $args->{config_file}->exists ) {
+        my $config =
+          Config::Tiny->read( $args->{config_file}->stringify, 'utf8' );
         die "Could not read configuration file: " . $config->errstr . "\n"
           if $config->errstr;
         if ( $config->{twtxt} ) {
@@ -85,15 +85,15 @@ sub to_epoch {
 
 sub sync {
     my ($self) = @_;
-    if ( !$self->file->exists ) {
-        $self->file->parent->mkpath;
-        $self->file->touch;
+    if ( !$self->config_file->exists ) {
+        $self->config_file->parent->mkpath;
+        $self->config_file->touch;
     }
-    my $config = Config::Tiny->read( $self->file->stringify, 'utf8' );
+    my $config = Config::Tiny->read( $self->config_file->stringify, 'utf8' );
     die "Could not read configuration file: " . $config->errstr . "\n"
       if $config->errstr;
     $config->{following} = $self->users;
-    $config->write( $self->file, 'utf8' );
+    $config->write( $self->config_file, 'utf8' );
     return;
 }
 
