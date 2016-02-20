@@ -37,25 +37,24 @@ sub BUILDARGS {
     my $args = ref $args[0] ? $args[0] : {@args};
     my $config_file = path( $args->{config_file} || '~/.config/twtxt/config' );
 
-    my $cli = {};
     GetOptionsFromArray(
         \@ARGV,
         'help|h'        => sub { pod2usage(1) },
-        'cache!'        => sub { $cli->{use_cache} = $_[1]; },
-        'pager!'        => sub { $cli->{use_pager} = $_[1]; },
-        'new'           => sub { $cli->{limit_to_new} = $_[1]; },
-        'rewrite-urls!' => sub { $cli->{rewrite_urls} = $_[1]; },
-        'ascending'     => sub { $cli->{sorting} = "$_[0]"; },
-        'descending'    => sub { $cli->{sorting} = "$_[0]"; },
-        'sorting=s'     => sub { $cli->{sorting} = $_[1]; },
-        'timeout=i'     => sub { $cli->{timeout} = $_[1]; },
-        'twtfile|f=s'   => sub { $cli->{twtfile} = $_[1]; },
-        'twturl=s'      => sub { $cli->{twturl} = $_[1]; },
-        'nick=s'        => sub { $cli->{nick} = $_[1]; },
-        'since=s'       => sub { $cli->{since} = $_[1]; },
-        'until=s'       => sub { $cli->{until} = $_[1]; },
-        'limit|l=i'     => sub { $cli->{limit_timeline} = $_[1]; },
-        'time-format=s' => sub { $cli->{time_format} = $_[1]; },
+        'cache!'        => sub { $args->{use_cache} = $_[1]; },
+        'pager!'        => sub { $args->{use_pager} = $_[1]; },
+        'new'           => sub { $args->{limit_to_new} = $_[1]; },
+        'rewrite-urls!' => sub { $args->{rewrite_urls} = $_[1]; },
+        'ascending'     => sub { $args->{sorting} = "$_[0]"; },
+        'descending'    => sub { $args->{sorting} = "$_[0]"; },
+        'sorting=s'     => sub { $args->{sorting} = $_[1]; },
+        'timeout=i'     => sub { $args->{timeout} = $_[1]; },
+        'twtfile|f=s'   => sub { $args->{twtfile} = $_[1]; },
+        'twturl=s'      => sub { $args->{twturl} = $_[1]; },
+        'nick=s'        => sub { $args->{nick} = $_[1]; },
+        'since=s'       => sub { $args->{since} = $_[1]; },
+        'until=s'       => sub { $args->{until} = $_[1]; },
+        'limit|l=i'     => sub { $args->{limit_timeline} = $_[1]; },
+        'time-format=s' => sub { $args->{time_format} = $_[1]; },
         'config|c=s' => sub {
             $config_file = path( $_[1] );
             die "Configuration file $_[1] does not exists\n"
@@ -77,7 +76,7 @@ sub BUILDARGS {
         }
     }
 
-    return { %$args, %$cli };
+    return $args;
 }
 
 sub to_epoch {
