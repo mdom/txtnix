@@ -45,6 +45,7 @@ sub _build_ua {
           ' (+' . $self->config->twturl . '; @' . $self->config->nick . ')';
     }
     $ua->transactor->name($ua_string);
+    $ua->proxy->detect;
     return $ua;
 }
 
