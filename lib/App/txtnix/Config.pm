@@ -66,10 +66,7 @@ sub BUILDARGS {
     ) or pod2usage(2);
 
     if ( $args->{config_file}->exists ) {
-        my $config =
-          Config::Tiny->read( $args->{config_file}->stringify, 'utf8' );
-        die "Could not read configuration file: " . $config->errstr . "\n"
-          if $config->errstr;
+        my $config = $class->read_file( $args->{config_file} );
         if ( $config->{twtxt} ) {
             $args = { %{ $config->{twtxt} }, %$args };
         }
@@ -79,6 +76,21 @@ sub BUILDARGS {
     }
 
     return $args;
+}
+
+sub write_file {
+    my ( $self, $config ) = @_;
+    $config->write( $self->config_file, 'utf8' );
+    return;
+}
+
+sub read_file {
+    my ( $self, $file ) = @_;
+    my $config =
+      Config::Tiny->read( $file || $self->config_file->stringify, 'utf8' );
+    die "Could not read configuration file: " . $config->errstr . "\n"
+      if $config->errstr;
+    return $config;
 }
 
 sub to_epoch {
@@ -91,11 +103,9 @@ sub sync {
         $self->config_file->parent->mkpath;
         $self->config_file->touch;
     }
-    my $config = Config::Tiny->read( $self->config_file->stringify, 'utf8' );
-    die "Could not read configuration file: " . $config->errstr . "\n"
-      if $config->errstr;
+    my $config = $self->read_file;
     $config->{following} = $self->users;
-    $config->write( $self->config_file, 'utf8' );
+    $self->write_file($config);
     return;
 }
 
