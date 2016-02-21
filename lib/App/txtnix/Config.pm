@@ -29,6 +29,7 @@ has twturl            => ( is => 'rw' );
 has pre_tweet_hook    => ( is => 'rw' );
 has post_tweet_hook   => ( is => 'rw' );
 has config_file       => ( is => 'rw' );
+has force             => ( is => 'rw' );
 has since => ( is => 'rw', default => sub { 0 }, coerce => \&to_epoch );
 has until => ( is => 'rw', default => sub { time }, coerce => \&to_epoch );
 
@@ -42,6 +43,7 @@ sub BUILDARGS {
         \@ARGV,
         'help|h'        => sub { pod2usage(1) },
         'cache!'        => sub { $args->{use_cache} = $_[1]; },
+        'force!'        => sub { $args->{force} = $_[1]; },
         'pager!'        => sub { $args->{use_pager} = $_[1]; },
         'new'           => sub { $args->{limit_to_new} = $_[1]; },
         'rewrite-urls!' => sub { $args->{rewrite_urls} = $_[1]; },

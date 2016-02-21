@@ -289,8 +289,20 @@ sub view : Command {
 
 sub follow : Command {
     my ( $self, $whom, $url ) = @_;
-    $self->config->users->{$whom} = $url;
-    $self->config->sync;
+    if (    $self->config->users->{$whom}
+        and $self->config->users->{$whom} eq $url )
+    {
+        print "You're already following $whom.\n";
+        return;
+    }
+    elsif ( $self->config->users->{$whom} && not $self->config->force ) {
+        print "You’re already following $whom under a differant url.";
+    }
+    else {
+        print "You’re now following $whom.\n";
+        $self->config->users->{$whom} = $url;
+        $self->config->sync;
+    }
     return;
 }
 
