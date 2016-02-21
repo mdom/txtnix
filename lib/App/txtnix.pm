@@ -69,7 +69,7 @@ sub run {
 
 }
 
-sub _get_tweets {
+sub get_tweets {
     my ( $self, $who ) = @_;
     my @tweets;
     my $following = $self->config->users;
@@ -193,7 +193,7 @@ sub parse_twtfile {
       split( /\n/, $string );
 }
 
-sub _display_tweets {
+sub display_tweets {
     my ( $self, @tweets ) = @_;
     my $fh;
     if ( $self->config->use_pager ) {
@@ -275,8 +275,8 @@ sub tweet : Command {
 
 sub timeline : Command {
     my $self   = shift;
-    my @tweets = $self->_get_tweets();
-    $self->_display_tweets(@tweets);
+    my @tweets = $self->get_tweets();
+    $self->display_tweets(@tweets);
 }
 
 sub view : Command {
@@ -284,8 +284,8 @@ sub view : Command {
     if ( !$who ) {
         die $self->name . ": Missing name for view.\n";
     }
-    my @tweets = $self->_get_tweets($who);
-    $self->_display_tweets(@tweets);
+    my @tweets = $self->get_tweets($who);
+    $self->display_tweets(@tweets);
 }
 
 sub follow : Command {
