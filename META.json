@@ -44,7 +44,6 @@
             "POSIX" : "0",
             "Path::Tiny" : "0",
             "Pod::Usage" : "0",
-            "Scalar::Util" : "0",
             "String::ShellQuote" : "0",
             "strict" : "0",
             "warnings" : "0"
