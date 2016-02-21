@@ -210,15 +210,25 @@ sub collapse_mentions {
 
 sub collapse_mention {
     my ( $self, $user, $url ) = @_;
-    my %urls =
-      map { $self->config->following->{$_} => $_ }
-      keys %{ $self->config->following };
+    my $known_users = $self->known_users;
+    my %urls = map { $known_users->{$_} => $_ } keys %{$known_users};
     if ( $urls{$url} ) {
         return "\@$urls{$url}";
     }
     else {
         return "\@<$user $url>";
     }
+}
+
+sub known_users {
+    my $self = shift;
+    if ( $self->config->nick and $self->config->twturl ) {
+        return {
+            $self->config->nick => $self->config->twturl,
+            %{ $self->config->following }
+        };
+    }
+    return $self->config->following;
 }
 
 sub expand_mentions {
@@ -229,12 +239,13 @@ sub expand_mentions {
 
 sub expand_mention {
     my ( $self, $user ) = @_;
-    if ( $self->config->following->{$user} ) {
+    my $known_users = $self->known_users;
+    if ( $known_users->{$user} ) {
         if ( $self->config->embed_names ) {
-            return "\@<$user " . $self->config->following->{$user} . ">";
+            return "\@<$user " . $known_users->{$user} . ">";
         }
         else {
-            return '@<' . $self->config->following->{$user} . '>';
+            return '@<' . $known_users->{$user} . '>';
         }
     }
     return "\@$user";
