@@ -319,6 +319,66 @@ sub cmd_following {
     return;
 }
 
+sub cmd_config {
+    my ( $self, $command, @args ) = @_;
+
+    pod2usage(2) if !$command;
+
+    $command = "cmd_config_$command";
+    if ( $self->can($command) ) {
+        $self->$command(@args);
+    }
+    else {
+        pod2usage(2);
+    }
+    return;
+}
+
+sub cmd_config_edit {
+    my $self = shift;
+    my $editor = $ENV{VISUAL} || $ENV{EDITOR} || 'vi';
+    system( $editor, $self->config->config_file ) == 0
+      or die "Can't edit configuration file: $!\n";
+    return;
+}
+
+sub cmd_config_get {
+    my ( $self, $key ) = @_;
+
+    pod2usage(2) if !$key;
+
+    my $config = $self->config->read_file;
+    if ( exists $config->{twtxt}->{$key} ) {
+        print $config->{twtxt}->{$key} . "\n";
+    }
+    else {
+        warn "Configuration key $key unset.\n";
+    }
+    return;
+}
+
+sub cmd_config_set {
+    my ( $self, $key, $value ) = @_;
+
+    pod2usage(2) if !$key || !defined $value;
+
+    my $config = $self->config->read_file;
+    $config->{twtxt}->{$key} = $value;
+    $self->config->write_file($config);
+    return;
+}
+
+sub cmd_config_remove {
+    my ( $self, $key ) = @_;
+
+    pod2usage(2) if !$key;
+
+    my $config = $self->config->read_file;
+    delete $config->{twtxt}->{$key};
+    $self->config->write_file($config);
+    return;
+}
+
 1;
 
 __END__
