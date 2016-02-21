@@ -206,7 +206,7 @@ sub display_tweets {
         $text = $self->collapse_mentions($text);
         printf {$fh} "%s %s: %s\n",
           $tweet->strftime( $self->config->time_format ),
-          $tweet->user, $tweet->text;
+          $tweet->user, $text;
     }
     return;
 }
