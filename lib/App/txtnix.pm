@@ -14,16 +14,6 @@ use IO::Pager;
 use String::ShellQuote qw(shell_quote);
 use File::Basename qw(basename);
 use Pod::Usage qw(pod2usage);
-use Scalar::Util qw( refaddr );
-
-my %commands;
-
-sub MODIFY_CODE_ATTRIBUTES {
-    my ( $package, $addr, @attrs ) = @_;
-    my %attrs = map { $_ => 1 } @attrs;
-    $commands{ refaddr $_[1] } = 1 if $attrs{Command};
-    return;
-}
 
 our $VERSION = '0.01';
 
@@ -55,10 +45,11 @@ sub BUILDARGS {
 }
 
 sub run {
-    my ( $self, $subcommand ) = splice( @_, 0, 2 );
+    my ( $self, $command ) = splice( @_, 0, 2 );
 
-    my $method = $self->can($subcommand);
-    if ( $method && $commands{ refaddr $method} ) {
+    $command = "cmd_$command";
+
+    if ( my $method = $self->can($command) ) {
         $self->$method(@_);
     }
     else {
@@ -248,7 +239,7 @@ sub expand_mention {
     return "\@$user";
 }
 
-sub tweet : Command {
+sub cmd_tweet {
     my ( $self, $text ) = @_;
     $text = b($text)->decode;
     $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
@@ -272,13 +263,13 @@ sub tweet : Command {
     return;
 }
 
-sub timeline : Command {
+sub cmd_timeline {
     my $self   = shift;
     my @tweets = $self->get_tweets();
     $self->display_tweets(@tweets);
 }
 
-sub view : Command {
+sub cmd_view {
     my ( $self, $who ) = @_;
     if ( !$who ) {
         die $self->name . ": Missing name for view.\n";
@@ -287,7 +278,7 @@ sub view : Command {
     $self->display_tweets(@tweets);
 }
 
-sub follow : Command {
+sub cmd_follow {
     my ( $self, $whom, $url ) = @_;
     if (    $self->config->users->{$whom}
         and $self->config->users->{$whom} eq $url )
@@ -306,7 +297,7 @@ sub follow : Command {
     return;
 }
 
-sub unfollow : Command {
+sub cmd_unfollow {
     my ( $self, $whom ) = @_;
     if ( not $self->config->users->{$whom} ) {
         print "You're not following $whom\n";
@@ -319,7 +310,7 @@ sub unfollow : Command {
     return;
 }
 
-sub following : Command {
+sub cmd_following {
     my ( $self, $whom, $url ) = @_;
     my %following = %{ $self->config->users };
     for my $user ( keys %following ) {
