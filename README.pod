@@ -8,7 +8,7 @@ txtnix - Client for twtxt, the minimalist microblogging service for hackers
 
   txtnix [OPTIONS] COMMAND
 
-  Commands: tweet, timeline, view, follow, unfollow, following
+  Commands: tweet, timeline, view, follow, unfollow, following, config
 
   Options:
     --cache/--no-cache Cache remote twtxt files locally. (Default: True)
@@ -20,6 +20,13 @@ txtnix - Client for twtxt, the minimalist microblogging service for hackers
     --twtfile | -f     Location of your twtxt file. (Default: twtxt.txt)
     --limit   | -l     Limit total number of shown tweets. (Default: 20)
     --config  | -c     Specify a custom config file location.
+
+  Examples:
+
+    $ txtnix config get    disclose_identity
+    $ txtnix config set    disclose_identity 0
+    $ txtnix config remove disclose_identify
+    $ txtnix config edit
 
 =head1 DESCRIPTION
 
