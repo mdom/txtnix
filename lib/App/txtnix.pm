@@ -62,10 +62,10 @@ sub run {
 sub get_tweets {
     my ( $self, $who ) = @_;
     my @tweets;
-    my $following = $self->config->users;
+    my $following = $self->config->following;
     if ($who) {
-        if ( exists $self->config->users->{$who} ) {
-            $following = { $who => $self->config->users->{$who} };
+        if ( exists $self->config->following->{$who} ) {
+            $following = { $who => $self->config->following->{$who} };
         }
         else {
             return;
@@ -109,7 +109,7 @@ sub get_tweets {
                         && $res->code == 200
                         && $res->headers->last_modified )
                     {
-                        $self->cache->set( $self->config->users->{$user},
+                        $self->cache->set( $self->config->following->{$user},
                             $res->headers->last_modified, $body );
                     }
                     push @tweets, $self->parse_twtfile( $user, $body );
@@ -164,7 +164,7 @@ sub check_for_moved_url {
               . $redirect->req->url . ' to '
               . $res->headers->location
               . " after 301.\n";
-            $self->config->users->{$user} = $res->headers->location;
+            $self->config->following->{$user} = $res->headers->location;
         }
     }
     return;
@@ -211,7 +211,8 @@ sub collapse_mentions {
 sub collapse_mention {
     my ( $self, $user, $url ) = @_;
     my %urls =
-      map { $self->config->users->{$_} => $_ } keys %{ $self->config->users };
+      map { $self->config->following->{$_} => $_ }
+      keys %{ $self->config->following };
     if ( $urls{$url} ) {
         return "\@$urls{$url}";
     }
@@ -228,12 +229,12 @@ sub expand_mentions {
 
 sub expand_mention {
     my ( $self, $user ) = @_;
-    if ( $self->config->users->{$user} ) {
+    if ( $self->config->following->{$user} ) {
         if ( $self->config->embed_names ) {
-            return "\@<$user " . $self->config->users->{$user} . ">";
+            return "\@<$user " . $self->config->following->{$user} . ">";
         }
         else {
-            return '@<' . $self->config->users->{$user} . '>';
+            return '@<' . $self->config->following->{$user} . '>';
         }
     }
     return "\@$user";
@@ -280,18 +281,18 @@ sub cmd_view {
 
 sub cmd_follow {
     my ( $self, $whom, $url ) = @_;
-    if (    $self->config->users->{$whom}
-        and $self->config->users->{$whom} eq $url )
+    if (    $self->config->following->{$whom}
+        and $self->config->following->{$whom} eq $url )
     {
         print "You're already following $whom.\n";
         return;
     }
-    elsif ( $self->config->users->{$whom} && not $self->config->force ) {
+    elsif ( $self->config->following->{$whom} && not $self->config->force ) {
         print "You’re already following $whom under a differant url.";
     }
     else {
         print "You’re now following $whom.\n";
-        $self->config->users->{$whom} = $url;
+        $self->config->following->{$whom} = $url;
         $self->config->sync;
     }
     return;
@@ -299,11 +300,11 @@ sub cmd_follow {
 
 sub cmd_unfollow {
     my ( $self, $whom ) = @_;
-    if ( not $self->config->users->{$whom} ) {
+    if ( not $self->config->following->{$whom} ) {
         print "You're not following $whom\n";
     }
     else {
-        delete $self->config->users->{$whom};
+        delete $self->config->following->{$whom};
         $self->config->sync;
         print "You've unfollowed $whom.\n";
     }
@@ -312,7 +313,7 @@ sub cmd_unfollow {
 
 sub cmd_following {
     my ( $self, $whom, $url ) = @_;
-    my %following = %{ $self->config->users };
+    my %following = %{ $self->config->following };
     for my $user ( keys %following ) {
         print "$user \@ " . $following{$user} . "\n";
     }

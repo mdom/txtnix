@@ -23,7 +23,7 @@ has disclose_identity => ( is => 'rw', default => sub { 0 } );
 has rewrite_urls      => ( is => 'rw', default => sub { 1 } );
 has embed_names       => ( is => 'rw', default => sub { 1 } );
 has check_following   => ( is => 'rw', default => sub { 1 } );
-has users             => ( is => 'rw', default => sub { {} } );
+has following         => ( is => 'rw', default => sub { {} } );
 has nick              => ( is => 'rw' );
 has twturl            => ( is => 'rw' );
 has pre_tweet_hook    => ( is => 'rw' );
@@ -71,7 +71,7 @@ sub BUILDARGS {
             $args = { %{ $config->{twtxt} }, %$args };
         }
         if ( $config->{following} ) {
-            $args->{users} = $config->{following};
+            $args->{following} = $config->{following};
         }
     }
 
@@ -104,7 +104,7 @@ sub sync {
         $self->config_file->touch;
     }
     my $config = $self->read_file;
-    $config->{following} = $self->users;
+    $config->{following} = $self->following;
     $self->write_file($config);
     return;
 }
