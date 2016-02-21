@@ -51,8 +51,7 @@ sub _build_ua {
 
 sub BUILDARGS {
     my ( $class, @args ) = @_;
-    my $args = ref $args[0] ? $args[0] : {@args};
-    return { config => App::txtnix::Config->new($args) };
+    return { config => App::txtnix::Config->new(@args) };
 }
 
 sub run {
