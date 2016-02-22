@@ -12,14 +12,13 @@ use App::txtnix::Cache;
 use App::txtnix::Config;
 use IO::Pager;
 use String::ShellQuote qw(shell_quote);
-use File::Basename qw(basename);
 use Pod::Usage qw(pod2usage);
 
 our $VERSION = '0.01';
 
 has config => ( is => 'ro' );
 has ua     => ( is => 'lazy' );
-has name   => ( is => 'ro', default => sub { basename $0 } );
+has name   => ( is => 'ro', default => sub { path($0)->basename } );
 has cache  => ( is => 'ro', default => sub { App::txtnix::Cache->new() } );
 
 sub _build_ua {

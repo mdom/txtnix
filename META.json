@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "Config::Tiny" : "0",
-            "File::Basename" : "0",
             "Getopt::Long" : "0",
             "HTTP::Date" : "0",
             "IO::Pager" : "0",
