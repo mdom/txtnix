@@ -138,6 +138,12 @@ sub get_tweets {
 
     $self->cache->clean if $self->config->use_cache;
 
+    return $self->filter_tweets(@tweets);
+}
+
+sub filter_tweets {
+    my ( $self, @tweets ) = @_;
+
     @tweets = grep {
              $_->timestamp >= $self->config->since
           && $_->timestamp <= $self->config->until
