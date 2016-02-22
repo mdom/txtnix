@@ -36,7 +36,10 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "FindBin" => 0,
-    "Test::More" => 0
+    "Mojo::UserAgent::Server" => 0,
+    "Mojolicious::Lite" => 0,
+    "Test::More" => 0,
+    "Test::Output" => 0
   },
   "VERSION" => "0.01",
   "test" => {
@@ -55,12 +58,15 @@ my %FallbackPrereqs = (
   "Mojo::ByteStream" => 0,
   "Mojo::JSON" => 0,
   "Mojo::UserAgent" => 0,
+  "Mojo::UserAgent::Server" => 0,
+  "Mojolicious::Lite" => 0,
   "Moo" => 0,
   "POSIX" => 0,
   "Path::Tiny" => 0,
   "Pod::Usage" => 0,
   "String::ShellQuote" => 0,
   "Test::More" => 0,
+  "Test::Output" => 0,
   "strict" => 0,
   "warnings" => 0
 );
