@@ -30,4 +30,7 @@ is( $tweets[0]->text, 'Whoo!' );
 is( @tweets,          1 );
 is( $tweets[0]->text, 'Tweet!' );
 
+@tweets = $app->get_tweets('charlie');
+is( @tweets, 0 );
+
 done_testing;
