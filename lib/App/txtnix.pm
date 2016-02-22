@@ -155,8 +155,8 @@ sub filter_tweets {
           : $a->timestamp <=> $b->timestamp
     } @tweets;
 
-    my $limit = $self->config->limit_timeline - 1;
-    return @tweets[ 0 .. $limit ];
+    my $limit = $self->config->limit_timeline;
+    return @tweets > $limit ? @tweets[ 0 .. $limit - 1 ] : @tweets;
 }
 
 sub check_for_moved_url {
