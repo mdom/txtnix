@@ -317,7 +317,7 @@ sub cmd_follow {
 sub cmd_unfollow {
     my ( $self, $whom ) = @_;
     if ( not $self->config->following->{$whom} ) {
-        print "You're not following $whom\n";
+        print "You're not following $whom.\n";
     }
     else {
         delete $self->config->following->{$whom};
@@ -369,7 +369,7 @@ sub cmd_config_get {
         print $config->{twtxt}->{$key} . "\n";
     }
     else {
-        warn "Configuration key $key unset.\n";
+        print "The configuration key $key is unset.\n";
     }
     return;
 }
