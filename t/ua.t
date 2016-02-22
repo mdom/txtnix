@@ -3,16 +3,44 @@ use warnings;
 use Test::More;
 use App::txtnix;
 use FindBin qw($Bin);
+use Path::Tiny;
 
-my $twtxt = App::txtnix->new( config_file => "$Bin/config" );
+my $empty_config = Path::Tiny->tempfile;
 
-is( $twtxt->ua->transactor->name, "txtnix/$App::txtnix::VERSION" );
+my $app;
 
-$twtxt =
-  App::txtnix->new( config_file => "$Bin/config", disclose_identity => 1 );
+$app = App::txtnix->new(
+    nick              => 'mdom',
+    twturl            => 'http://www.domgoergen.com/twtxt.txt',
+    disclose_identity => 0,
+    config_file       => "$empty_config"
+);
 
-is( $twtxt->ua->transactor->name,
+is( $app->ua->transactor->name, "txtnix/$App::txtnix::VERSION" );
+
+$app = App::txtnix->new(
+    nick              => 'mdom',
+    twturl            => 'http://www.domgoergen.com/twtxt.txt',
+    disclose_identity => 1,
+    config_file       => "$empty_config"
+);
+
+is( $app->ua->transactor->name,
 "txtnix/$App::txtnix::VERSION (+http://www.domgoergen.com/twtxt.txt; \@mdom)"
 );
+
+$app = App::txtnix->new(
+    twturl            => 'http://www.domgoergen.com/twtxt.txt',
+    disclose_identity => 1,
+    config_file       => "$empty_config"
+);
+is( $app->ua->transactor->name, "txtnix/$App::txtnix::VERSION" );
+
+$app = App::txtnix->new(
+    nick              => 'mdom',
+    disclose_identity => 1,
+    config_file       => "$empty_config"
+);
+is( $app->ua->transactor->name, "txtnix/$App::txtnix::VERSION" );
 
 done_testing;
