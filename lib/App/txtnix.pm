@@ -46,16 +46,13 @@ sub BUILDARGS {
 sub run {
     my ( $self, $command ) = splice( @_, 0, 2 );
 
-    $command = "cmd_$command";
-
-    if ( my $method = $self->can($command) ) {
+    if ( $command and my $method = $self->can("cmd_$command") ) {
         $self->$method(@_);
     }
     else {
         pod2usage( -exitval => 1, -message => "Unknown command" );
     }
     return 0;
-
 }
 
 sub get_tweets {
