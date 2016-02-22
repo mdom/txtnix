@@ -304,10 +304,10 @@ sub cmd_follow {
         return;
     }
     elsif ( $self->config->following->{$whom} && not $self->config->force ) {
-        print "You’re already following $whom under a differant url.";
+        print "You're already following $whom under a differant url.\n";
     }
     else {
-        print "You’re now following $whom.\n";
+        print "You're now following $whom.\n";
         $self->config->following->{$whom} = $url;
         $self->config->sync;
     }
