@@ -58,11 +58,7 @@ sub BUILDARGS {
         'until=s'       => sub { $args->{until} = $_[1]; },
         'limit|l=i'     => sub { $args->{limit_timeline} = $_[1]; },
         'time-format=s' => sub { $args->{time_format} = $_[1]; },
-        'config|c=s' => sub {
-            $args->{config_file} = path( $_[1] );
-            die "Configuration file $_[1] does not exists\n"
-              unless $args->{config_file}->exists;
-        }
+        'config|c=s'    => sub { $args->{config_file} = path( $_[1] ); }
     ) or pod2usage(2);
 
     if ( $args->{config_file}->exists ) {
