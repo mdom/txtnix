@@ -2,6 +2,7 @@ package App::txtnix;
 
 use strict;
 use warnings;
+use 5.14.0;
 use Config::Tiny;
 use Path::Tiny;
 use Mojo::UserAgent;
@@ -43,16 +44,57 @@ sub BUILDARGS {
     return { config => App::txtnix::Config->new(@args) };
 }
 
+sub usage {
+    my ( $self, $command, $message, $rc ) = @_;
+    $rc //= 1;
+    pod2usage( -exitval => $rc, -message => $message );
+}
+
 sub run {
     my ( $self, $command ) = splice( @_, 0, 2 );
 
-    if ( $command and my $method = $self->can("cmd_$command") ) {
-        $self->$method(@_);
+    my %commands = (
+        timeline  => { args => 0, method => \&timeline },
+        tweet     => { args => 1, method => \&tweet },
+        view      => { args => 1, method => \&view },
+        unfollow  => { args => 1, method => \&unfollow },
+        follow    => { args => 2, method => \&follow },
+        following => { args => 0, method => \&following },
+        config    => {
+            cmds => {
+                edit   => { args => 0, method => \&cmd_config_edit },
+                get    => { args => 1, method => \&cmd_config_get },
+                set    => { args => 2, method => \&cmd_config_set },
+                remove => { args => 1, method => \&cmd_config_remove },
+            },
+        },
+    );
+
+    return $self->usage( $command, "Missing subcommand" )
+      if not defined $command;
+
+    my $cmd_spec = $commands{$command};
+
+    while ( exists $cmd_spec->{cmds} ) {
+        $command .= " $_[0]";
+        last unless exists $cmd_spec->{cmds}->{ $_[0] };
+        $cmd_spec = $cmd_spec->{cmds}->{ +shift };
     }
-    else {
-        pod2usage( -exitval => 1, -message => "Unknown command" );
-    }
-    return 0;
+
+    return $self->usage( $command, "Unknown subcommand $command" )
+      if !$cmd_spec || !defined $cmd_spec->{method};
+
+    return $self->usage( $command, "Too few arguments for $command" )
+      if defined $cmd_spec->{min_args} && @_ < $cmd_spec->{min_args}
+      || defined $cmd_spec->{args} && @_ < $cmd_spec->{args};
+
+    return $self->usage( $command, "Too many arguments for $command" )
+      if defined $cmd_spec->{max_args} && @_ > $cmd_spec->{max_args}
+      || defined $cmd_spec->{args} && @_ > $cmd_spec->{args};
+
+    my $method = $cmd_spec->{method};
+
+    return $self->$method(@_);
 }
 
 sub get_tweets {
@@ -253,7 +295,7 @@ sub expand_mention {
     return "\@$user";
 }
 
-sub cmd_tweet {
+sub tweet {
     my ( $self, $text ) = @_;
     $text = b($text)->decode;
     $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
@@ -277,75 +319,57 @@ sub cmd_tweet {
     return;
 }
 
-sub cmd_timeline {
+sub timeline {
     my $self   = shift;
     my @tweets = $self->get_tweets();
     $self->display_tweets(@tweets);
+    return 0;
 }
 
-sub cmd_view {
+sub view {
     my ( $self, $who ) = @_;
-    if ( !$who ) {
-        die $self->name . ": Missing name for view.\n";
-    }
     my @tweets = $self->get_tweets($who);
     $self->display_tweets(@tweets);
+    return 0;
 }
 
-sub cmd_follow {
+sub follow {
     my ( $self, $whom, $url ) = @_;
     if (    $self->config->following->{$whom}
         and $self->config->following->{$whom} eq $url )
     {
         print "You're already following $whom.\n";
-        return;
+        return 1;
     }
     elsif ( $self->config->following->{$whom} && not $self->config->force ) {
         print "You're already following $whom under a differant url.\n";
+        return 1;
     }
-    else {
-        print "You're now following $whom.\n";
-        $self->config->following->{$whom} = $url;
-        $self->config->sync;
-    }
-    return;
+    print "You're now following $whom.\n";
+    $self->config->following->{$whom} = $url;
+    $self->config->sync;
+    return 0;
 }
 
-sub cmd_unfollow {
+sub unfollow {
     my ( $self, $whom ) = @_;
     if ( not $self->config->following->{$whom} ) {
         print "You're not following $whom.\n";
+        return 1;
     }
-    else {
-        delete $self->config->following->{$whom};
-        $self->config->sync;
-        print "You've unfollowed $whom.\n";
-    }
-    return;
+    delete $self->config->following->{$whom};
+    $self->config->sync;
+    print "You've unfollowed $whom.\n";
+    return 0;
 }
 
-sub cmd_following {
+sub following {
     my ( $self, $whom, $url ) = @_;
     my %following = %{ $self->config->following };
     for my $user ( keys %following ) {
         print "$user \@ " . $following{$user} . "\n";
     }
-    return;
-}
-
-sub cmd_config {
-    my ( $self, $command, @args ) = @_;
-
-    pod2usage(2) if !$command;
-
-    $command = "cmd_config_$command";
-    if ( $self->can($command) ) {
-        $self->$command(@args);
-    }
-    else {
-        pod2usage(2);
-    }
-    return;
+    return 0;
 }
 
 sub cmd_config_edit {
@@ -353,14 +377,11 @@ sub cmd_config_edit {
     my $editor = $ENV{VISUAL} || $ENV{EDITOR} || 'vi';
     system( $editor, $self->config->config_file ) == 0
       or die "Can't edit configuration file: $!\n";
-    return;
+    return 0;
 }
 
 sub cmd_config_get {
     my ( $self, $key ) = @_;
-
-    pod2usage(2) if !$key;
-
     my $config = $self->config->read_file;
     if ( exists $config->{twtxt}->{$key} ) {
         print $config->{twtxt}->{$key} . "\n";
@@ -368,29 +389,23 @@ sub cmd_config_get {
     else {
         print "The configuration key $key is unset.\n";
     }
-    return;
+    return 0;
 }
 
 sub cmd_config_set {
     my ( $self, $key, $value ) = @_;
-
-    pod2usage(2) if !$key || !defined $value;
-
     my $config = $self->config->read_file;
     $config->{twtxt}->{$key} = $value;
     $self->config->write_file($config);
-    return;
+    return 0;
 }
 
 sub cmd_config_remove {
     my ( $self, $key ) = @_;
-
-    pod2usage(2) if !$key;
-
     my $config = $self->config->read_file;
     delete $config->{twtxt}->{$key};
     $self->config->write_file($config);
-    return;
+    return 0;
 }
 
 1;
