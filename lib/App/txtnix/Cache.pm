@@ -6,7 +6,11 @@ use Mojo::ByteStream 'b';
 use Path::Tiny;
 use Mojo::JSON qw(encode_json decode_json);
 
-has cache_dir => ( is => 'lazy' );
+has cache_dir => ( is => 'lazy', coerce => \&to_path );
+
+sub to_path {
+    ref $_[0] eq 'Path::Tiny' ? $_[0] : path( $_[0] );
+}
 
 sub _build_cache_dir {
     my $dir = path('~/.cache/txtnix/');
