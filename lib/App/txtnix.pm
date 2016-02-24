@@ -24,7 +24,7 @@ has twtfile => (
     coerce  => sub { ref $_[0] ? $_[0] : path( $_[0] ) }
 );
 
-has use_pager         => ( is => 'rw', default => sub { 1 } );
+has pager             => ( is => 'rw', default => sub { 1 } );
 has sorting           => ( is => 'rw', default => sub { 'descending' } );
 has timeout           => ( is => 'rw', default => sub { 5 } );
 has use_cache         => ( is => 'rw', default => sub { 1 } );
@@ -247,7 +247,7 @@ sub parse_twtfile {
 sub display_tweets {
     my ( $self, @tweets ) = @_;
     my $fh;
-    if ( $self->use_pager ) {
+    if ( $self->pager ) {
         IO::Pager->new($fh);
     }
     else {
