@@ -13,7 +13,7 @@ $app = App::txtnix->new(
     nick              => 'mdom',
     twturl            => 'http://www.domgoergen.com/twtxt.txt',
     disclose_identity => 0,
-    config_file       => "$empty_config"
+    config            => "$empty_config"
 );
 
 is( $app->ua->transactor->name, "txtnix/$App::txtnix::VERSION" );
@@ -22,7 +22,7 @@ $app = App::txtnix->new(
     nick              => 'mdom',
     twturl            => 'http://www.domgoergen.com/twtxt.txt',
     disclose_identity => 1,
-    config_file       => "$empty_config"
+    config            => "$empty_config"
 );
 
 is( $app->ua->transactor->name,
@@ -32,14 +32,14 @@ is( $app->ua->transactor->name,
 $app = App::txtnix->new(
     twturl            => 'http://www.domgoergen.com/twtxt.txt',
     disclose_identity => 1,
-    config_file       => "$empty_config"
+    config            => "$empty_config"
 );
 is( $app->ua->transactor->name, "txtnix/$App::txtnix::VERSION" );
 
 $app = App::txtnix->new(
     nick              => 'mdom',
     disclose_identity => 1,
-    config_file       => "$empty_config"
+    config            => "$empty_config"
 );
 is( $app->ua->transactor->name, "txtnix/$App::txtnix::VERSION" );
 

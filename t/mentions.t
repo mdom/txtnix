@@ -4,7 +4,7 @@ use Test::More;
 use App::txtnix;
 use FindBin qw($Bin);
 
-my $twtxt = App::txtnix->new( config_file => "$Bin/config" );
+my $twtxt = App::txtnix->new( config => "$Bin/config" );
 
 is( $twtxt->collapse_mentions('@<foo https://example.com/foo/twtxt.txt>'),
     '@foo' );
@@ -14,7 +14,7 @@ is( $twtxt->expand_mentions('@foo'),
     '@<foo https://example.com/foo/twtxt.txt>' );
 is( $twtxt->expand_mentions('@bar'), '@bar' );
 
-$twtxt->config->embed_names(0);
+$twtxt->embed_names(0);
 is( $twtxt->expand_mentions('@foo'), '@<https://example.com/foo/twtxt.txt>' );
 
 ## with nick and twturl
@@ -22,17 +22,17 @@ is( $twtxt->collapse_mentions('@<mdom http://www.domgoergen.com/twtxt.txt>'),
     '@mdom' );
 
 ## with twtwurl but no nick
-$twtxt->config->nick(undef);
+$twtxt->nick(undef);
 is( $twtxt->collapse_mentions('@<mdom http://www.domgoergen.com/twtxt.txt>'),
     '@<mdom http://www.domgoergen.com/twtxt.txt>' );
 
 ## without twturl and nick
-$twtxt->config->twturl(undef);
+$twtxt->twturl(undef);
 is( $twtxt->collapse_mentions('@<mdom http://www.domgoergen.com/twtxt.txt>'),
     '@<mdom http://www.domgoergen.com/twtxt.txt>' );
 
 ## which nick but no twturl
-$twtxt->config->nick('mdom');
+$twtxt->nick('mdom');
 is( $twtxt->collapse_mentions('@<mdom http://www.domgoergen.com/twtxt.txt>'),
     '@<mdom http://www.domgoergen.com/twtxt.txt>' );
 

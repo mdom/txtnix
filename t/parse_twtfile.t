@@ -9,7 +9,7 @@ my $empty_config = Path::Tiny->tempfile;
 
 my ( $app, @tweets );
 
-$app = App::txtnix->new( config_file => "$empty_config" );
+$app = App::txtnix->new( config => "$empty_config" );
 
 @tweets =
   $app->parse_twtfile( 'mdom', path("$Bin/twtfiles/empty")->slurp_utf8 );

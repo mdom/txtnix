@@ -9,9 +9,9 @@ use Mojolicious::Lite;
 my $config  = Path::Tiny->tempfile;
 my $twtfile = Path::Tiny->tempfile;
 my $app     = App::txtnix->new(
-    config_file => $config,
-    twtfile     => $twtfile,
-    following   => { bob => '/bob.txt', alice => '/alice.txt' }
+    config    => $config,
+    twtfile   => $twtfile,
+    following => { bob => '/bob.txt', alice => '/alice.txt' }
 );
 
 # Silence

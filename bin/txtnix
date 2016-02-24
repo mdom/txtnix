@@ -2,9 +2,10 @@
 
 use strict;
 use warnings;
-use App::txtnix;
+use OptArgs qw/class_optargs/;
+my ($class, $opts) = class_optargs('App::txtnix::Cmd');
 
-exit App::txtnix->new()->run(@ARGV);
+exit $class->new($opts)->run();
 
 __END__
 
