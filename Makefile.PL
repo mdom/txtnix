@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,16 +17,19 @@ my %WriteMakefileArgs = (
     "bin/txtnix"
   ],
   "LICENSE" => "gpl",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "App::txtnix",
   "PREREQ_PM" => {
     "Config::Tiny" => 0,
     "Getopt::Long" => 0,
     "HTTP::Date" => 0,
     "IO::Pager" => 0,
+    "Mojo::Base" => 0,
     "Mojo::ByteStream" => 0,
     "Mojo::JSON" => 0,
     "Mojo::UserAgent" => 0,
     "Moo" => 0,
+    "OptArgs" => 0,
     "POSIX" => 0,
     "Path::Tiny" => 0,
     "Pod::Usage" => 0,
@@ -55,12 +58,14 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "HTTP::Date" => 0,
   "IO::Pager" => 0,
+  "Mojo::Base" => 0,
   "Mojo::ByteStream" => 0,
   "Mojo::JSON" => 0,
   "Mojo::UserAgent" => 0,
   "Mojo::UserAgent::Server" => 0,
   "Mojolicious::Lite" => 0,
   "Moo" => 0,
+  "OptArgs" => 0,
   "POSIX" => 0,
   "Path::Tiny" => 0,
   "Pod::Usage" => 0,

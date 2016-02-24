@@ -17,27 +17,142 @@ txtnix - Client for twtxt, the minimalist microblogging service for hackers
 
 =head1 SYNOPSIS
 
-  txtnix [OPTIONS] COMMAND
+  txtnix COMMAND [OPTIONS...]
 
-  Commands: tweet, timeline, view, follow, unfollow, following, config
+  Command:
+  tweet       Append a new tweet to your twtxt file.
+  timeline    Retrieve your personal timeline.
+  view        Show feed of given source.
+  follow      Add a new source to your followings.
+  unfollow    Remove an existing source from your followings.
+  following   Return the list of sources you're following.
+  config      Get or set config item.
 
   Options:
-    --cache/--no-cache Cache remote twtxt files locally. (Default: True)
-    --timeout          Maximum time requests are allowed to take. (Default: 5.0)
-    --pager/--no-pager Use a pager to display content. (Default: False)
-    --ascending        Sort timeline in ascending order.
-    --descending       Sort timeline in descending order. (Default)
-    --time_format      Format to display timestamps. (Default: %F %H:%M)
-    --twtfile | -f     Location of your twtxt file. (Default: twtxt.txt)
-    --limit   | -l     Limit total number of shown tweets. (Default: 20)
-    --config  | -c     Specify a custom config file location.
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
 
-  Examples:
 
-    $ txtnix config get    disclose_identity
-    $ txtnix config set    disclose_identity 0
-    $ txtnix config remove disclose_identify
-    $ txtnix config edit
+  txtnix config COMMAND [OPTIONS...]
+
+  Command:
+  edit        Edit configuration file.
+  get         Get configuration option.
+  set         Set configuration option.
+  remove      Remove configuration option.
+
+  Options:
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
+
+
+  txtnix config edit [OPTIONS...]
+
+  Options:
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
+
+
+  txtnix config get KEY [OPTIONS...]
+
+  Arguments:
+  KEY         Configuration option to get.
+
+  Options:
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
+
+
+  txtnix config remove KEY [OPTIONS...]
+
+  Arguments:
+  KEY         Configuration option to remove.
+
+  Options:
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
+
+
+  txtnix config set KEY VALUE [OPTIONS...]
+
+  Arguments:
+  KEY         Configuration option to set.
+  VALUE       Value configuration option to set to.
+
+  Options:
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
+
+
+  txtnix follow NICKNAME URL [OPTIONS...]
+
+  Arguments:
+  NICKNAME    Local nickname for url.
+  URL         URL for follow.
+
+  Options:
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
+
+
+  txtnix following [OPTIONS...]
+
+  Options:
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
+
+
+  txtnix timeline [OPTIONS...]
+
+  Options:
+  --help           Print a help message and exit.
+  --config         Specify a custom config file location.
+  --cache          Cache remote twtxt files locally.
+  --timeout        Maximum time requests are allowed to take.
+  --pager          Use a pager to display content.
+  --time-format    Format to display timestamps.
+  --limit          Limit total number of shown tweets.
+  --ascending      Sort timeline in ascending order.
+  --descending     Sort timeline in descending order.
+
+
+  txtnix tweet TEXT [OPTIONS...]
+
+  Arguments:
+  TEXT            Message to tweet.
+
+  Options:
+  --help          Print a help message and exit.
+  --config        Specify a custom config file location.
+  --created-at    ISO8601 datetime to use in Tweet, instead of current time.
+  --twtfile       Location of your twtxt file.
+
+
+  txtnix unfollow NICKNAME [OPTIONS...]
+
+  Arguments:
+  NICKNAME    Nick to unfollow.
+
+  Options:
+  --help      Print a help message and exit.
+  --config    Specify a custom config file location.
+
+
+  txtnix view SOURCE [OPTIONS...]
+
+  Arguments:
+  SOURCE           Source to view.
+
+  Options:
+  --help           Print a help message and exit.
+  --config         Specify a custom config file location.
+  --cache          Cache remote twtxt files locally.
+  --timeout        Maximum time requests are allowed to take.
+  --pager          Use a pager to display content.
+  --time-format    Format to display timestamps.
+  --limit          Limit total number of shown tweets.
+  --ascending      Sort timeline in ascending order.
+  --descending     Sort timeline in descending order.
 
 =head1 DESCRIPTION
 
