@@ -178,7 +178,7 @@ sub get_tweets {
         }
     )->wait;
 
-    if ( $self->twtfile->exists ) {
+    if ( not defined $who and $self->twtfile->exists ) {
         push @tweets,
           $self->parse_twtfile( $self->nick || $ENV{USER},
             $self->twtfile->slurp_utf8 );
