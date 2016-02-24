@@ -25,12 +25,12 @@ sub run {
 # Silence
 app->log->level('fatal');
 
-get '/bob.txt'   => { text => "20160203\tWhoo!" };
-get '/alice.txt' => { text => "20160202\tTweet!" };
+get '/bob.txt'   => { text => "2016-02-03T00:00:00Z \tWhoo!" };
+get '/alice.txt' => { text => "2016-02-02T00:00:00Z \tTweet!" };
 
 stdout_is( sub { run('timeline') }, <<'EOO');
-1970-08-22 08:03 bob: Whoo!
-1970-08-22 08:03 alice: Tweet!
+2016-02-03 00:00 bob: Whoo!
+2016-02-02 00:00 alice: Tweet!
 EOO
 
 run( 'tweet', 'Hello World' );
