@@ -11,7 +11,7 @@ use Moo;
 use App::txtnix::Tweet;
 use App::txtnix::Cache;
 use IO::Pager;
-use Mojo::Util 'term_escape';
+use Mojo::ByteStream 'b';
 
 our $VERSION = '0.01';
 
@@ -229,7 +229,9 @@ sub parse_twtfile {
     my @tweets;
     for my $line ( split( /\n/, $string ) ) {
         my ( $time, $text ) = split( /\t/, $line, 2 );
-        $text = term_escape($text);
+        next if not defined $text;
+        $text = b($text)->decode;
+        $text =~ s/\P{XPosixPrint}//g;
         if ( $time and $text ) {
             push @tweets,
               App::txtnix::Tweet->new(
@@ -256,7 +258,7 @@ sub display_tweets {
         $text = $self->collapse_mentions($text);
         printf {$fh} "%s %s: %s\n",
           $tweet->strftime( $self->time_format ),
-          $tweet->user, $text;
+          $tweet->user, b($text)->encode;
     }
     return;
 }
