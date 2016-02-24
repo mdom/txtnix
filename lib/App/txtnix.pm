@@ -11,6 +11,7 @@ use Moo;
 use App::txtnix::Tweet;
 use App::txtnix::Cache;
 use IO::Pager;
+use Mojo::Util 'term_escape';
 
 our $VERSION = '0.01';
 
@@ -225,15 +226,20 @@ sub check_for_moved_url {
 
 sub parse_twtfile {
     my ( $self, $user, $string ) = @_;
-    return map {
-        App::txtnix::Tweet->new(
-            user      => $user,
-            timestamp => $_->[0],
-            text      => $_->[1]
-          )
-      }
-      map { [ split /\t/, $_, 2 ] }
-      split( /\n/, $string );
+    my @tweets;
+    for my $line ( split( /\n/, $string ) ) {
+        my ( $time, $text ) = split( /\t/, $line, 2 );
+        $text = term_escape($text);
+        if ( $time and $text ) {
+            push @tweets,
+              App::txtnix::Tweet->new(
+                user      => $user,
+                timestamp => $time,
+                text      => $text,
+              );
+        }
+    }
+    return @tweets;
 }
 
 sub display_tweets {

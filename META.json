@@ -40,6 +40,7 @@
             "Mojo::ByteStream" : "0",
             "Mojo::JSON" : "0",
             "Mojo::UserAgent" : "0",
+            "Mojo::Util" : "0",
             "Moo" : "0",
             "OptArgs" : "0",
             "POSIX" : "0",
