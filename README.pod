@@ -10,153 +10,169 @@ txtnix - Client for twtxt, the minimalist microblogging service for hackers
 
 =head1 SYNOPSIS
 
-  txtnix COMMAND [OPTIONS...]
+  $ txtnix --help
 
-  Command:
-  tweet       Append a new tweet to your twtxt file.
-  timeline    Retrieve your personal timeline.
-  view        Show feed of given source.
-  follow      Add a new source to your followings.
-  unfollow    Remove an existing source from your followings.
-  following   Return the list of sources you're following.
-  config      Get or set config item.
+    Command:
+    tweet       Append a new tweet to your twtxt file.
+    timeline    Retrieve your personal timeline.
+    view        Show feed of given source.
+    follow      Add a new source to your followings.
+    unfollow    Remove an existing source from your followings.
+    following   Return the list of sources you're following.
+    config      Get or set config item.
 
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
+    Options:
+      --help      Print a help message and exit.
+      --config    Specify a custom config file location.
 
-
-  txtnix config COMMAND [OPTIONS...]
-
-  Command:
-  edit        Edit configuration file.
-  get         Get configuration option.
-  set         Set configuration option.
-  remove      Remove configuration option.
-
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
-
-
-  txtnix config edit [OPTIONS...]
-
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
-
-
-  txtnix config get KEY [OPTIONS...]
-
-  Arguments:
-  KEY         Configuration option to get.
-
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
-
-
-  txtnix config remove KEY [OPTIONS...]
-
-  Arguments:
-  KEY         Configuration option to remove.
-
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
-
-
-  txtnix config set KEY VALUE [OPTIONS...]
-
-  Arguments:
-  KEY         Configuration option to set.
-  VALUE       Value configuration option to set to.
-
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
-
-
-  txtnix follow NICKNAME URL [OPTIONS...]
-
-  Arguments:
-  NICKNAME    Local nickname for url.
-  URL         URL for follow.
-
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
-
-
-  txtnix following [OPTIONS...]
-
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
-
-
-  txtnix timeline [OPTIONS...]
-
-  Options:
-  --help           Print a help message and exit.
-  --config         Specify a custom config file location.
-  --cache          Cache remote twtxt files locally.
-  --timeout        Maximum time requests are allowed to take.
-  --pager          Use a pager to display content.
-  --time-format    Format to display timestamps.
-  --limit          Limit total number of shown tweets.
-  --ascending      Sort timeline in ascending order.
-  --descending     Sort timeline in descending order.
-
-
-  txtnix tweet TEXT [OPTIONS...]
-
-  Arguments:
-  TEXT            Message to tweet.
-
-  Options:
-  --help          Print a help message and exit.
-  --config        Specify a custom config file location.
-  --created-at    ISO8601 datetime to use in Tweet, instead of current time.
-  --twtfile       Location of your twtxt file.
-
-
-  txtnix unfollow NICKNAME [OPTIONS...]
-
-  Arguments:
-  NICKNAME    Nick to unfollow.
-
-  Options:
-  --help      Print a help message and exit.
-  --config    Specify a custom config file location.
-
-
-  txtnix view SOURCE [OPTIONS...]
-
-  Arguments:
-  SOURCE           Source to view.
-
-  Options:
-  --help           Print a help message and exit.
-  --config         Specify a custom config file location.
-  --cache          Cache remote twtxt files locally.
-  --timeout        Maximum time requests are allowed to take.
-  --pager          Use a pager to display content.
-  --time-format    Format to display timestamps.
-  --limit          Limit total number of shown tweets.
-  --ascending      Sort timeline in ascending order.
-  --descending     Sort timeline in descending order.
+   $ txtnix follow bob http://example.com/twtxt.txt
+   $ txtnix tweet 'Hello twtxt world'
+   $ txtnix timeline
 
 =head1 DESCRIPTION
 
-I<txtnix> is a client for the decentralised, minimalist microblogging
-service for hackers L<https://github.com/buckket/twtxt>.
+I<txtnix> is a client for the decentralised, minimalist microblogging service
+for hackers L<https://github.com/buckket/twtxt>.
 
-Until i find the time to write some documentation,
-you should check the very good documentation over at
-I<http://twtxt.readthedocs.org/en/latest/index.html>. Although i don't
-plan to reimplement every feature identically, the configuration options
-and commands should behave very similar at the moment.
+Instead of signing up at a closed and/or regulated microblogging platform,
+getting your status updates out with twtxt is as easy as putting them in a
+publicly accessible text file. The URL pointing to this file is your identity,
+your account. twtxt then tracks these text files, like a feedreader, and builds
+your unique timeline out of them, depending on which files you track. The
+format is simple, human readable, and integrates well with UNIX command line
+utilities.
+
+All subcommand of I<txtnix> provides extensive help, so don't hesitate
+to call them with the I<--help> option.
+
+=head1 CONFIGURATION FILE
+
+twtxt uses a simple INI-like configuration file. It checks
+~/.config/twtxt/config for its configuration, but you can overwrite it
+with the command line switch I<--config>.
+
+Here's an example conf file, showing every currently supported option:
+
+  [twtxt]
+  nick = bob
+  twtfile = ~/twtxt.txt
+  twturl = http://example.org/twtxt.txt
+  check_following = 0
+  use_pager = 0
+  use_cache = 1
+  disclose_identity = 0
+  limit_timeline = 20
+  timeout = 5
+  sorting = descending
+  pre_tweet_hook  = "scp buckket@example.org:~/public_html/twtxt.txt {twtfile}"
+  post_tweet_hook = "scp {twtfile} buckket@example.org:~/public_html/twtxt.txt"
+
+  [following]
+  alice = https://example.org/alice.txt
+  charlie = https://example.org/charlie.txt
+
+=head2 twtxt
+
+=over 4
+
+=item nick
+
+Your nick, will be displayed in your timeline, expanded in your tweets
+and send in your user agent string if you set I<disclose_identity>
+to true. Defaults to your local username.
+
+=item twtfile
+
+Path to your local twtxt file. Defaults to I<~/twtxt.txt>.
+
+=item twturl
+
+URL to your public twtxt file. This is only needed in case you decide
+to disclose your identity.
+
+=item use_pager
+
+Use a pager (less) to display your timeline. Defaults to true.
+
+=item use_cache
+
+Cache remote twtxt files locally. This defaults to true as their usually is no
+reason not to do this. Every URL is checked with a I<If-Modified-Since>
+header, so you still get always the most up-to-date timeline.
+
+=item disclose_identity
+
+Include nick and twturl in twtxt's user-agent. To respect your privacy this
+feature is disabled by default. But you may enable it to let other users
+discover that you follow them.
+
+=item limit_timeline
+
+Limit amount of tweets shown in your timeline. Defaults to 20.
+
+=item timeout
+
+Time a http request is allowed to take. Defaults to 5 seconds.
+
+=item rewrite_urls
+
+Rewrite urls your following depending on their http response
+code. Currently only 301 (moved permanently) are rewritten, but this
+may change in the future. Defaults to true. You get a warning if a url
+is rewritten.
+
+=item embed_names
+
+I<txtnix> expands the local names in your tweets to their urls. So I<@bob>
+becomes I<@E<lt>http://example.com/twtxt.txtE<gt>>. With embed names you can
+also share your local nickname with your followers. If this is set to true
+mentions will be rewritten to I<@E<lt>bob http://example.com/twtxt.txtE<gt>>.
+Defaults to true.
+
+=item sorting
+
+Order in which to sort the timeline. Can be either I<descending> or
+I<ascending>. Dedault to I<descending>, so the newest tweets are on the top of
+the timeline.
+
+=item time_format
+
+Format to convert timestamp to a date in your timeline. Defaults to I<%F %H:%M>.
+
+=item pre_tweet_hook
+
+Command to be executed before tweeting.
+
+=item post_tweet_hook
+
+Command to be executed after tweeting.
+
+=back
+
+=head2 followings
+
+This section holds all your followings as nick, URL pairs. You can edit
+this section manually or use the follow/unfollow commands of twtxt for
+greater comfort.
+
+=head1 Hooks
+
+I<pre_tweet_hook> and I<post_tweet_hook> are very useful if you want to
+push your twtxt file to a remote server. The following examples are just
+some ideas, basically the sky is the limit.
+
+Transmit the the latest tweet via curl to an http endpoint:
+
+  post_tweet_hook = "tail -1 {twtfile} | curl -s -d @- -d 'name=foo' -d 'password=bar' http://example.com/feeds"
+
+Publish your twtfile on aws s3:
+
+  post_tweet_hook = "aws s3 cp {twtfile} s3://mybucket.org/twtxt.txt --cache-control 'max-age=60,public'"
+
+Update your git hosted twtfile before tweeting and push it afterwards:
+
+  pre_tweet_hook = "cd ~/git/website && git pull --rebase --prune"
+  post_tweet_hook = "cd ~/git/website && git commit -m tweet twtxt.txt && git push"
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -173,3 +189,5 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut
