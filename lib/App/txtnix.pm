@@ -25,8 +25,7 @@ has twtfile => (
 );
 
 has pager             => ( is => 'rw', default => sub { 1 } );
-has ascending         => ( is => 'rw', default => sub { 0 } );
-has descending        => ( is => 'rw', default => sub { 1 } );
+has sorting           => ( is => 'rw', default => sub { "descending" } );
 has timeout           => ( is => 'rw', default => sub { 5 } );
 has use_cache         => ( is => 'rw', default => sub { 1 } );
 has limit             => ( is => 'rw', default => sub { 20 } );
@@ -51,6 +50,13 @@ sub BUILDARGS {
     $args->{use_cache} = delete $args->{cache};
     $args->{config} =
       path( $args->{config} || '~/.config/twtxt/config' );
+
+    if ( exists $args->{ascending} and $args->{ascending} ) {
+        $args->{sorting} = 'ascending';
+    }
+    if ( exists $args->{descending} and $args->{descending} ) {
+        $args->{sorting} = 'descending';
+    }
 
     if ( $args->{config}->exists ) {
         my $config = $class->read_file( $args->{config} );
@@ -200,9 +206,9 @@ sub filter_tweets {
       @tweets;
 
     @tweets = sort {
-            $self->ascending
-          ? $a->timestamp <=> $b->timestamp
-          : $b->timestamp <=> $a->timestamp
+            $self->sorting eq 'descending'
+          ? $b->timestamp <=> $a->timestamp
+          : $a->timestamp <=> $b->timestamp
     } @tweets;
 
     my $limit = $self->limit;
