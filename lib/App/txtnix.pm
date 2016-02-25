@@ -25,7 +25,8 @@ has twtfile => (
 );
 
 has pager             => ( is => 'rw', default => sub { 1 } );
-has sorting           => ( is => 'rw', default => sub { 'descending' } );
+has ascending         => ( is => 'rw', default => sub { 0 } );
+has descending        => ( is => 'rw', default => sub { 1 } );
 has timeout           => ( is => 'rw', default => sub { 5 } );
 has use_cache         => ( is => 'rw', default => sub { 1 } );
 has limit             => ( is => 'rw', default => sub { 20 } );
@@ -199,9 +200,9 @@ sub filter_tweets {
       @tweets;
 
     @tweets = sort {
-            $self->sorting eq 'descending'
-          ? $b->timestamp <=> $a->timestamp
-          : $a->timestamp <=> $b->timestamp
+            $self->ascending
+          ? $a->timestamp <=> $b->timestamp
+          : $b->timestamp <=> $a->timestamp
     } @tweets;
 
     my $limit = $self->limit;
