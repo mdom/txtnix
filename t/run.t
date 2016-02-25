@@ -42,8 +42,12 @@ output_like(
 qr{Rewrite url from http://127.0.0.1:[\d]+/alice.txt to /alice2.0.txt after 301.}
 );
 
+stdout_is( sub { run( 'timeline', '--ascending' ) }, <<'EOO');
+2016-02-02 00:00 alice: Tweet!
+2016-02-03 00:00 bob: Whoo!
+EOO
 
-stdout_is( sub { run('timeline') }, <<'EOO');
+stdout_is( sub { run( 'timeline', '--descending' ) }, <<'EOO');
 2016-02-03 00:00 bob: Whoo!
 2016-02-02 00:00 alice: Tweet!
 EOO
