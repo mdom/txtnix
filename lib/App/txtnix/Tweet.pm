@@ -19,7 +19,7 @@ sub to_epoch {
 
 sub strftime {
     my ( $self, $format ) = @_;
-    return POSIX::strftime( $format, gmtime $self->timestamp );
+    return POSIX::strftime( $format, localtime $self->timestamp );
 }
 
 sub to_string {
