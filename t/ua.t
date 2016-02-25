@@ -32,7 +32,8 @@ is( $app->ua->transactor->name,
 $app = App::txtnix->new(
     twturl            => 'http://www.domgoergen.com/twtxt.txt',
     disclose_identity => 1,
-    config            => "$empty_config"
+    config            => "$empty_config",
+    nick              => '',
 );
 is( $app->ua->transactor->name, "txtnix/$App::txtnix::VERSION" );
 

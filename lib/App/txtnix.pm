@@ -35,7 +35,7 @@ has rewrite_urls      => ( is => 'rw', default => sub { 1 } );
 has embed_names       => ( is => 'rw', default => sub { 1 } );
 has check_following   => ( is => 'rw', default => sub { 1 } );
 has following         => ( is => 'rw', default => sub { {} } );
-has nick              => ( is => 'rw' );
+has nick              => ( is => 'rw', default => sub { $ENV{USER} } );
 has twturl            => ( is => 'rw' );
 has pre_tweet_hook    => ( is => 'rw' );
 has post_tweet_hook   => ( is => 'rw' );
@@ -187,8 +187,7 @@ sub get_tweets {
 
     if ( not defined $who and $self->twtfile->exists ) {
         push @tweets,
-          $self->parse_twtfile( $self->nick || $ENV{USER},
-            $self->twtfile->slurp_utf8 );
+          $self->parse_twtfile( $self->nick, $self->twtfile->slurp_utf8 );
     }
 
     $self->sync;
