@@ -71,6 +71,14 @@ opt descending => (
     isa     => 'Bool',
     comment => 'Sort timeline in descending order.',
 );
+opt since => (
+    isa     => 'Str',
+    comment => 'Only display tweets written after the supplied datetime.',
+);
+opt until => (
+    isa     => 'Str',
+    comment => 'Only display tweets written until the supplied datetime.',
+);
 
 subcmd
   cmd     => 'view',
@@ -109,6 +117,14 @@ opt ascending => (
 opt descending => (
     isa     => 'Bool',
     comment => 'Sort timeline in descending order.',
+);
+opt since => (
+    isa     => 'Str',
+    comment => 'Only display tweets written after the supplied datetime.',
+);
+opt until => (
+    isa     => 'Str',
+    comment => 'Only display tweets written until the supplied datetime.',
 );
 
 subcmd
