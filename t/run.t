@@ -7,6 +7,8 @@ use Mojolicious::Lite;
 use Mojo::UserAgent::Server;
 use OptArgs 'class_optargs';
 
+$ENV{TZ} = 'UTC';
+
 my $config  = Path::Tiny->tempfile;
 my $twtfile = Path::Tiny->tempfile;
 
@@ -35,6 +37,10 @@ EOO
 
 run( 'tweet', 'Hello World' );
 like( $twtfile->slurp_utf8, qr/[\d:TZ-]+\tHello World/ );
+
+$twtfile->spew('');
+run( 'tweet', '--created-at', '2016-02-03T00:00:00Z', 'Hello World' );
+is( $twtfile->slurp_utf8, "2016-02-03T00:00:00+0000\tHello World\n" );
 
 stdout_is(
     sub { run( 'follow', 'bob', '/bob.txt' ) },
