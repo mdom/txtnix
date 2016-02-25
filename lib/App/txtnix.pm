@@ -133,7 +133,7 @@ sub get_tweets {
         sub {
             my $delay = shift;
             while ( my ( $user, $url ) = each %{$following} ) {
-                my ( $cache, $params );
+                my ( $cache, $params ) = ( undef, {} );
                 if ( $self->use_cache ) {
                     $cache = $self->cache->get($url);
                     if ($cache) {
