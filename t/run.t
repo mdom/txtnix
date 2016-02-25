@@ -27,8 +27,21 @@ sub run {
 # Silence
 app->log->level('fatal');
 
-get '/bob.txt'   => { text => "2016-02-03T00:00:00Z \tWhoo!" };
-get '/alice.txt' => { text => "2016-02-02T00:00:00Z \tTweet!" };
+get '/alice.txt' => sub {
+    my $self = shift;
+    $self->res->code(301);
+    return $self->redirect_to('/alice2.0.txt');
+};
+
+get '/bob.txt'      => { text => "2016-02-03T00:00:00Z \tWhoo!" };
+get '/alice2.0.txt' => { text => "2016-02-02T00:00:00Z \tTweet!" };
+
+output_like(
+    sub { run('timeline') },
+    undef,
+qr{Rewrite url from http://127.0.0.1:[\d]+/alice.txt to /alice2.0.txt after 301.}
+);
+
 
 stdout_is( sub { run('timeline') }, <<'EOO');
 2016-02-03 00:00 bob: Whoo!
@@ -59,7 +72,7 @@ stdout_is(
     qq{You're not following charlie.\n}
 );
 
-stdout_is( sub { run('following') }, qq{alice @ /alice.txt\n} );
+stdout_is( sub { run('following') }, qq{alice @ /alice2.0.txt\n} );
 
 stdout_is( sub { run( 'follow', 'bob', '/bob.txt' ) },
     qq{You're now following bob.\n} );
