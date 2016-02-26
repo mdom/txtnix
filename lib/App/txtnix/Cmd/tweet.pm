@@ -1,14 +1,12 @@
 package App::txtnix::Cmd::tweet;
-use Moo;
+use Mojo::Base 'App::txtnix';
 use Mojo::ByteStream 'b';
 use App::txtnix::Tweet;
 use Path::Tiny;
 use String::ShellQuote qw(shell_quote);
 
-extends 'App::txtnix';
-
-has text       => ( is => 'rw' );
-has created_at => ( is => 'rw' );
+has 'text';
+has 'created_at';
 
 sub run {
     my ($self) = @_;
@@ -16,15 +14,9 @@ sub run {
     $text = b($text)->decode;
     $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
 
-    if ( $self->created_at ) {
-        $self->to_epoch( $self->created_at );
-    }
-    else {
-        $self->created_at(time);
-    }
+    my $time = $self->created_at ? $self->to_epoch( $self->created_at ) : time;
 
-    my $tweet =
-      App::txtnix::Tweet->new( text => $text, timestamp => $self->created_at );
+    my $tweet = App::txtnix::Tweet->new( text => $text, timestamp => $time );
     my $file = path( $self->twtfile );
     $file->touch unless $file->exists;
 

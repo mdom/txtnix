@@ -1,22 +1,14 @@
 package App::txtnix::Cache;
-use strict;
-use warnings;
-use Moo;
+use Mojo::Base -base;
 use Mojo::ByteStream 'b';
 use Path::Tiny;
 use Mojo::JSON qw(encode_json decode_json);
 
-has cache_dir => ( is => 'lazy', coerce => \&to_path );
-
-sub to_path {
-    ref $_[0] eq 'Path::Tiny' ? $_[0] : path( $_[0] );
-}
-
-sub _build_cache_dir {
+has cache_dir => sub {
     my $dir = path('~/.cache/txtnix/');
     $dir->mkpath if not $dir->exists;
     return $dir;
-}
+};
 
 sub get {
     my ( $self, $key ) = @_;

@@ -1,8 +1,7 @@
 package App::txtnix::Cmd::view;
-use Moo;
-extends 'App::txtnix';
+use Mojo::Base 'App::txtnix';
 
-has source => ( is => 'rw' );
+has 'source';
 
 sub run {
     my ($self) = @_;

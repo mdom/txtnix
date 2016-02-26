@@ -1,21 +1,10 @@
 package App::txtnix::Tweet;
-use strict;
-use warnings;
+use Mojo::Base -base;
 use HTTP::Date 'str2time';
 use POSIX ();
-use Moo;
 
-has user => ( is => 'ro' );
-has timestamp => (
-    is      => 'ro',
-    coerce  => \&to_epoch,
-    default => sub { time }
-);
-has text => ( is => 'ro' );
-
-sub to_epoch {
-    return $_[0] =~ /[^\d]/ ? str2time( $_[0] ) : $_[0];
-}
+has [ 'user', 'text' ];
+has timestamp => sub { time };
 
 sub strftime {
     my ( $self, $format ) = @_;

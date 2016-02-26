@@ -39,7 +39,6 @@
             "Mojo::ByteStream" : "0",
             "Mojo::JSON" : "0",
             "Mojo::UserAgent" : "0",
-            "Moo" : "0",
             "OptArgs" : "0",
             "POSIX" : "0",
             "Path::Tiny" : "0",

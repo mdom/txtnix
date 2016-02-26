@@ -1,9 +1,8 @@
 package App::txtnix::Cmd::following;
-use Moo;
-extends 'App::txtnix';
+use Mojo::Base 'App::txtnix';
 
-has 'nick' => ( is => 'rw' );
-has 'url'  => ( is => 'rw' );
+has 'nick';
+has 'url';
 
 sub run {
     my ( $self, $whom, $url ) = @_;

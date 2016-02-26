@@ -1,9 +1,8 @@
 package App::txtnix::Cmd::config::set;
-use Moo;
-extends 'App::txtnix';
+use Mojo::Base 'App::txtnix';
 
-has key   => ( is => 'rw' );
-has value => ( is => 'rw' );
+has 'key';
+has 'value';
 
 sub run {
     my ($self) = @_;

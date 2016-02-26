@@ -1,13 +1,11 @@
 package App::txtnix;
 
-use strict;
-use warnings;
+use Mojo::Base -base;
 use 5.14.0;
 use Config::Tiny;
 use Path::Tiny;
 use HTTP::Date;
 use Mojo::UserAgent;
-use Moo;
 use App::txtnix::Tweet;
 use App::txtnix::Cache;
 use IO::Pager;
@@ -15,41 +13,38 @@ use Mojo::ByteStream 'b';
 
 our $VERSION = '0.01';
 
-has ua => ( is => 'lazy' );
-has cache => ( is => 'ro', default => sub { App::txtnix::Cache->new() } );
+has 'ua'  => sub { shift->_build_ua };
+has cache => sub { App::txtnix::Cache->new() };
 
-has twtfile => (
-    is      => 'rw',
-    default => sub { path('~/twtxt') },
-    coerce  => sub { ref $_[0] ? $_[0] : path( $_[0] ) }
-);
+has twtfile           => sub { path('~/twtxt') };
+has pager             => sub { 1 };
+has sorting           => sub { "descending" };
+has timeout           => sub { 5 };
+has use_cache         => sub { 1 };
+has limit             => sub { 20 };
+has time_format       => sub { '%F %H:%M' };
+has disclose_identity => sub { 0 };
+has rewrite_urls      => sub { 1 };
+has embed_names       => sub { 1 };
+has check_following   => sub { 1 };
+has following         => sub { {} };
+has nick              => sub { $ENV{USER} };
+has since             => sub { 0 };
+has until             => sub { time };
 
-has pager             => ( is => 'rw', default => sub { 1 } );
-has sorting           => ( is => 'rw', default => sub { "descending" } );
-has timeout           => ( is => 'rw', default => sub { 5 } );
-has use_cache         => ( is => 'rw', default => sub { 1 } );
-has limit             => ( is => 'rw', default => sub { 20 } );
-has time_format       => ( is => 'rw', default => sub { '%F %H:%M' } );
-has disclose_identity => ( is => 'rw', default => sub { 0 } );
-has rewrite_urls      => ( is => 'rw', default => sub { 1 } );
-has embed_names       => ( is => 'rw', default => sub { 1 } );
-has check_following   => ( is => 'rw', default => sub { 1 } );
-has following         => ( is => 'rw', default => sub { {} } );
-has nick              => ( is => 'rw', default => sub { $ENV{USER} } );
-has twturl            => ( is => 'rw' );
-has pre_tweet_hook    => ( is => 'rw' );
-has post_tweet_hook   => ( is => 'rw' );
-has config            => ( is => 'rw' );
-has force             => ( is => 'rw' );
-has since => ( is => 'rw', default => sub { 0 }, coerce => \&to_epoch );
-has until => ( is => 'rw', default => sub { time }, coerce => \&to_epoch );
+has [qw( twturl pre_tweet_hook post_tweet_hook config force )];
 
-sub BUILDARGS {
+sub new {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
     $args->{use_cache} = delete $args->{cache};
     $args->{config} =
       path( $args->{config} || '~/.config/twtxt/config' );
+
+    $args->{since} = $class->to_epoch( $args->{since} )
+      if exists $args->{since};
+    $args->{until} = $class->to_epoch( $args->{until} )
+      if exists $args->{until};
 
     if ( exists $args->{ascending} and $args->{ascending} ) {
         $args->{sorting} = 'ascending';
@@ -67,7 +62,8 @@ sub BUILDARGS {
             $args->{following} = $config->{following};
         }
     }
-    return $args;
+    $args->{twtfile} = path( $args->{twtfile} ) if exists $args->{twtfile};
+    return bless {%$args}, ref $class || $class;
 }
 
 sub _build_ua {
@@ -102,7 +98,7 @@ sub read_file {
 }
 
 sub to_epoch {
-    return $_[0] =~ /[^\d]/ ? str2time( $_[0] ) : $_[0];
+    return str2time( $_[1] );
 }
 
 sub sync {
@@ -238,6 +234,7 @@ sub parse_twtfile {
         next if not defined $text;
         $text = b($text)->decode;
         $text =~ s/\P{XPosixPrint}//g;
+        $time = $self->to_epoch($time);
         if ( $time and $text ) {
             push @tweets,
               App::txtnix::Tweet->new(

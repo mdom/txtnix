@@ -1,8 +1,7 @@
 package App::txtnix::Cmd::unfollow;
-use Moo;
-extends 'App::txtnix';
+use Mojo::Base 'App::txtnix';
 
-has nickname => ( is => 'rw' );
+has 'nickname';
 
 sub run {
     my ($self) = @_;

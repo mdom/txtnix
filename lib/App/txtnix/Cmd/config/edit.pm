@@ -1,6 +1,5 @@
 package App::txtnix::Cmd::config::edit;
-use Moo;
-extends 'App::txtnix';
+use Mojo::Base 'App::txtnix';
 
 sub run {
     my ( $self, $opts ) = @_;

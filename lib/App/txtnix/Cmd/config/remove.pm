@@ -1,8 +1,7 @@
 package App::txtnix::Cmd::config::remove;
-use Moo;
-extends 'App::txtnix';
+use Mojo::Base 'App::txtnix';
 
-has key => ( is => 'rw' );
+has 'key';
 
 sub run {
     my ($self) = @_;
