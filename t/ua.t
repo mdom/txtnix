@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 use App::txtnix;
-use FindBin qw($Bin);
 use Path::Tiny;
 
 my $empty_config = Path::Tiny->tempfile;
