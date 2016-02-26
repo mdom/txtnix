@@ -3,6 +3,7 @@ use warnings;
 use Path::Tiny;
 use Test::More;
 use Test::Output;
+use App::txtnix;
 use Mojolicious::Lite;
 use Mojo::UserAgent::Server;
 use OptArgs 'class_optargs';
@@ -96,5 +97,18 @@ stdout_is(
     sub { run( 'config', 'get', 'disclose_identity' ) },
     qq{The configuration key disclose_identity is unset.\n}
 );
+
+get '/eve.txt' => sub {
+    my $self = shift;
+    $self->res->code(410);
+    return $self->render( text => 'GONE' );
+};
+
+run follow => eve => '/eve.txt';
+
+stderr_like( sub { run( 'view', 'eve' ) },
+    qr/Unfollow user eve after 410 response/ );
+
+is( App::txtnix->new( config => $config )->following->{eve}, undef );
 
 done_testing;

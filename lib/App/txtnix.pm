@@ -176,6 +176,10 @@ sub get_tweets {
                         ? "$err->{code} response: $err->{message}"
                         : "Connection error: $err->{message}"
                       ) . "\n";
+                    if ( $tx->res->code == 410 and $self->rewrite_urls ) {
+                        warn "Unfollow user $user after 410 response.\n";
+                        delete $self->following->{$user};
+                    }
                 }
             }
         }
