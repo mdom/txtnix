@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Config::Tiny" : "0",
             "HTTP::Date" : "0",
             "IO::Pager" : "0",

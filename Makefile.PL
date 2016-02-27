@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "App::txtnix",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Config::Tiny" => 0,
     "HTTP::Date" => 0,
     "IO::Pager" => 0,
@@ -51,6 +52,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Config::Tiny" => 0,
   "ExtUtils::MakeMaker" => 0,
   "FindBin" => 0,
