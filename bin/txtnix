@@ -103,7 +103,7 @@ to disclose your identity.
 
 =item use_pager
 
-Use a pager (less) to display your timeline. Defaults to true.
+Use a pager (less) to display your timeline. Defaults to false.
 
 =item use_cache
 
