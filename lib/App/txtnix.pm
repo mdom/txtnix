@@ -195,7 +195,8 @@ sub get_tweets {
 
     $self->sync;
 
-    $self->cache->clean if $self->use_cache;
+    $self->cache->clean( values $self->following )
+      if $self->use_cache;
 
     return $self->filter_tweets(@tweets);
 }
