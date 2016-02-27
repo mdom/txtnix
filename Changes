@@ -2,6 +2,15 @@ Revision history for Perl module App::txtnix
 
 {{$NEXT}}
 
+0.02  2016-02-27 22:35:53 CET
+
+  * Use use_pager in configuration file to be compatible with twtxt
+  * In the same vein use_pager defaults to false
+  * Add new option cache_dir
+  * Cache dir is now actually cleaned
+  * Unfollow users after 410 response
+  * Replace Moo with Mojo::Base
+
 0.01  2016-02-25 22:36:20 CET
 
   * Initial release

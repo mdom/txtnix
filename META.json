@@ -72,7 +72,7 @@
          "web" : "https://github.com/mdom/txtnix"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "Mario Domgoergen <mdom@taz.de>"
    ]
