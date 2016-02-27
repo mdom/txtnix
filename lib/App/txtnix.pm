@@ -13,10 +13,11 @@ use Mojo::ByteStream 'b';
 
 our $VERSION = '0.01';
 
-has 'ua'  => sub { shift->_build_ua };
-has cache => sub { App::txtnix::Cache->new() };
+has 'ua' => sub { shift->_build_ua };
+has cache => sub { App::txtnix::Cache->new( cache_dir => shift->cache_dir ) };
 
 has twtfile           => sub { path('~/twtxt') };
+has twtfile           => sub { path('~/.cache/txtnix') };
 has pager             => sub { 1 };
 has sorting           => sub { "descending" };
 has timeout           => sub { 5 };
@@ -32,7 +33,7 @@ has nick              => sub { $ENV{USER} };
 has since             => sub { 0 };
 has until             => sub { time };
 
-has [qw( twturl pre_tweet_hook post_tweet_hook config force )];
+has [qw( twturl pre_tweet_hook post_tweet_hook config force cache_dir )];
 
 sub new {
     my ( $class, @args ) = @_;
@@ -62,7 +63,10 @@ sub new {
             $args->{following} = $config->{following};
         }
     }
-    $args->{twtfile} = path( $args->{twtfile} ) if exists $args->{twtfile};
+    for my $path (qw(twtfile cache_dir)) {
+        $args->{$path} = path( $args->{$path} ) if exists $args->{$path};
+    }
+
     return bless {%$args}, ref $class || $class;
 }
 

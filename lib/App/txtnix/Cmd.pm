@@ -47,6 +47,10 @@ opt cache => (
     isa     => 'Bool',
     comment => 'Cache remote twtxt files locally.',
 );
+opt cache_dir => (
+    isa     => 'Str',
+    comment => 'Directory for saving twtxt files locally.',
+);
 opt timeout => (
     isa     => 'Int',
     comment => 'Maximum time requests are allowed to take.',
@@ -54,6 +58,7 @@ opt timeout => (
 opt pager => (
     isa     => 'Bool',
     comment => 'Use a pager to display content.',
+    default => 1,
 );
 opt time_format => (
     isa     => 'Str',
@@ -93,6 +98,10 @@ arg source => (
 opt cache => (
     isa     => 'Bool',
     comment => 'Cache remote twtxt files locally.',
+);
+opt cache_dir => (
+    isa     => 'Str',
+    comment => 'Directory for saving twtxt files locally.',
 );
 opt timeout => (
     isa     => 'Int',

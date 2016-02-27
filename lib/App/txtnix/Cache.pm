@@ -4,11 +4,15 @@ use Mojo::ByteStream 'b';
 use Path::Tiny;
 use Mojo::JSON qw(encode_json decode_json);
 
-has cache_dir => sub {
-    my $dir = path('~/.cache/txtnix/');
-    $dir->mkpath if not $dir->exists;
-    return $dir;
-};
+has cache_dir => sub { path('~/.cache/txtnix/') };
+
+sub new {
+    my $class = shift;
+    my $self = bless @_ ? @_ > 1 ? {@_} : { %{ $_[0] } } : {},
+      ref $class || $class;
+    $self->cache_dir->mkpath if not $self->cache_dir->exists;
+    return $self;
+}
 
 sub get {
     my ( $self, $key ) = @_;
