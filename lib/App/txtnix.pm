@@ -18,7 +18,7 @@ has cache => sub { App::txtnix::Cache->new( cache_dir => shift->cache_dir ) };
 
 has twtfile           => sub { path('~/twtxt') };
 has cache_dir         => sub { path('~/.cache/txtnix') };
-has pager             => sub { 1 };
+has use_pager         => sub { 0 };
 has sorting           => sub { "descending" };
 has timeout           => sub { 5 };
 has use_cache         => sub { 1 };
@@ -41,6 +41,9 @@ sub new {
 
     $args->{use_cache} = delete $args->{cache}
       if exists $args->{cache};
+
+    $args->{use_pager} = delete $args->{pager}
+      if exists $args->{pager};
 
     $args->{config} =
       path( $args->{config} || '~/.config/twtxt/config' );
@@ -265,7 +268,7 @@ sub parse_twtfile {
 sub display_tweets {
     my ( $self, @tweets ) = @_;
     my $fh;
-    if ( $self->pager ) {
+    if ( $self->use_pager ) {
         IO::Pager->new($fh);
     }
     else {

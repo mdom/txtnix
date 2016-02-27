@@ -58,7 +58,6 @@ opt timeout => (
 opt pager => (
     isa     => 'Bool',
     comment => 'Use a pager to display content.',
-    default => 1,
 );
 opt time_format => (
     isa     => 'Str',
