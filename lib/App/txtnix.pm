@@ -17,7 +17,7 @@ has 'ua' => sub { shift->_build_ua };
 has cache => sub { App::txtnix::Cache->new( cache_dir => shift->cache_dir ) };
 
 has twtfile           => sub { path('~/twtxt') };
-has twtfile           => sub { path('~/.cache/txtnix') };
+has cache_dir         => sub { path('~/.cache/txtnix') };
 has pager             => sub { 1 };
 has sorting           => sub { "descending" };
 has timeout           => sub { 5 };
@@ -33,12 +33,15 @@ has nick              => sub { $ENV{USER} };
 has since             => sub { 0 };
 has until             => sub { time };
 
-has [qw( twturl pre_tweet_hook post_tweet_hook config force cache_dir )];
+has [qw( twturl pre_tweet_hook post_tweet_hook config force )];
 
 sub new {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
-    $args->{use_cache} = delete $args->{cache};
+
+    $args->{use_cache} = delete $args->{cache}
+      if exists $args->{cache};
+
     $args->{config} =
       path( $args->{config} || '~/.config/twtxt/config' );
 
