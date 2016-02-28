@@ -173,8 +173,8 @@ sub get_tweets {
                         && $res->code == 200
                         && $res->headers->last_modified )
                     {
-                        $self->cache->set( $self->following->{$user},
-                            $res->headers->last_modified, $body );
+                        $self->cache->set( $url, $res->headers->last_modified,
+                            $body );
                     }
                     push @tweets, $self->parse_twtfile( $user, $body );
                 }
