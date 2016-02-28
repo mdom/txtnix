@@ -39,25 +39,19 @@ sub new {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
 
-    $args->{use_cache} = delete $args->{cache}
-      if exists $args->{cache};
-
-    $args->{use_pager} = delete $args->{pager}
-      if exists $args->{pager};
+    for (qw(cache pager)) {
+        $args->{"use_$_"} = delete $args->{$_} if exists $args->{$_};
+    }
 
     $args->{config} =
       path( $args->{config} || '~/.config/twtxt/config' );
 
-    $args->{since} = $class->to_epoch( $args->{since} )
-      if exists $args->{since};
-    $args->{until} = $class->to_epoch( $args->{until} )
-      if exists $args->{until};
-
-    if ( exists $args->{ascending} and $args->{ascending} ) {
-        $args->{sorting} = 'ascending';
+    for (qw(since until)) {
+        $args->{$_} = $class->to_epoch( $args->{$_} ) if exists $args->{$_};
     }
-    if ( exists $args->{descending} and $args->{descending} ) {
-        $args->{sorting} = 'descending';
+
+    for (qw(ascending descending )) {
+        $args->{sorting} = $_ if exists $args->{$_} && $args->{$_};
     }
 
     if ( $args->{config}->exists ) {
