@@ -4,7 +4,7 @@ use HTTP::Date 'str2time';
 use Mojo::ByteStream 'b';
 use POSIX ();
 
-has [ 'user', 'text' ];
+has [qw(source text)];
 has timestamp => sub { time };
 
 sub strftime {
@@ -19,7 +19,7 @@ sub to_string {
 
 sub md5_hash {
     my $self = shift;
-    return b( $self->timestamp . $self->user . $self->text )->encode->md5_sum;
+    return b( $self->timestamp . $self->text )->encode->md5_sum;
 }
 
 1;

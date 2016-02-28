@@ -7,7 +7,9 @@ use Path::Tiny;
 use HTTP::Date;
 use Mojo::UserAgent;
 use App::txtnix::Tweet;
+use App::txtnix::Source;
 use App::txtnix::Cache;
+use App::txtnix::Registry;
 use IO::Pager;
 use Mojo::ByteStream 'b';
 
@@ -33,7 +35,7 @@ has nick              => sub { $ENV{USER} };
 has since             => sub { 0 };
 has until             => sub { time };
 
-has [qw( twturl pre_tweet_hook post_tweet_hook config force )];
+has [qw( twturl pre_tweet_hook post_tweet_hook config force registry )];
 
 sub new {
     my ( $class, @args ) = @_;
@@ -129,25 +131,20 @@ sub get_tweets {
             return;
         }
     }
-    Mojo::IOLoop->delay(
-        sub {
-            my $delay = shift;
-            while ( my ( $user, $url ) = each %{$following} ) {
-                my ( $cache, $params ) = ( undef, {} );
-                if ( $self->use_cache ) {
-                    $cache = $self->cache->get($url);
-                    if ($cache) {
-                        $params =
-                          { "If-Modified-Since" => $cache->{last_modified} };
-                    }
-                }
-                $delay->pass( $user, $cache );
-                $self->ua->get( $url => $params => $delay->begin );
+    my $delay = Mojo::IOLoop->delay;
+
+    while ( my ( $user, $url ) = each %{$following} ) {
+        my ( $cache, $params ) = ( undef, {} );
+        if ( $self->use_cache ) {
+            $cache = $self->cache->get($url);
+            if ($cache) {
+                $params = { "If-Modified-Since" => $cache->{last_modified} };
             }
-        },
-        sub {
-            my ( $delay, @results ) = @_;
-            while ( my ( $user, $cache, $tx ) = splice( @results, 0, 3 ) ) {
+        }
+        my $end = $delay->begin;
+        $self->ua->get(
+            $url => $params => sub {
+                my ( $ua, $tx ) = @_;
 
                 if ( my $res = $tx->success ) {
 
@@ -170,7 +167,10 @@ sub get_tweets {
                         $self->cache->set( $url, $res->headers->last_modified,
                             $body );
                     }
-                    push @tweets, $self->parse_twtfile( $user, $body );
+                    my $source =
+                      App::txtnix::Source->new( url => $url, nick => $user );
+                    push @tweets, $self->parse_twtfile( $source, $body );
+
                 }
                 else {
                     my $err = $tx->error;
@@ -189,13 +189,44 @@ sub get_tweets {
                         delete $self->following->{$user};
                     }
                 }
+                $end->();
             }
-        }
-    )->wait;
+        );
+    }
+
+    if ( $self->registry && $self->twturl ) {
+        my $end = $delay->begin;
+        my $registry =
+          App::txtnix::Registry->new( url => $self->registry, ua => $self->ua );
+        my @mentions = $registry->get_mentions(
+            $self->twturl => sub {
+                my (@results) = @_;
+                for my $result (@results) {
+                    my ( $nick, $url ) =
+                      $result->[0] =~ /\@<(?:(\w+) )?([^>]+)>/;
+                    my $source =
+                      App::txtnix::Source->new( url => $url, nick => $nick );
+                    push @tweets,
+                      App::txtnix::Tweet->new(
+                        timestamp => $self->to_epoch( $result->[1] ),
+                        text      => $result->[2],
+                        source    => $source,
+                      );
+                }
+                $end->();
+            }
+        );
+    }
+
+    $delay->wait;
 
     if ( not defined $who and $self->twtfile->exists ) {
+        my $source = App::txtnix::Source->new(
+            file => $self->twtfile->exists,
+            nick => $self->nick
+        );
         push @tweets,
-          $self->parse_twtfile( $self->nick, $self->twtfile->slurp_utf8 );
+          $self->parse_twtfile( $source, $self->twtfile->slurp_utf8 );
     }
 
     $self->sync;
@@ -212,6 +243,14 @@ sub filter_tweets {
     @tweets =
       grep { $_->timestamp >= $self->since && $_->timestamp <= $self->until }
       @tweets;
+
+    my %seen_tweets;
+
+    for my $tweet (@tweets) {
+        $seen_tweets{ $tweet->md5_hash } = $tweet;
+    }
+
+    @tweets = values %seen_tweets;
 
     @tweets = sort {
             $self->sorting eq 'descending'
@@ -240,7 +279,7 @@ sub check_for_moved_url {
 }
 
 sub parse_twtfile {
-    my ( $self, $user, $string ) = @_;
+    my ( $self, $source, $string ) = @_;
     my @tweets;
     for my $line ( split( /\n/, $string ) ) {
         my ( $time, $text ) = split( /\t/, $line, 2 );
@@ -250,7 +289,7 @@ sub parse_twtfile {
         if ( $time and $text ) {
             push @tweets,
               App::txtnix::Tweet->new(
-                user      => $user,
+                source    => $source,
                 timestamp => $time,
                 text      => $text,
               );
@@ -269,11 +308,28 @@ sub display_tweets {
         $fh = \*STDOUT;
     }
     for my $tweet (@tweets) {
-        my $text = $tweet->text;
-        $text = $self->collapse_mentions($text);
-        printf {$fh} "%s %s: %s\n",
-          $tweet->strftime( $self->time_format ),
-          $tweet->user, b($text)->encode;
+        my $time = $tweet->strftime( $self->time_format );
+        my $text = $self->collapse_mentions( $tweet->text || '' );
+
+        my $nick;
+        if ( $tweet->source->file ) {
+            $nick = $tweet->source->nick;
+        }
+        elsif ( $tweet->source->url ) {
+            if ( !( $nick = $self->url_to_nick( $tweet->source->url ) ) ) {
+                if ( $tweet->source->nick ) {
+                    $nick = '@<'
+                      . $tweet->source->nick . ' '
+                      . $tweet->source->url . '>';
+                }
+                else {
+                    $nick = '@<' . $tweet->source->url . '>';
+                }
+            }
+        }
+        my $line = "$time $nick: $text\n";
+
+        print {$fh} b($line)->encode,;
     }
     return;
 }
