@@ -278,6 +278,13 @@ sub display_tweets {
     return;
 }
 
+sub url_to_nick {
+    my ( $self, $url ) = @_;
+    my $known_users = $self->known_users;
+    my %urls = map { $known_users->{$_} => $_ } keys %{$known_users};
+    return $urls{$url};
+}
+
 sub collapse_mentions {
     my ( $self, $text ) = @_;
     $text =~ s/\@<(?:(\w+) )?([^>]+)>/$self->collapse_mention($1,$2)/ge;
@@ -286,14 +293,8 @@ sub collapse_mentions {
 
 sub collapse_mention {
     my ( $self, $user, $url ) = @_;
-    my $known_users = $self->known_users;
-    my %urls = map { $known_users->{$_} => $_ } keys %{$known_users};
-    if ( $urls{$url} ) {
-        return "\@$urls{$url}";
-    }
-    else {
-        return "\@<$user $url>";
-    }
+    my $nick = $self->url_to_nick($url);
+    return $nick ? "\@$nick" : $user ? "\@<$user $url>" : "\@<$url>";
 }
 
 sub known_users {
