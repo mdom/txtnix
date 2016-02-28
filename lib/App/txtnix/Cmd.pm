@@ -12,11 +12,13 @@ opt help => (
     isa     => 'Bool',
     comment => 'Print a help message and exit.',
     ishelp  => 1,
+    alias   => 'h',
 );
 
 opt config => (
     isa     => 'Str',
     comment => 'Specify a custom config file location.',
+    alias   => 'c',
 );
 
 subcmd
@@ -32,11 +34,13 @@ arg text => (
 opt created_at => (
     isa     => 'Str',
     comment => 'ISO8601 datetime to use in Tweet, instead of current time.',
+    alias   => 'a',
 );
 
 opt twtfile => (
     isa     => 'Str',
     comment => 'Location of your twtxt file.',
+    alias   => 't',
 );
 
 subcmd
@@ -58,30 +62,37 @@ opt timeout => (
 opt pager => (
     isa     => 'Bool',
     comment => 'Use a pager to display content.',
+    alias   => 'p',
 );
 opt time_format => (
     isa     => 'Str',
     comment => 'Format to display timestamps.',
+    alias   => 'f',
 );
 opt limit => (
     isa     => 'Int',
     comment => 'Limit total number of shown tweets.',
+    alias   => 'l',
 );
 opt ascending => (
     isa     => 'Bool',
     comment => 'Sort timeline in ascending order.',
+    alias   => 'a',
 );
 opt descending => (
     isa     => 'Bool',
     comment => 'Sort timeline in descending order.',
+    alias   => 'd',
 );
 opt since => (
     isa     => 'Str',
     comment => 'Only display tweets written after the supplied datetime.',
+    alias   => 's',
 );
 opt until => (
     isa     => 'Str',
     comment => 'Only display tweets written until the supplied datetime.',
+    alias   => 'u',
 );
 
 subcmd
@@ -109,30 +120,37 @@ opt timeout => (
 opt pager => (
     isa     => 'Bool',
     comment => 'Use a pager to display content.',
+    alias   => 'p',
 );
 opt time_format => (
     isa     => 'Str',
     comment => 'Format to display timestamps.',
+    alias   => 'f',
 );
 opt limit => (
     isa     => 'Int',
     comment => 'Limit total number of shown tweets.',
+    alias   => 'l',
 );
 opt ascending => (
     isa     => 'Bool',
     comment => 'Sort timeline in ascending order.',
+    alias   => 'a',
 );
 opt descending => (
     isa     => 'Bool',
     comment => 'Sort timeline in descending order.',
+    alias   => 'd',
 );
 opt since => (
     isa     => 'Str',
     comment => 'Only display tweets written after the supplied datetime.',
+    alias   => 's',
 );
 opt until => (
     isa     => 'Str',
     comment => 'Only display tweets written until the supplied datetime.',
+    alias   => 'u',
 );
 
 subcmd
