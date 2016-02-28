@@ -159,7 +159,7 @@ sub get_tweets {
 
                     $self->check_for_moved_url( $tx, $user );
 
-                    my $body = $res->body;
+                    my $body = b( $res->body )->decode;
                     if ( $res->code == 304 && $cache ) {
                         $body = $cache->{body};
                     }
@@ -251,7 +251,6 @@ sub parse_twtfile {
     for my $line ( split( /\n/, $string ) ) {
         my ( $time, $text ) = split( /\t/, $line, 2 );
         next if not defined $text;
-        $text = b($text)->decode;
         $text =~ s/\P{XPosixPrint}//g;
         $time = $self->to_epoch($time);
         if ( $time and $text ) {
