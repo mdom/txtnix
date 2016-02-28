@@ -187,6 +187,7 @@ sub get_tweets {
                         : "Connection error: $err->{message}"
                       ) . "\n";
                     if (   $tx->res
+                        && $tx->res->code
                         && $tx->res->code == 410
                         && $self->rewrite_urls )
                     {
