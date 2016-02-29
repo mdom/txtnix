@@ -194,7 +194,7 @@ sub get_tweets {
         );
     }
 
-    if ( $self->registry && $self->twturl ) {
+    if ( !$who && $self->registry && $self->twturl ) {
         my $end = $delay->begin;
         my $registry =
           App::txtnix::Registry->new( url => $self->registry, ua => $self->ua );
