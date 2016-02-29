@@ -222,8 +222,8 @@ sub get_tweets {
 
     if ( not defined $who and $self->twtfile->exists ) {
         my $source = App::txtnix::Source->new(
-            file => $self->twtfile->exists,
-            nick => $self->nick
+            file => $self->twtfile,
+            nick => $self->nick,
         );
         push @tweets,
           $self->parse_twtfile( $source, $self->twtfile->slurp_utf8 );
