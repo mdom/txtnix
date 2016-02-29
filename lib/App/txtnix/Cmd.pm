@@ -238,4 +238,29 @@ arg key => (
     required => 1,
 );
 
+subcmd
+  cmd     => 'query',
+  comment => 'Query your regsitry.';
+
+arg command => (
+    isa      => 'SubCmd',
+    comment  => 'sub command to run',
+    required => 1,
+);
+
+subcmd
+  cmd     => [qw( query users)],
+  comment => 'Query registry for users.';
+
+arg search_term => (
+    isa     => 'Str',
+    comment => 'Search term.',
+);
+
+opt limit => (
+    isa     => 'Int',
+    comment => 'Limit total number of shown users.',
+    alias   => 'l',
+);
+
 1;
