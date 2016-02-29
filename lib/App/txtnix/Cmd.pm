@@ -183,6 +183,11 @@ subcmd
   cmd     => 'following',
   comment => q{Return the list of sources you're following.};
 
+arg nickname => (
+    isa     => 'Str',
+    comment => 'Search for NICKNAME.',
+);
+
 subcmd
   cmd     => 'config',
   comment => 'Get or set config item.';
