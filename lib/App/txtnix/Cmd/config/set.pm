@@ -6,9 +6,9 @@ has 'value';
 
 sub run {
     my ($self) = @_;
-    my $config = $self->read_file;
+    my $config = $self->read_config;
     $config->{twtxt}->{ $self->key } = $self->value;
-    $self->write_file($config);
+    $self->write_config($config);
     return 0;
 }
 

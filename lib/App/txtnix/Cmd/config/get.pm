@@ -6,7 +6,7 @@ has 'key';
 sub run {
     my ($self) = @_;
     my $key    = $self->key;
-    my $config = $self->read_file;
+    my $config = $self->read_config;
     if ( exists $config->{twtxt}->{$key} ) {
         print $config->{twtxt}->{$key} . "\n";
     }

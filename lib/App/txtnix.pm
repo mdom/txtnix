@@ -57,7 +57,7 @@ sub new {
     }
 
     if ( $args->{config}->exists ) {
-        my $config = $class->read_file( $args->{config} );
+        my $config = $class->read_config( $args->{config} );
         if ( $config->{twtxt} ) {
             $args = { %{ $config->{twtxt} }, %$args };
         }
@@ -88,13 +88,13 @@ sub _build_ua {
     return $ua;
 }
 
-sub write_file {
+sub write_config {
     my ( $self, $config ) = @_;
     $config->write( $self->config, 'utf8' );
     return;
 }
 
-sub read_file {
+sub read_config {
     my ( $self, $file ) = @_;
     my $config =
       Config::Tiny->read( $file || $self->config->stringify, 'utf8' );
@@ -113,9 +113,9 @@ sub sync {
         $self->config->parent->mkpath;
         $self->config->touch;
     }
-    my $config = $self->read_file;
+    my $config = $self->read_config;
     $config->{following} = $self->following;
-    $self->write_file($config);
+    $self->write_config($config);
     return;
 }
 
