@@ -39,8 +39,9 @@
             "Mojo::Base" : "0",
             "Mojo::ByteStream" : "0",
             "Mojo::JSON" : "0",
+            "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
-            "Mojolicious" : "4.89",
+            "Mojolicious" : "6.0",
             "OptArgs" : "0",
             "POSIX" : "0",
             "Path::Tiny" : "0",
@@ -73,7 +74,7 @@
          "web" : "https://github.com/mdom/txtnix"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Mario Domgoergen <mdom@taz.de>"
    ]

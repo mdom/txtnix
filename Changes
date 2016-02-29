@@ -2,6 +2,11 @@ Revision history for Perl module App::txtnix
 
 {{$NEXT}}
 
+0.03  2016-02-29 21:08:40 CET
+
+  * Access registries to show mentions of users you don't follow
+  * Allow short options
+
 0.02  2016-02-27 22:35:53 CET
 
   * Use use_pager in configuration file to be compatible with twtxt
