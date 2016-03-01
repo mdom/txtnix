@@ -16,10 +16,9 @@ use Mojo::ByteStream 'b';
 
 our $VERSION = '0.03';
 
-has 'ua' => sub { shift->_build_ua };
-has cache => sub { App::txtnix::Cache->new( cache_dir => shift->cache_dir ) };
-
-has twtfile           => sub { path('~/twtxt') };
+has ua      => sub { shift->_build_ua };
+has cache   => sub { App::txtnix::Cache->new( cache_dir => shift->cache_dir ) };
+has twtfile => sub { path('~/twtxt') };
 has cache_dir         => sub { path('~/.cache/txtnix') };
 has use_pager         => sub { 0 };
 has sorting           => sub { "descending" };
