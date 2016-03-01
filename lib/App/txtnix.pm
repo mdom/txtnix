@@ -102,8 +102,8 @@ sub read_config {
     my ( $self, $file ) = @_;
     my $config =
       Config::Tiny->read( $file || $self->config->stringify, 'utf8' );
-    die "Could not read configuration file: " . $config->errstr . "\n"
-      if $config->errstr;
+    die "Could not read configuration file: $Config::Tiny::errstr\n"
+      if !defined $config;
     return $config;
 }
 
