@@ -8,6 +8,7 @@ use Mojo::Date;
 
 has 'text';
 has 'created_at';
+has 'hooks';
 
 sub run {
     my ($self) = @_;
@@ -30,12 +31,12 @@ sub run {
     my $pre_hook  = $self->pre_tweet_hook;
     my $post_hook = $self->post_tweet_hook;
     my $twtfile   = shell_quote( $self->twtfile );
-    if ($pre_hook) {
+    if ( $self->hooks && $pre_hook ) {
         $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
         system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
     }
     $file->append_utf8( $tweet->to_string . "\n" );
-    if ($post_hook) {
+    if ( $self->hooks && $post_hook ) {
         $post_hook =~ s/\Q{twtfile}/$twtfile/ge;
         system($post_hook) == 0
           or die "Can't call post_tweet_hook $post_hook.\n";

@@ -43,6 +43,12 @@ opt twtfile => (
     alias   => 't',
 );
 
+opt hooks => (
+    isa     => 'Bool',
+    comment => 'Run hooks.',
+    alias   => 'r',
+);
+
 subcmd
   cmd     => 'timeline',
   comment => 'Retrieve your personal timeline.';
