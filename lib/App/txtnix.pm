@@ -46,7 +46,7 @@ sub new {
     }
 
     $args->{config} =
-      path( $args->{config} || '~/.config/twtxt/config' );
+      $args->{config} ? path( $args->{config} ) : $class->_build_config_file;
 
     for (qw(since until)) {
         if ( exists $args->{$_} ) {
@@ -90,6 +90,17 @@ sub _build_ua {
     $ua->transactor->name($ua_string);
     $ua->proxy->detect;
     return $ua;
+}
+
+sub _build_config_file {
+    my $dir = path(
+          $ENV{XDG_CONFIG_HOME} ? $ENV{XDG_CONFIG_HOME}
+        : $^O eq "MSWin32"      ? $ENV{APPDATA}
+        : $^O eq 'darwin'       ? '~/Library/Application Support'
+        :                         '~/.config/'
+    )->child('twtxt');
+    $dir->mkpath if !$dir->exists;
+    return $dir->child('config');
 }
 
 sub write_config {
