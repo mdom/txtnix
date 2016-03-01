@@ -31,7 +31,7 @@ is( $tweets[0]->text, 'Whoo!' );
 is( @tweets,          1 );
 is( $tweets[0]->text, 'Tweet!' );
 
-stderr_is( sub { $app->get_tweets('charlie') },
-    "Failing to get tweets for url: Connection error: No route to host\n" );
+stderr_like( sub { $app->get_tweets('charlie') },
+    qr/Failing to get tweets for url: Connection error:/ );
 
 done_testing;
