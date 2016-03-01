@@ -5,17 +5,16 @@ use Mojo::Date;
 use POSIX ();
 
 has [qw(source text)];
-has timestamp => sub { time };
+has timestamp => sub { Mojo::Date->new() };
 
 sub strftime {
     my ( $self, $format ) = @_;
-    return POSIX::strftime( $format, localtime $self->timestamp );
+    return POSIX::strftime( $format, localtime $self->timestamp->epoch );
 }
 
 sub to_string {
     my $self = shift;
-    return Mojo::Date->new( $self->timestamp )->to_datetime . "\t"
-      . $self->text;
+    return $self->timestamp->to_datetime . "\t" . $self->text;
 }
 
 sub md5_hash {

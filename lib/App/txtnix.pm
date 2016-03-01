@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use 5.14.0;
 use Config::Tiny;
 use Path::Tiny;
-use HTTP::Date;
+use Mojo::Date;
 use Mojo::UserAgent;
 use App::txtnix::Tweet;
 use App::txtnix::Source;
@@ -32,8 +32,8 @@ has embed_names       => sub { 1 };
 has check_following   => sub { 1 };
 has following         => sub { {} };
 has nick              => sub { $ENV{USER} };
-has since             => sub { 0 };
-has until             => sub { time };
+has since             => sub { Mojo::Date->new->epoch(0) };
+has until             => sub { Mojo::Date->new() };
 
 has [qw( twturl pre_tweet_hook post_tweet_hook config force registry )];
 
@@ -49,7 +49,11 @@ sub new {
       path( $args->{config} || '~/.config/twtxt/config' );
 
     for (qw(since until)) {
-        $args->{$_} = $class->to_epoch( $args->{$_} ) if exists $args->{$_};
+        if ( exists $args->{$_} ) {
+            $args->{$_} = $class->to_date( $args->{$_} );
+            die "Can't parse parameter $_ as rfc3339.\n"
+              if !defined $args->{$_}->epoch;
+        }
     }
 
     for (qw(ascending descending )) {
@@ -103,8 +107,10 @@ sub read_config {
     return $config;
 }
 
-sub to_epoch {
-    return str2time( $_[1] );
+sub to_date {
+    my ( $self, $date ) = @_;
+    $date =~ s/([+-]\d\d)(\d\d)/$1:$2/;
+    return Mojo::Date->new($date);
 }
 
 sub sync {
@@ -206,9 +212,11 @@ sub get_tweets {
                       $result->[0] =~ /\@<(?:(\w+) )?([^>]+)>/;
                     my $source =
                       App::txtnix::Source->new( url => $url, nick => $nick );
+                    my $timestamp = $self->to_date( $result->[1] );
+                    next if !defined $timestamp->epoch;
                     push @tweets,
                       App::txtnix::Tweet->new(
-                        timestamp => $self->to_epoch( $result->[1] ),
+                        timestamp => $timestamp,
                         text      => $result->[2],
                         source    => $source,
                       );
@@ -241,8 +249,10 @@ sub filter_tweets {
     my ( $self, @tweets ) = @_;
 
     @tweets =
-      grep { $_->timestamp >= $self->since && $_->timestamp <= $self->until }
-      @tweets;
+      grep {
+             $_->timestamp->epoch >= $self->since->epoch
+          && $_->timestamp->epoch <= $self->until->epoch
+      } @tweets;
 
     my %seen_tweets;
 
@@ -254,8 +264,8 @@ sub filter_tweets {
 
     @tweets = sort {
             $self->sorting eq 'descending'
-          ? $b->timestamp <=> $a->timestamp
-          : $a->timestamp <=> $b->timestamp
+          ? $b->timestamp->epoch <=> $a->timestamp->epoch
+          : $a->timestamp->epoch <=> $b->timestamp->epoch
     } @tweets;
 
     my $limit = $self->limit;
@@ -285,7 +295,8 @@ sub parse_twtfile {
         my ( $time, $text ) = split( /\t/, $line, 2 );
         next if not defined $text;
         $text =~ s/\P{XPosixPrint}//g;
-        $time = $self->to_epoch($time);
+        $time = $self->to_date($time);
+        next if !defined $time->epoch;
         if ( $time and $text ) {
             push @tweets,
               App::txtnix::Tweet->new(

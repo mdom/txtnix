@@ -34,8 +34,8 @@ get '/alice.txt' => sub {
     return $self->redirect_to('/alice2.0.txt');
 };
 
-get '/bob.txt'      => { text => "2016-02-03T00:00:00Z \tWhoo!" };
-get '/alice2.0.txt' => { text => "2016-02-02T00:00:00Z \tTweet!" };
+get '/bob.txt'      => { text => "2016-02-03T00:00:00Z\tWhoo!" };
+get '/alice2.0.txt' => { text => "2016-02-02T00:00:00Z\tTweet!" };
 
 output_like(
     sub { run('timeline') },

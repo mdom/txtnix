@@ -4,6 +4,7 @@ use Mojo::ByteStream 'b';
 use App::txtnix::Tweet;
 use Path::Tiny;
 use String::ShellQuote qw(shell_quote);
+use Mojo::Date;
 
 has 'text';
 has 'created_at';
@@ -14,7 +15,13 @@ sub run {
     $text = b($text)->decode;
     $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
 
-    my $time = $self->created_at ? $self->to_epoch( $self->created_at ) : time;
+    my $time =
+        $self->created_at
+      ? $self->to_date( $self->created_at )
+      : Mojo::Date->new();
+
+    die "Can't parse --created-at " . $self->created_at . " as rfc3339.\n"
+      if !defined $time->epoch;
 
     my $tweet = App::txtnix::Tweet->new( text => $text, timestamp => $time );
     my $file = path( $self->twtfile );

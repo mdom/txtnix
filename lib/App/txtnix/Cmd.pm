@@ -33,7 +33,7 @@ arg text => (
 
 opt created_at => (
     isa     => 'Str',
-    comment => 'ISO8601 datetime to use in Tweet, instead of current time.',
+    comment => 'RFC 3339 datetime to use in Tweet, instead of current time.',
     alias   => 'a',
 );
 
