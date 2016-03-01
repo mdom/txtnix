@@ -195,6 +195,7 @@ sub get_tweets {
                 }
                 else {
                     my $err = $tx->error;
+                    chomp( $err->{message} );
                     warn "Failing to get tweets for $user: "
                       . (
                         $err->{code}
