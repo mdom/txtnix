@@ -6,6 +6,7 @@ use Config::Tiny;
 use Path::Tiny;
 use Mojo::Date;
 use Mojo::UserAgent;
+use Mojo::URL;
 use App::txtnix::Tweet;
 use App::txtnix::Source;
 use App::txtnix::Cache;
@@ -144,8 +145,11 @@ sub get_tweets {
         if ( exists $self->following->{$who} ) {
             $following = { $who => $self->following->{$who} };
         }
+        elsif ( my $nick = $self->url_to_nick($who) ) {
+            $following = { $nick => $who };
+        }
         else {
-            return;
+            $following = { url => $who };
         }
     }
     my $delay = Mojo::IOLoop->delay;

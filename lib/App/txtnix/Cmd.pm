@@ -107,7 +107,7 @@ subcmd
 
 arg source => (
     isa      => 'Str',
-    comment  => 'Source to view.',
+    comment  => 'Nick or URL to view.',
     required => 1,
 );
 

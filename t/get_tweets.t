@@ -5,6 +5,7 @@ use App::txtnix;
 use Path::Tiny;
 use Test::More;
 use Mojolicious::Lite;
+use Test::Output;
 
 my $config  = Path::Tiny->tempfile;
 my $twtfile = Path::Tiny->tempfile;
@@ -30,7 +31,7 @@ is( $tweets[0]->text, 'Whoo!' );
 is( @tweets,          1 );
 is( $tweets[0]->text, 'Tweet!' );
 
-@tweets = $app->get_tweets('charlie');
-is( @tweets, 0 );
+stderr_is( sub { $app->get_tweets('charlie') },
+    "Failing to get tweets for url: Connection error: No route to host\n" );
 
 done_testing;
