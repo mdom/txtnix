@@ -35,6 +35,7 @@ has following         => sub { {} };
 has nick              => sub { $ENV{USER} };
 has since             => sub { Mojo::Date->new->epoch(0) };
 has until             => sub { Mojo::Date->new() };
+has ca_file           => sub { '/etc/ssl/certs/ca-certificates.crt' };
 
 has [qw( twturl pre_tweet_hook post_tweet_hook config force registry )];
 
@@ -90,6 +91,8 @@ sub _build_ua {
     }
     $ua->transactor->name($ua_string);
     $ua->proxy->detect;
+    $ua->ca( $self->ca_file );
+
     return $ua;
 }
 
