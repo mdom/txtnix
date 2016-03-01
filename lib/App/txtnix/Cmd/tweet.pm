@@ -8,7 +8,7 @@ use Mojo::Date;
 
 has 'text';
 has 'created_at';
-has 'hooks';
+has 'hooks' => sub { 1 };
 
 sub run {
     my ($self) = @_;
