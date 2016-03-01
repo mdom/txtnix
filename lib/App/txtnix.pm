@@ -327,6 +327,7 @@ sub parse_twtfile {
 
 sub display_tweets {
     my ( $self, @tweets ) = @_;
+    return if !@tweets;
     my $fh;
     if ( $self->use_pager ) {
         IO::Pager->new($fh);
