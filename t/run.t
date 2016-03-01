@@ -58,7 +58,7 @@ like( $twtfile->slurp_utf8, qr/[\d:TZ-]+\tHello World/ );
 
 $twtfile->spew('');
 run( 'tweet', '--created-at', '2016-02-03T00:00:00Z', 'Hello World' );
-is( $twtfile->slurp_utf8, "2016-02-03T00:00:00+0000\tHello World\n" );
+is( $twtfile->slurp_utf8, "2016-02-03T00:00:00Z\tHello World\n" );
 
 stdout_is(
     sub { run( 'follow', 'bob', '/bob.txt' ) },

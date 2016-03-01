@@ -1,6 +1,7 @@
 package App::txtnix::Tweet;
 use Mojo::Base -base;
 use Mojo::ByteStream 'b';
+use Mojo::Date;
 use POSIX ();
 
 has [qw(source text)];
