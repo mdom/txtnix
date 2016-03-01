@@ -34,10 +34,11 @@
          "requires" : {
             "Carp" : "0",
             "Config::Tiny" : "0",
-            "HTTP::Date" : "0",
             "IO::Pager" : "0",
             "Mojo::Base" : "0",
             "Mojo::ByteStream" : "0",
+            "Mojo::Date" : "0",
+            "Mojo::IOLoop" : "0",
             "Mojo::JSON" : "0",
             "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
@@ -46,6 +47,7 @@
             "POSIX" : "0",
             "Path::Tiny" : "0",
             "String::ShellQuote" : "0",
+            "Time::Local" : "1.2100",
             "perl" : "v5.14.0",
             "strict" : "0",
             "warnings" : "0"
