@@ -10,7 +10,7 @@ sub run {
       ? $self->following->{ $self->source }
       : $self->source;
     my @tweets = $self->get_tweets($url);
-    $self->display_tweets(@tweets);
+    $self->display_tweets( 0, @tweets );
     return 0;
 }
 

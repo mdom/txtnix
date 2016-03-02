@@ -327,7 +327,7 @@ sub parse_twtfile {
 }
 
 sub display_tweets {
-    my ( $self, @tweets ) = @_;
+    my ( $self, $display_nick, @tweets ) = @_;
     return if !@tweets;
     my $fh;
     if ( $self->use_pager ) {
@@ -340,23 +340,14 @@ sub display_tweets {
         my $time = $tweet->strftime( $self->time_format );
         my $text = $self->collapse_mentions( $tweet->text || '' );
 
-        my $nick;
-        if ( $tweet->source->file ) {
-            $nick = $tweet->source->nick;
+        my $line;
+        if ($display_nick) {
+            my $nick = $tweet->source->nick;
+            $line = "$time $nick: $text\n";
         }
-        elsif ( $tweet->source->url ) {
-            if ( !( $nick = $self->url_to_nick( $tweet->source->url ) ) ) {
-                if ( $tweet->source->nick ) {
-                    $nick = '@<'
-                      . $tweet->source->nick . ' '
-                      . $tweet->source->url . '>';
-                }
-                else {
-                    $nick = '@<' . $tweet->source->url . '>';
-                }
-            }
+        else {
+            $line = "$time $text\n";
         }
-        my $line = "$time $nick: $text\n";
 
         print {$fh} b($line)->encode,;
     }
