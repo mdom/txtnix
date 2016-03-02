@@ -256,7 +256,7 @@ sub get_tweets {
           if $self->use_cache;
     }
 
-    return $self->filter_tweets(@tweets);
+    return @tweets;
 }
 
 sub filter_tweets {

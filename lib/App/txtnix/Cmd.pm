@@ -100,6 +100,11 @@ opt until => (
     comment => 'Only display tweets written until the supplied datetime.',
     alias   => 'u',
 );
+opt me => (
+    isa     => 'Bool',
+    comment => 'Only display your tweets and all replies and mentions.',
+    alias   => 'm',
+);
 
 subcmd
   cmd     => 'view',
