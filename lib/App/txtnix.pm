@@ -140,23 +140,15 @@ sub sync {
 }
 
 sub get_tweets {
-    my ( $self, $who ) = @_;
+    my ( $self, $source ) = @_;
     my @tweets;
-    my $following = $self->following;
-    if ($who) {
-        if ( exists $self->following->{$who} ) {
-            $following = { $who => $self->following->{$who} };
-        }
-        elsif ( my $nick = $self->url_to_nick($who) ) {
-            $following = { $nick => $who };
-        }
-        else {
-            $following = { url => $who };
-        }
-    }
+
+    my @urls = $source || values %{ $self->following };
+
     my $delay = Mojo::IOLoop->delay;
 
-    while ( my ( $user, $url ) = each %{$following} ) {
+    for my $url (@urls) {
+        my $nick = $self->url_to_nick($url);
         my ( $cache, $params ) = ( undef, {} );
         if ( $self->use_cache ) {
             $cache = $self->cache->get($url);
@@ -171,7 +163,7 @@ sub get_tweets {
 
                 if ( my $res = $tx->success ) {
 
-                    $self->check_for_moved_url( $tx, $user );
+                    $self->check_for_moved_url( $tx, $nick ) if $nick;
 
                     my $body = b( $res->body )->decode;
                     if ( $res->code == 304 && $cache ) {
@@ -179,7 +171,7 @@ sub get_tweets {
                     }
 
                     if ( !$body ) {
-                        warn "No $body for $user. Ignoring\n";
+                        warn "No $body for $url. Ignoring\n";
                         next;
                     }
 
@@ -191,26 +183,28 @@ sub get_tweets {
                             $body );
                     }
                     my $source =
-                      App::txtnix::Source->new( url => $url, nick => $user );
+                      App::txtnix::Source->new( url => $url, nick => $nick );
                     push @tweets, $self->parse_twtfile( $source, $body );
 
                 }
                 else {
                     my $err = $tx->error;
+                    my $source = $nick || $url;
                     chomp( $err->{message} );
-                    warn "Failing to get tweets for $user: "
+                    warn "Failing to get tweets for $source: "
                       . (
                         $err->{code}
                         ? "$err->{code} response: $err->{message}"
                         : "Connection error: $err->{message}"
                       ) . "\n";
-                    if (   $tx->res
+                    if (   $nick
+                        && $tx->res
                         && $tx->res->code
                         && $tx->res->code == 410
                         && $self->rewrite_urls )
                     {
-                        warn "Unfollow user $user after 410 response.\n";
-                        delete $self->following->{$user};
+                        warn "Unfollow user $nick after 410 response.\n";
+                        delete $self->following->{$nick};
                     }
                 }
                 $end->();
@@ -218,7 +212,7 @@ sub get_tweets {
         );
     }
 
-    if ( !$who && $self->registry && $self->twturl ) {
+    if ( !$source && $self->registry && $self->twturl ) {
         my $end = $delay->begin;
         my $registry =
           App::txtnix::Registry->new( url => $self->registry, ua => $self->ua );
@@ -246,7 +240,7 @@ sub get_tweets {
 
     $delay->wait;
 
-    if ( not defined $who and $self->twtfile->exists ) {
+    if ( !$source and $self->twtfile->exists ) {
         my $source = App::txtnix::Source->new(
             file => $self->twtfile,
             nick => $self->nick,
@@ -255,10 +249,12 @@ sub get_tweets {
           $self->parse_twtfile( $source, $self->twtfile->slurp_utf8 );
     }
 
-    $self->sync;
+    if ( !$source ) {
+        $self->sync;
 
-    $self->cache->clean( values %{ $self->following } )
-      if $self->use_cache;
+        $self->cache->clean( values %{ $self->following } )
+          if $self->use_cache;
+    }
 
     return $self->filter_tweets(@tweets);
 }

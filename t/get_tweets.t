@@ -27,11 +27,11 @@ my @tweets;
 is( @tweets,          2 );
 is( $tweets[0]->text, 'Whoo!' );
 
-@tweets = $app->get_tweets('alice');
+@tweets = $app->get_tweets('/alice.txt');
 is( @tweets,          1 );
 is( $tweets[0]->text, 'Tweet!' );
 
 stderr_like( sub { $app->get_tweets('charlie') },
-    qr/Failing to get tweets for url: Connection error:/ );
+    qr/Failing to get tweets for charlie: Connection error:/ );
 
 done_testing;

@@ -106,7 +106,7 @@ get '/eve.txt' => sub {
 
 run follow => eve => '/eve.txt';
 
-stderr_like( sub { run( 'view', 'eve' ) },
+stderr_like( sub { run('timeline') },
     qr/Unfollow user eve after 410 response/ );
 
 is( App::txtnix->new( config => $config )->following->{eve}, undef );
