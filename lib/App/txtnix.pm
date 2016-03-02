@@ -295,11 +295,14 @@ sub check_for_moved_url {
     my $redirect = $tx->redirects->[0];
     if ( $redirect && $self->rewrite_urls ) {
         my $res = $redirect->res;
-        if ( $res->code == 301 && $res->headers->location ) {
+        if ( ( $res->code == 301 || $res->code == 308 )
+            && $res->headers->location )
+        {
             warn 'Rewrite url from '
               . $redirect->req->url . ' to '
               . $res->headers->location
-              . " after 301.\n";
+              . " after "
+              . $res->code . ".\n";
             $self->following->{$user} = $res->headers->location;
         }
     }
