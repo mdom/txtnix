@@ -2,6 +2,21 @@ Revision history for Perl module App::txtnix
 
 {{$NEXT}}
 
+0.04  2016-03-02 22:13:01 CET
+
+  * Display nicks only for the timeline command but not for view.
+  * Handle http code 308 like 301.
+  * Add configuration option ca_file.
+  * Enable strict hostname verification for TLS.
+  * Do not call pager without tweets.
+  * Handle urls as arguements to the view command.
+  * Find config at os specific locations.
+  * Add parameter --no-hooks for tweet command to disable hooks.
+  * Only support RFC 3339.  Timestamps are now handled by Mojo::Date
+    instead of HTTP::Date.
+  * Add new subcommand query users to query a registry for all registered
+    users.
+
 0.03  2016-02-29 21:08:40 CET
 
   * Access registries to show mentions of users you don't follow
