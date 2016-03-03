@@ -38,22 +38,29 @@ sub get_mentions {
     return $self->query_endpoint( $query, $cb );
 }
 
+sub process_result {
+    my ( $self, $tx ) = @_;
+    my @result;
+    if ( my $res = $tx->success ) {
+        for my $line ( split /\n/, b( $res->body )->decode ) {
+            push @result, [ split /\t/, $line ];
+        }
+    }
+    return @result;
+}
+
 sub query_endpoint {
     my ( $self, $endpoint, $cb ) = @_;
-    croak('Missing parameter callback.') if not $cb;
-    $self->ua->get(
-        $endpoint => sub {
-            my ( $ua, $tx ) = @_;
-            my @result;
-            if ( my $res = $tx->success ) {
-                for my $line ( split /\n/, b( $res->body )->decode ) {
-                    push @result, [ split /\t/, $line ];
-                }
+    if ($cb) {
+        return $self->ua->get(
+            $endpoint => sub {
+                my ( $ua, $tx ) = @_;
+                my @result = $self->process_result($tx);
+                $cb->(@result);
             }
-            $cb->(@result);
-        }
-    );
-    return;
+        );
+    }
+    return $self->process_result( $self->ua->get($endpoint) );
 }
 
 1;
