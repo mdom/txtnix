@@ -274,4 +274,14 @@ opt limit => (
     alias   => 'l',
 );
 
+subcmd
+  cmd     => [qw( query tags)],
+  comment => 'Query registry for tags.';
+
+arg search_term => (
+    isa      => 'Str',
+    comment  => 'Search term.',
+    required => 1,
+);
+
 1;

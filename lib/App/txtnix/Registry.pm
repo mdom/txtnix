@@ -21,7 +21,7 @@ sub get_tweets {
     return $self->query_endpoint( $query, $cb );
 }
 
-sub get_tag {
+sub get_tags {
     my ( $self, $tag, $cb ) = @_;
     croak('Parameter tag must be provided for get_tag.')
       if not $tag;
