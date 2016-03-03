@@ -294,4 +294,13 @@ arg search_term => (
     required => 1,
 );
 
+subcmd
+  cmd     => [qw( query tweets)],
+  comment => 'Query registry for tweets.';
+
+arg search_term => (
+    isa     => 'Str',
+    comment => 'Search term.',
+);
+
 1;
