@@ -31,6 +31,9 @@ txtnix - Client for twtxt, the minimalist microblogging service for hackers
     unfollow    Remove an existing source from your followings.
     following   Return the list of sources you're following.
     config      Get or set config item.
+    query       Query your registry.
+    register    Register at your registry.
+
 
     Options:
       --help      Print a help message and exit.
