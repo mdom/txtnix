@@ -275,6 +275,16 @@ opt limit => (
 );
 
 subcmd
+  cmd     => [qw( query mentions)],
+  comment => 'Query registry for mentions.';
+
+arg search_term => (
+    isa      => 'Str',
+    comment  => 'Search term.',
+    required => 1,
+);
+
+subcmd
   cmd     => [qw( query tags)],
   comment => 'Query registry for tags.';
 
