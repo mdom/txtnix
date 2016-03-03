@@ -7,6 +7,23 @@ use Carp;
 
 has [ 'url', 'ua' ];
 
+sub register_user {
+    my ( $self, $url, $nickname ) = @_;
+
+    croak('Parameter url or nickname missing')
+      if !$url && !$nickname;
+
+    my $endpoint = Mojo::URL->new( $self->url )->path('/api/plain/users')
+      ->query( nickname => $nickname, url => $url );
+
+    my $tx = $self->ua->post($endpoint);
+
+    return 1 if $tx->success;
+
+    warn "Can't add user: " . $tx->error->{message} . "\n";
+    return 0;
+}
+
 sub get_users {
     my ( $self, $user, $cb ) = @_;
     my $query = Mojo::URL->new( $self->url )->path('/api/plain/users')

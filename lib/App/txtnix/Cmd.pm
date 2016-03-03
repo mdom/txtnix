@@ -251,7 +251,7 @@ arg key => (
 
 subcmd
   cmd     => 'query',
-  comment => 'Query your regsitry.';
+  comment => 'Query your registry.';
 
 arg command => (
     isa      => 'SubCmd',
@@ -302,5 +302,9 @@ arg search_term => (
     isa     => 'Str',
     comment => 'Search term.',
 );
+
+subcmd
+  cmd     => 'register',
+  comment => 'Register at your registry.';
 
 1;
