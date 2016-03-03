@@ -1,9 +1,6 @@
 package App::txtnix::Cmd::query::tweets;
-use Mojo::Base 'App::txtnix';
+use Mojo::Base 'App::txtnix::Cmd::query';
 use App::txtnix::Registry;
-use App::txtnix::Tweet;
-use App::txtnix::Source;
-use Mojo::IOLoop;
 
 has [qw( search_term )];
 
@@ -15,20 +12,7 @@ sub run {
 
     my @results = $registry->get_tweets( $self->search_term );
 
-    my @tweets;
-    for my $result (@results) {
-        my ( $mention, $time, $text ) = @$result;
-        my ( $nick, $url ) = $self->parse_mention($mention);
-        my $source = App::txtnix::Source->new( nick => $nick, url => $url );
-        push @tweets,
-          App::txtnix::Tweet->new(
-            source    => $source,
-            text      => $text,
-            timestamp => $self->to_date($time)
-          );
-    }
-
-    $self->display_tweets( 1, @tweets );
+    $self->display_tweets( 1, $self->query_result_to_tweets(@results) );
 
     return 0;
 }

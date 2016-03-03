@@ -1,7 +1,6 @@
 package App::txtnix::Cmd::query::users;
-use Mojo::Base 'App::txtnix';
+use Mojo::Base 'App::txtnix::Cmd::query';
 use App::txtnix::Registry;
-use Mojo::IOLoop;
 
 has [qw( search_term )];
 
