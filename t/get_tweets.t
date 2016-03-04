@@ -31,7 +31,4 @@ is( $tweets[0]->text, 'Whoo!' );
 is( @tweets,          1 );
 is( $tweets[0]->text, 'Tweet!' );
 
-stderr_like( sub { $app->get_tweets('charlie') },
-    qr/Failing to get tweets for charlie: Connection error:/ );
-
 done_testing;
