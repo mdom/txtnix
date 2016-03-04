@@ -13,7 +13,6 @@ has 'hooks' => sub { 1 };
 sub run {
     my ($self) = @_;
     my $text = $self->text;
-    $text = b($text)->decode;
     $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
 
     my $time =
