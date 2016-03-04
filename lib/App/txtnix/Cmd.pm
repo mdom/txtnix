@@ -274,6 +274,11 @@ opt limit => (
     alias   => 'l',
 );
 
+opt unfollowed => (
+    isa     => 'Bool',
+    comment => 'Only list users you are not already following.',
+);
+
 subcmd
   cmd     => [qw( query mentions)],
   comment => 'Query registry for mentions.';
