@@ -123,6 +123,14 @@ to activate hostname verification. Setting this to an empty value
 disables hostname verification on a global basis which is definitely
 not recommended.
 
+=item key_file
+
+Path to TLS key file.
+
+=item cert_file
+
+Path to TLS cert file.
+
 =item disclose_identity
 
 Include nick and twturl in twtxt's user-agent. To respect your privacy this
