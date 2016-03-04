@@ -14,7 +14,7 @@ use App::txtnix::Registry;
 use IO::Pager;
 use Mojo::ByteStream 'b';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has ua      => sub { shift->_build_ua };
 has cache   => sub { App::txtnix::Cache->new( cache_dir => shift->cache_dir ) };

@@ -2,6 +2,18 @@ Revision history for Perl module App::txtnix
 
 {{$NEXT}}
 
+0.05  2016-03-04 22:23:53 CET
+
+  * Expose tls key and cert settings from UserAgent.
+  * Skip mentions from the registry from users i already follow.
+  * The argument to tweet was double decoded.
+  * Add new command register to register at a registry.
+  * Add new command query tweets
+  * Add new command query mentions
+  * Add new command query tags
+  * Add option --unfollowed to just list unfollowed user in query user.
+  * Add options --me for timeline to just personal tweets
+
 0.04  2016-03-02 22:13:01 CET
 
   * Display nicks only for the timeline command but not for view.
