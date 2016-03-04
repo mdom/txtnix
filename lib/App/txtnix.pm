@@ -144,6 +144,7 @@ sub get_tweets {
     my @tweets;
 
     my @urls = $source || values %{ $self->following };
+    my %urls = map { $_ => 1 } @urls;
 
     my $delay = Mojo::IOLoop->delay;
 
@@ -222,6 +223,7 @@ sub get_tweets {
                 for my $result (@results) {
                     my ( $nick, $url ) =
                       $result->[0] =~ /\@<(?:(\w+) )?([^>]+)>/;
+                    next if $url and $urls{$url};
                     my $source =
                       App::txtnix::Source->new( url => $url, nick => $nick );
                     my $timestamp = $self->to_date( $result->[1] );
