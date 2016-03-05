@@ -34,6 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "Config::Tiny" : "0",
+            "IO::Interactive" : "0",
             "IO::Pager" : "0",
             "Mojo::Base" : "0",
             "Mojo::ByteStream" : "0",

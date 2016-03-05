@@ -5,6 +5,7 @@ use App::txtnix::Tweet;
 use Path::Tiny;
 use String::ShellQuote qw(shell_quote);
 use Mojo::Date;
+use IO::Interactive qw(is_interactive);
 
 has 'text';
 has 'created_at';
@@ -25,12 +26,16 @@ sub run {
     if ( $self->text ) {
         push @lines, $self->text;
     }
-    else {
+    elsif ( is_interactive() ) {
         my $file = Path::Tiny->tempfile;
         my $editor = $ENV{VISUAL} || $ENV{EDITOR} || 'vi';
         system( $editor, $file ) == 0
           or die "Can't execute $editor: $!\n";
         push @lines, $file->lines_utf8( { chomp => 1 } );
+    }
+    else {
+        @lines = <STDIN>;
+        chomp(@lines);
     }
 
     my @tweets;
