@@ -183,8 +183,13 @@ sub get_tweets {
                         && $res->code == 200
                         && $res->headers->last_modified )
                     {
-                        $self->cache->set( $url, $res->headers->last_modified,
-                            $body );
+                        $self->cache->set(
+                            $url,
+                            {
+                                last_modified => $res->headers->last_modified,
+                                body          => $body
+                            }
+                        );
                     }
                     my $source =
                       App::txtnix::Source->new( url => $url, nick => $nick );

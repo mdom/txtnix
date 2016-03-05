@@ -23,11 +23,10 @@ sub get {
 }
 
 sub set {
-    my ( $self, $key, $last_modified, $body ) = @_;
+    my ( $self, $key, $hash ) = @_;
     my $id         = b($key)->b64_encode('');
     my $cache_file = $self->cache_dir->child($id);
-    return $cache_file->spew_utf8(
-        encode_json( { last_modified => $last_modified, body => $body } ) );
+    return $cache_file->spew_utf8( encode_json($hash) );
 }
 
 sub clean {
