@@ -39,6 +39,7 @@ sub run {
         $line =~ s/\@(\w+)/$self->expand_mention($1)/ge;
         push @tweets,
           App::txtnix::Tweet->new( text => $line, timestamp => $time );
+        $time = Mojo::Date->new( $time->epoch + 0.1 );
     }
 
     my $file = path( $self->twtfile );
