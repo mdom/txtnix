@@ -12,8 +12,6 @@ has 'hooks' => sub { 1 };
 
 sub run {
     my ($self) = @_;
-    my $text = $self->text;
-    $text =~ s/\@(\w+)/$self->expand_mention($1)/ge;
 
     my $time =
         $self->created_at
@@ -23,18 +21,42 @@ sub run {
     die "Can't parse --created-at " . $self->created_at . " as rfc3339.\n"
       if !defined $time->epoch;
 
-    my $tweet = App::txtnix::Tweet->new( text => $text, timestamp => $time );
+    my @lines;
+    if ( $self->text ) {
+        push @lines, $self->text;
+    }
+    else {
+        my $file = Path::Tiny->tempfile;
+        my $editor = $ENV{VISUAL} || $ENV{EDITOR} || 'vi';
+        system( $editor, $file ) == 0
+          or die "Can't execute $editor: $!\n";
+        push @lines, $file->lines_utf8( { chomp => 1 } );
+    }
+
+    my @tweets;
+
+    for my $line (@lines) {
+        $line =~ s/\@(\w+)/$self->expand_mention($1)/ge;
+        push @tweets,
+          App::txtnix::Tweet->new( text => $line, timestamp => $time );
+    }
+
     my $file = path( $self->twtfile );
     $file->touch unless $file->exists;
 
     my $pre_hook  = $self->pre_tweet_hook;
     my $post_hook = $self->post_tweet_hook;
     my $twtfile   = shell_quote( $self->twtfile );
+
     if ( $self->hooks && $pre_hook ) {
         $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
         system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
     }
-    $file->append_utf8( $tweet->to_string . "\n" );
+
+    for my $tweet (@tweets) {
+        $file->append_utf8( $tweet->to_string . "\n" );
+    }
+
     if ( $self->hooks && $post_hook ) {
         $post_hook =~ s/\Q{twtfile}/$twtfile/ge;
         system($post_hook) == 0

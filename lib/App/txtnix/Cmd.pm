@@ -26,9 +26,8 @@ subcmd
   comment => 'Append a new tweet to your twtxt file.';
 
 arg text => (
-    isa      => 'Str',
-    comment  => 'Message to tweet.',
-    required => 1,
+    isa     => 'Str',
+    comment => 'Message to tweet.',
 );
 
 opt created_at => (
