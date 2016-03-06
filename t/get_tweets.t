@@ -23,11 +23,11 @@ get '/alice.txt' => { text => "20160202\tTweet!" };
 
 my @tweets;
 
-@tweets = $app->get_tweets;
+@tweets = $app->filter_tweets( $app->get_tweets );
 is( @tweets,          2 );
 is( $tweets[0]->text, 'Whoo!' );
 
-@tweets = $app->get_tweets('/alice.txt');
+@tweets = $app->filter_tweets( $app->get_tweets('/alice.txt') );
 is( @tweets,          1 );
 is( $tweets[0]->text, 'Tweet!' );
 
