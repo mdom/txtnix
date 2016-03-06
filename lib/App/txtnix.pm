@@ -27,6 +27,7 @@ has use_cache         => sub { 1 };
 has limit             => sub { 20 };
 has time_format       => sub { '%F %H:%M' };
 has disclose_identity => sub { 0 };
+has write_metadata    => sub { 0 };
 has rewrite_urls      => sub { 1 };
 has embed_names       => sub { 1 };
 has check_following   => sub { 1 };
@@ -140,6 +141,12 @@ sub sync {
     $config->{following} = $self->following;
     $self->write_config($config);
     return;
+}
+
+sub add_metadata {
+    my $self = shift;
+    return $self->twtfile->append_utf8(
+        '# ' . Mojo::Date->new()->to_datetime . "\t" . join( ' ', @_ ) . "\n" );
 }
 
 sub get_tweets {
@@ -319,6 +326,7 @@ sub parse_twtfile {
     my ( $self, $source, $string ) = @_;
     my @tweets;
     for my $line ( split( /\n/, $string ) ) {
+        next if $line =~ /^#/;
         my ( $time, $text ) = split( /\t/, $line, 2 );
         next if not defined $text;
         $text =~ s/\P{XPosixPrint}//g;

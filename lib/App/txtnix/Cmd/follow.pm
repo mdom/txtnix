@@ -20,6 +20,8 @@ sub run {
     print "You're now following $nick.\n";
     $self->following->{$nick} = $self->url;
     $self->sync;
+    $self->add_metadata( 'follow', $self->nickname, $self->url )
+      if $self->write_metadata;
     return 0;
 }
 
