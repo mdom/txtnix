@@ -2,6 +2,14 @@ Revision history for Perl module App::txtnix
 
 {{$NEXT}}
 
+0.06  2016-03-06 22:25:54 CET
+
+  * Sort tweets in test.
+  * Write follow and unfollow metadata to twtfile (highly experimental, do not
+    use!).
+  * Read tweets from STDIN if term is not interactive.
+  * Edit tweets in editor without arguments to tweet.
+
 0.05  2016-03-04 22:23:53 CET
 
   * Expose tls key and cert settings from UserAgent.
