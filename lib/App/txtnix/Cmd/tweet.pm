@@ -38,6 +38,8 @@ sub run {
         chomp(@lines);
     }
 
+    return 0 if !@lines;
+
     my @tweets;
 
     for my $line (@lines) {
