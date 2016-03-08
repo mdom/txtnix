@@ -131,6 +131,11 @@ sub write_config {
 
 sub read_config {
     my ( $self, $file ) = @_;
+    $file = path( $file || $self->config );
+    if ( !$file->exists ) {
+        $file->parent->mkpath;
+        $file->touch;
+    }
     my $config =
       Config::Tiny->read( $file || $self->config->stringify, 'utf8' );
     die "Could not read configuration file: $Config::Tiny::errstr\n"
@@ -146,10 +151,6 @@ sub to_date {
 
 sub sync {
     my ($self) = @_;
-    if ( !$self->config->exists ) {
-        $self->config->parent->mkpath;
-        $self->config->touch;
-    }
     my $config = $self->read_config;
     $config->{following} = $self->following;
     $self->write_config($config);
