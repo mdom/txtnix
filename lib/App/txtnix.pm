@@ -153,7 +153,7 @@ sub sync {
 sub add_metadata {
     my $self = shift;
     return $self->twtfile->append_utf8(
-        '# ' . Mojo::Date->new()->to_datetime . "\t" . join( ' ', @_ ) . "\n" );
+        Mojo::Date->new()->to_datetime . "\t// " . join( ' ', @_ ) . "\n" );
 }
 
 sub get_tweets {
