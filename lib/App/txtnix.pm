@@ -157,6 +157,14 @@ sub sync {
     return;
 }
 
+sub config_set {
+    my ( $self, $key, $value ) = @_;
+    my $config = $self->read_config;
+    $config->{twtxt}->{$key} = $value;
+    $self->write_config($config);
+    return;
+}
+
 sub add_metadata {
     my $self = shift;
     return $self->twtfile->append_utf8(
