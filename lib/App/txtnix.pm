@@ -39,6 +39,8 @@ has nick              => sub { $ENV{USER} };
 has since             => sub { Mojo::Date->new->epoch(0) };
 has until             => sub { Mojo::Date->new() };
 has ca_file           => sub { '/etc/ssl/certs/ca-certificates.crt' };
+has show_new          => sub { 0 };
+has last_timeline     => sub { 0 };
 
 has [
     qw( twturl pre_tweet_hook post_tweet_hook config force registry key_file cert_file )
@@ -300,6 +302,10 @@ sub get_tweets {
 
 sub filter_tweets {
     my ( $self, @tweets ) = @_;
+
+    if ( $self->show_new && $self->last_timeline ) {
+        $self->since( Mojo::Date->new( $self->last_timeline ) );
+    }
 
     @tweets =
       grep {

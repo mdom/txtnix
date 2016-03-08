@@ -99,6 +99,10 @@ opt until => (
     comment => 'Only display tweets written until the supplied datetime.',
     alias   => 'u',
 );
+opt new => (
+    isa     => 'Bool',
+    comment => 'Only display new tweets.',
+);
 opt me => (
     isa     => 'Bool',
     comment => 'Only display your tweets and all replies and mentions.',
