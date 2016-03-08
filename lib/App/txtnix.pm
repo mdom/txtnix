@@ -48,8 +48,14 @@ sub new {
     my ( $class, @args ) = @_;
     my $args = ref $args[0] ? $args[0] : {@args};
 
-    for (qw(cache pager)) {
-        $args->{"use_$_"} = delete $args->{$_} if exists $args->{$_};
+    my %translate = (
+        cache => 'use_cache',
+        pager => 'use_pager',
+        new   => 'show_new',
+    );
+
+    for ( keys %translate ) {
+        $args->{ $translate{$_} } = delete $args->{$_} if exists $args->{$_};
     }
 
     $args->{config} =
