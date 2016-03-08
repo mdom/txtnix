@@ -17,6 +17,10 @@ sub run {
         print "You're already following $nick under a differant url.\n";
         return 1;
     }
+    elsif ( $nick eq $self->nick ) {
+        print "Your nickname is also $nick. Please choose a different nick.\n";
+        return 1;
+    }
     print "You're now following $nick.\n";
     $self->following->{$nick} = $self->url;
     $self->sync;
