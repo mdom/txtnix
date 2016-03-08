@@ -7,6 +7,8 @@ use Path::Tiny;
 use Mojo::Date;
 use Mojo::UserAgent;
 use Mojo::URL;
+use Mojo::Loader qw(data_section);
+use Mojo::Template;
 use App::txtnix::Tweet;
 use App::txtnix::Source;
 use App::txtnix::Cache;
@@ -32,6 +34,7 @@ has rewrite_urls      => sub { 1 };
 has embed_names       => sub { 1 };
 has check_following   => sub { 1 };
 has following         => sub { {} };
+has display_format    => sub { 'simple' };
 has nick              => sub { $ENV{USER} };
 has since             => sub { Mojo::Date->new->epoch(0) };
 has until             => sub { Mojo::Date->new() };
@@ -58,6 +61,10 @@ sub new {
             die "Can't parse parameter $_ as rfc3339.\n"
               if !defined $args->{$_}->epoch;
         }
+    }
+
+    for (qw(pretty simple )) {
+        $args->{display_format} = $_ if exists $args->{$_} && $args->{$_};
     }
 
     for (qw(ascending descending )) {
@@ -354,20 +361,22 @@ sub display_tweets {
     else {
         $fh = \*STDOUT;
     }
+    my $format        = $self->display_format;
+    my $template_name = $format eq 'pretty' ? 'pretty.txt' : 'simple.txt';
+    my $template      = data_section( __PACKAGE__, $template_name );
+    my $mt =
+      Mojo::Template->new( vars => 1, encoding => 'UTF-8' )->parse($template);
     for my $tweet (@tweets) {
-        my $time = $tweet->strftime( $self->time_format );
-        my $text = $self->collapse_mentions( $tweet->text || '' );
 
-        my $line;
-        if ($display_nick) {
-            my $nick = $tweet->source->nick;
-            $line = "$time $nick: $text\n";
-        }
-        else {
-            $line = "$time $text\n";
-        }
-
-        print {$fh} b($line)->encode,;
+        print {$fh} b(
+            $mt->process(
+                {
+                    nick    => $tweet->source->nick,
+                    content => $self->collapse_mentions( $tweet->text || '' ),
+                    time    => $tweet->strftime( $self->time_format ),
+                }
+            )
+        )->encode;
     }
     return;
 }
@@ -428,6 +437,15 @@ sub expand_mention {
 }
 
 1;
+
+__DATA__
+
+@@ pretty.txt
+* <%= $nick %> (<%= $time %>):
+%= $content . "\n"
+
+@@ simple.txt
+<%= $time %> <%= $nick %>: <%= $content %>
 
 __END__
 

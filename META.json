@@ -40,9 +40,11 @@
             "Mojo::ByteStream" : "0",
             "Mojo::Date" : "0",
             "Mojo::JSON" : "0",
+            "Mojo::Loader" : "0",
+            "Mojo::Template" : "0",
             "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
-            "Mojolicious" : "6.0",
+            "Mojolicious" : "6.54",
             "OptArgs" : "0",
             "POSIX" : "0",
             "Path::Tiny" : "0",
@@ -56,7 +58,6 @@
       "test" : {
          "requires" : {
             "FindBin" : "0",
-            "Mojo::Loader" : "0",
             "Mojo::UserAgent::Server" : "0",
             "Mojolicious::Lite" : "0",
             "Test::More" : "0",

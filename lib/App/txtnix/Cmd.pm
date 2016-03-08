@@ -104,6 +104,14 @@ opt me => (
     comment => 'Only display your tweets and all replies and mentions.',
     alias   => 'm',
 );
+opt pretty => (
+    isa     => 'Bool',
+    comment => 'Display tweets in a less dense way.',
+);
+opt simple => (
+    isa     => 'Bool',
+    comment => 'Display tweets line in one line.',
+);
 
 subcmd
   cmd     => 'view',
@@ -161,6 +169,14 @@ opt until => (
     isa     => 'Str',
     comment => 'Only display tweets written until the supplied datetime.',
     alias   => 'u',
+);
+opt pretty => (
+    isa     => 'Bool',
+    comment => 'Display tweets in a less dense way.',
+);
+opt simple => (
+    isa     => 'Bool',
+    comment => 'Display tweets line in one line.',
 );
 
 subcmd
