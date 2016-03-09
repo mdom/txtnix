@@ -159,10 +159,10 @@ Time a http request is allowed to take. Defaults to 5 seconds.
 
 =item rewrite_urls
 
-Rewrite urls your following depending on their http response
-code. Currently only 301 (moved permanently) are rewritten, but this
-may change in the future. Defaults to true. You get a warning if a url
-is rewritten.
+Rewrite urls you are following depending on their http response
+code. Addresses that return 301 (moved permanently) are rewritten
+to their new url. Return code 410 (gone) results in unfollowing that
+address. Defaults to true. You get a warning if a url is rewritten.
 
 =item embed_names
 
@@ -175,12 +175,13 @@ Defaults to true.
 =item sorting
 
 Order in which to sort the timeline. Can be either I<descending> or
-I<ascending>. Dedault to I<descending>, so the newest tweets are on the top of
+I<ascending>. Defaults to I<descending>, so the newest tweets are on the top of
 the timeline.
 
 =item time_format
 
-Format to convert timestamp to a date in your timeline. Defaults to I<%F %H:%M>.
+How to format dates in your timeline. This should be a strftime-like
+format string. Defaults to I<%F %H:%M>.
 
 =item pre_tweet_hook
 
@@ -190,6 +191,31 @@ Command to be executed before tweeting.
 
 Command to be executed after tweeting.
 
+=item write_metadata
+
+Write metadata about who you followed or unfollowed in your twtfile. The twtxt
+file format does not specify any way to add metadata to your feed, so the
+current implementation to use a text starting with I<//> is a properiaty
+extension of txtnix. Use at your own risk. Defaults to false.
+
+=item hide_metadata
+
+Hide txtnix style metadata. Defaults to true.
+
+=item use_colors
+
+Use ANSI-colors for the I<pretty> layout. Defaults to true.
+
+=item display_layout
+
+In which format to display your timeline. I<txtnix> defines two different
+layout: I<simple> is a line oriented very basic layout. I<pretty> looks
+less dense and supports ANSI colors and text wrapping. Defaults to simple.
+
+=item wrap_text
+
+If to wrap text in pretty display. Defaults to true.
+
 =back
 
 =head2 followings
@@ -197,6 +223,20 @@ Command to be executed after tweeting.
 This section holds all your followings as nick, URL pairs. You can edit
 this section manually or use the follow/unfollow commands of twtxt for
 greater comfort.
+
+=head2 colors
+
+In I<pretty mode> mentions, hashtags, the nick and timestamp can be colorized
+with ANSI colors. You can set either I<mention>, I<hashtag>, I<time> or
+I<nick>:
+
+  [colors]
+  nick = blue on_magenta
+  time = grey09
+  hashtag = rgb515
+  mention =
+
+Setting a value to an empty string will disable coloring for that element.
 
 =head1 Hooks
 
