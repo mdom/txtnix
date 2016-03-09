@@ -407,7 +407,7 @@ sub display_tweets {
         print {$fh} b(
             $mt->process(
                 {
-                    nick    => $tweet->source->nick,
+                    nick    => $tweet->source->to_string,
                     content => $self->collapse_mentions( $tweet->text || '' ),
                     time    => $tweet->strftime( $self->time_format ),
                     color   => $self->colors,
