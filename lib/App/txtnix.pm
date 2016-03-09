@@ -30,6 +30,7 @@ has limit             => sub { 20 };
 has time_format       => sub { '%F %H:%M' };
 has disclose_identity => sub { 0 };
 has write_metadata    => sub { 0 };
+has hide_metadata     => sub { 1 };
 has rewrite_urls      => sub { 1 };
 has embed_names       => sub { 1 };
 has check_following   => sub { 1 };
@@ -321,7 +322,8 @@ sub filter_tweets {
 
     @tweets =
       grep {
-             $_->timestamp->epoch >= $self->since->epoch
+             !( $self->hide_metadata && index( $_->text, '//' ) == 0 )
+          && $_->timestamp->epoch >= $self->since->epoch
           && $_->timestamp->epoch <= $self->until->epoch
       } @tweets;
 
