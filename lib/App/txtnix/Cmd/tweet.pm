@@ -22,6 +22,13 @@ sub run {
     die "Can't parse --created-at " . $self->created_at . " as rfc3339.\n"
       if !defined $time->epoch;
 
+    my $twtfile  = shell_quote( $self->twtfile );
+    my $pre_hook = $self->pre_tweet_hook;
+    if ( $self->hooks && $pre_hook ) {
+        $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
+        system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
+    }
+
     my @lines;
     if ( $self->text ) {
         push @lines, $self->text;
@@ -49,22 +56,11 @@ sub run {
         $time = Mojo::Date->new( $time->epoch + 0.1 );
     }
 
-    my $file = path( $self->twtfile );
-    $file->touch unless $file->exists;
-
-    my $pre_hook  = $self->pre_tweet_hook;
-    my $post_hook = $self->post_tweet_hook;
-    my $twtfile   = shell_quote( $self->twtfile );
-
-    if ( $self->hooks && $pre_hook ) {
-        $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
-        system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
-    }
-
     for my $tweet (@tweets) {
-        $file->append_utf8( $tweet->to_string . "\n" );
+        $self->twtfile->append_utf8( $tweet->to_string . "\n" );
     }
 
+    my $post_hook = $self->post_tweet_hook;
     if ( $self->hooks && $post_hook ) {
         $post_hook =~ s/\Q{twtfile}/$twtfile/ge;
         system($post_hook) == 0
