@@ -335,14 +335,14 @@ sub filter_tweets {
 
     @tweets = values %seen_tweets;
 
-    @tweets = sort {
+    @tweets = sort { $b->timestamp->epoch <=> $a->timestamp->epoch } @tweets;
+
+    my $limit = $self->limit;
+    return sort {
             $self->sorting eq 'descending'
           ? $b->timestamp->epoch <=> $a->timestamp->epoch
           : $a->timestamp->epoch <=> $b->timestamp->epoch
-    } @tweets;
-
-    my $limit = $self->limit;
-    return @tweets > $limit ? @tweets[ 0 .. $limit - 1 ] : @tweets;
+    } @tweets > $limit ? @tweets[ 0 .. $limit - 1 ] : @tweets;
 }
 
 sub check_for_moved_url {
