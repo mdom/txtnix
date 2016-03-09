@@ -223,9 +223,9 @@ I<nick>:
   nick = blue on_magenta
   time = grey09
   hashtag = rgb515
-  mention =
+  mention = clear
 
-Setting a value to an empty string will disable coloring for that element.
+Setting a value to I<clear> will disable coloring for that element.
 
 =head1 Hooks
 

@@ -44,17 +44,9 @@ has show_new          => sub { 0 };
 has last_timeline     => sub { 0 };
 has use_colors        => sub { 0 };
 has wrap_text         => sub { 1 };
-has colors            => sub {
-    {
-        nick    => 'bright_yellow',
-        time    => 'bright_blue',
-        mention => 'cyan',
-        hashtag => 'cyan',
-    };
-};
 
 has [
-    qw( twturl pre_tweet_hook post_tweet_hook config force registry key_file cert_file )
+    qw( colors twturl pre_tweet_hook post_tweet_hook config force registry key_file cert_file )
 ];
 
 sub new {
@@ -82,6 +74,8 @@ sub new {
         }
     }
 
+    $args->{colors} ||= {};
+
     for (qw(pretty simple )) {
         $args->{display_format} = $_ if exists $args->{$_} && $args->{$_};
     }
@@ -98,10 +92,20 @@ sub new {
         if ( $config->{following} ) {
             $args->{following} = $config->{following};
         }
+
         if ( $config->{colors} ) {
-            $args->{colors} = $config->{colors};
+            $args->{colors} = { %{ $config->{colors} }, %{ $args->{colors} } };
         }
     }
+
+    $args->{colors} = {
+        nick    => 'bright_yellow',
+        time    => 'bright_blue',
+        mention => 'cyan',
+        hashtag => 'cyan',
+        %{ $args->{colors} },
+    };
+
     for my $path (qw(twtfile cache_dir)) {
         $args->{$path} = path( $args->{$path} ) if exists $args->{$path};
     }
