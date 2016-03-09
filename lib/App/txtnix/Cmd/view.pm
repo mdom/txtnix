@@ -1,5 +1,6 @@
 package App::txtnix::Cmd::view;
 use Mojo::Base 'App::txtnix';
+use Path::Tiny;
 
 has 'source';
 
@@ -9,7 +10,18 @@ sub run {
         $self->following->{ $self->source }
       ? $self->following->{ $self->source }
       : $self->source;
-    my @tweets = $self->get_tweets($url);
+
+    my @tweets;
+
+    my $file = path($url);
+    if ( $file->exists ) {
+        my $source = App::txtnix::Source->new( file => $file );
+        @tweets = $self->parse_twtfile( $source, $file->slurp_utf8 );
+    }
+    else {
+        @tweets = $self->get_tweets($url);
+    }
+
     @tweets = $self->filter_tweets(@tweets);
     $self->display_tweets( 0, @tweets );
     return 0;
