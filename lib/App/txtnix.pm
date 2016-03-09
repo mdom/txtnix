@@ -479,9 +479,11 @@ __DATA__
 
 @@ pretty.txt
 % use Term::ANSIColor;
-* <%= colored($nick, $color->{nick}) %> (<%= colored($time, $color->{time}) %>):
+% use Text::Wrap;
 % $content =~ s/(@\w+)/colored($1, $color->{mention})/ge;
-%= $content . "\n"
+%
+* <%= colored($nick, $color->{nick}) %> (<%= colored($time, $color->{time}) %>):
+%= wrap('','',$content) . "\n"
 
 @@ simple.txt
 <%= $time %> <%= $nick %>: <%= $content %>
