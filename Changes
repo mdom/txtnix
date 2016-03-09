@@ -2,6 +2,21 @@ Revision history for Perl module App::txtnix
 
 {{$NEXT}}
 
+0.07  2016-03-09 23:00:03 CET
+
+  *  Run pre_tweet_hooks before reading tweets
+  *  Sorting now decides how the newest tweets are sorted
+  *  Add options to hide metadata
+  *  Add text wrapping for pretty
+  *  Subcommand view can display local files
+  *  Add color support for display_format pretty. Default color theme is by kdave, thanks!
+  *  Add option timline --new to show only new tweets
+  *  Check if you are trying to followy someone with your own nick
+  *  Use c99 oneline comments as metadata sign
+  *  Add display formats simple and pretty
+  *  Do not run post_hook in tweet if no tweets are entered
+  *  Add INSTALLATION section
+
 0.06  2016-03-06 22:25:54 CET
 
   * Sort tweets in test.
