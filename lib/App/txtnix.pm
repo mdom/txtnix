@@ -47,6 +47,7 @@ has colors            => sub {
         nick    => 'bright_yellow',
         time    => 'bright_blue',
         mention => 'cyan',
+        hashtag => 'cyan',
     };
 };
 
@@ -481,6 +482,7 @@ __DATA__
 % use Term::ANSIColor;
 % use Text::Wrap;
 % $content =~ s/(@\w+)/colored($1, $color->{mention})/ge;
+% $content =~ s/(#\w+)/colored($1, $color->{hashtag})/ge;
 %
 * <%= colored($nick, $color->{nick}) %> (<%= colored($time, $color->{time}) %>):
 %= wrap('','',$content) . "\n"
