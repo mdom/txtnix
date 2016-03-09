@@ -44,9 +44,9 @@ has last_timeline     => sub { 0 };
 has use_colors        => sub { 0 };
 has colors            => sub {
     {
-        nick    => 'red',
-        time    => 'green',
-        mention => 'white on_magenta',
+        nick    => 'bright_yellow',
+        time    => 'bright_blue',
+        mention => 'cyan',
     };
 };
 
