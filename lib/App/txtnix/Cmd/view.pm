@@ -14,7 +14,7 @@ sub run {
     my @tweets;
 
     my $file = path($url);
-    if ( $file->exists ) {
+    if ( $file->is_file ) {
         my $source = App::txtnix::Source->new( file => $file );
         @tweets = $self->parse_twtfile( $source, $file->slurp_utf8 );
     }
