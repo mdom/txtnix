@@ -43,6 +43,7 @@ has ca_file           => sub { '/etc/ssl/certs/ca-certificates.crt' };
 has show_new          => sub { 0 };
 has last_timeline     => sub { 0 };
 has use_colors        => sub { 0 };
+has wrap_text         => sub { 1 };
 has colors            => sub {
     {
         nick    => 'bright_yellow',
@@ -487,7 +488,11 @@ __DATA__
 % $content =~ s/(#\w+)/colored($1, $app->colors->{hashtag})/ge;
 %
 * <%= colored($nick, $app->colors->{nick}) %> (<%= colored($time, $app->colors->{time}) %>):
+% if ( $app->wrap_text ) {
 %= wrap('','',$content) . "\n"
+% } else {
+%= $content . "\n"
+% }
 
 @@ simple.txt
 <%= $time %> <%= $nick %>: <%= $content %>
