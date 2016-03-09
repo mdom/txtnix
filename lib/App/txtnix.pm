@@ -41,6 +41,14 @@ has until             => sub { Mojo::Date->new() };
 has ca_file           => sub { '/etc/ssl/certs/ca-certificates.crt' };
 has show_new          => sub { 0 };
 has last_timeline     => sub { 0 };
+has use_colors        => sub { 0 };
+has colors            => sub {
+    {
+        nick    => 'red',
+        time    => 'green',
+        mention => 'white on_magenta',
+    };
+};
 
 has [
     qw( twturl pre_tweet_hook post_tweet_hook config force registry key_file cert_file )
@@ -86,6 +94,9 @@ sub new {
         }
         if ( $config->{following} ) {
             $args->{following} = $config->{following};
+        }
+        if ( $config->{colors} ) {
+            $args->{colors} = $config->{colors};
         }
     }
     for my $path (qw(twtfile cache_dir)) {
@@ -389,12 +400,17 @@ sub display_tweets {
       Mojo::Template->new( vars => 1, encoding => 'UTF-8' )->parse($template);
     for my $tweet (@tweets) {
 
+        if ( !$self->use_colors ) {
+            $ENV{ANSI_COLORS_DISABLED} = 0;
+        }
+
         print {$fh} b(
             $mt->process(
                 {
                     nick    => $tweet->source->nick,
                     content => $self->collapse_mentions( $tweet->text || '' ),
                     time    => $tweet->strftime( $self->time_format ),
+                    color   => $self->colors,
                 }
             )
         )->encode;
@@ -462,7 +478,9 @@ sub expand_mention {
 __DATA__
 
 @@ pretty.txt
-* <%= $nick %> (<%= $time %>):
+% use Term::ANSIColor;
+* <%= colored($nick, $color->{nick}) %> (<%= colored($time, $color->{time}) %>):
+% $content =~ s/(@\w+)/colored($1, $color->{mention})/ge;
 %= $content . "\n"
 
 @@ simple.txt
