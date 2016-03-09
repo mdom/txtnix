@@ -413,7 +413,7 @@ sub display_tweets {
                     nick    => $tweet->source->to_string,
                     content => $self->collapse_mentions( $tweet->text || '' ),
                     time    => $tweet->strftime( $self->time_format ),
-                    color   => $self->colors,
+                    app     => $self,
                 }
             )
         )->encode;
@@ -483,10 +483,10 @@ __DATA__
 @@ pretty.txt
 % use Term::ANSIColor;
 % use Text::Wrap;
-% $content =~ s/(@\w+)/colored($1, $color->{mention})/ge;
-% $content =~ s/(#\w+)/colored($1, $color->{hashtag})/ge;
+% $content =~ s/(@\w+)/colored($1, $app->colors->{mention})/ge;
+% $content =~ s/(#\w+)/colored($1, $app->colors->{hashtag})/ge;
 %
-* <%= colored($nick, $color->{nick}) %> (<%= colored($time, $color->{time}) %>):
+* <%= colored($nick, $app->colors->{nick}) %> (<%= colored($time, $app->colors->{time}) %>):
 %= wrap('','',$content) . "\n"
 
 @@ simple.txt
