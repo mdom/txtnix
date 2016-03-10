@@ -2,7 +2,7 @@ package App::txtnix::Tweet;
 use Mojo::Base -base;
 use Mojo::ByteStream 'b';
 use Mojo::Date;
-use Time::Duration;
+use Time::Duration qw(concise ago);
 use POSIX ();
 
 has [qw(source text)];
@@ -11,7 +11,8 @@ has timestamp => sub { Mojo::Date->new() };
 sub strftime {
     my ( $self, $format ) = @_;
     if ( $format eq 'relative' ) {
-        return ago( ( int( ( time - $self->timestamp->epoch ) / 60 ) ) * 60 );
+        return concise(
+            ago( ( int( ( time - $self->timestamp->epoch ) / 60 ) ) * 60 ) );
     }
     return POSIX::strftime( $format, localtime $self->timestamp->epoch );
 }
