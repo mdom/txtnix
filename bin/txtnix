@@ -180,8 +180,9 @@ the timeline.
 
 =item time_format
 
-How to format dates in your timeline. This should be a strftime-like
-format string. Defaults to I<%F %H:%M>.
+How to format dates in your timeline. This should be a strftime-like format
+string. As special case you can set it to I<relative> to get relative dates
+like I<1 hour and 23 minutes ago>. Defaults to I<%F %H:%M>.
 
 =item pre_tweet_hook
 
