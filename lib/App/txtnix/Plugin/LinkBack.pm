@@ -36,7 +36,7 @@ sub linkback {
     for my $url (@linkbacks) {
         my $end = $delay->begin;
         $app->ua->post(
-            $url => { url => $app->twturl } => sub {
+            $url => form => { url => $app->twturl } => sub {
                 my ( $ua, $tx ) = @_;
                 warn "Couldn't ping back to $url\n" if !$tx->success;
                 $end->();
