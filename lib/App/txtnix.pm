@@ -193,10 +193,10 @@ sub add_metadata {
 }
 
 sub get_tweets {
-    my ( $self, $source ) = @_;
+    my ( $self, @source ) = @_;
     my @tweets;
 
-    my @urls = $source || values %{ $self->following };
+    my @urls = @source ? @source : values %{ $self->following };
     my %urls = map { $_ => 1 } @urls;
 
     my $delay = Mojo::IOLoop->delay;
@@ -271,10 +271,10 @@ sub get_tweets {
         );
     }
 
-    if ( !$source && $self->registry && $self->twturl ) {
         my $end = $delay->begin;
         my $registry =
           App::txtnix::Registry->new( url => $self->registry, ua => $self->ua );
+    if ( !@source && $self->registry && $self->twturl ) {
         my @mentions = $registry->get_mentions(
             $self->twturl => sub {
                 my (@results) = @_;
@@ -300,7 +300,7 @@ sub get_tweets {
 
     $delay->wait;
 
-    if ( !$source and $self->twtfile->exists ) {
+    if ( !@source and $self->twtfile->exists ) {
         my $source = App::txtnix::Source->new(
             file => $self->twtfile,
             nick => $self->nick,
@@ -309,7 +309,7 @@ sub get_tweets {
           $self->parse_twtfile( $source, $self->twtfile->slurp_utf8 );
     }
 
-    if ( !$source ) {
+    if ( !@source ) {
         $self->sync;
 
         $self->cache->clean( values %{ $self->following } )
