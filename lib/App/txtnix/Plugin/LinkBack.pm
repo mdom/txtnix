@@ -32,7 +32,7 @@ sub linkback {
 
     my %linkback;
     for my $tweet ( $app->get_tweets(@mentions) ) {
-        if ( $tweet->text =~ m{//\s+linkback\s+(.*?)\s*$} ) {
+        if ( $tweet->text =~ m{^\s*//\s+linkback\s+(.*?)\s*$} ) {
             $linkback{ $tweet->source->url } = $1;
         }
     }
