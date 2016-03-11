@@ -44,6 +44,7 @@ has show_new          => sub { 0 };
 has last_timeline     => sub { 0 };
 has use_colors        => sub { 0 };
 has wrap_text         => sub { 1 };
+has character_limit   => sub { 1024 };
 
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config force registry key_file cert_file )
@@ -395,6 +396,11 @@ sub parse_twtfile {
         my ( $time, $text ) = split( /\t/, $line, 2 );
         next if not defined $text;
         $text =~ s/\P{XPosixPrint}//g;
+
+        if ( $self->character_limit && $self->character_limit > 0 ) {
+            $text = substr( $text, 0, $self->character_limit );
+        }
+
         $time = $self->to_date($time);
         next if !defined $time->epoch;
         if ( $time and $text ) {

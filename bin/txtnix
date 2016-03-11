@@ -217,6 +217,11 @@ less dense and supports ANSI colors and text wrapping. Defaults to simple.
 
 If to wrap text in pretty display. Defaults to true.
 
+=item character_limit
+
+Number of characters a remote tweet can have. Setting it to zero will
+disable this security precaution. Defaults to 1024.
+
 =back
 
 =head2 followings
