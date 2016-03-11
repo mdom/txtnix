@@ -165,6 +165,7 @@ sub read_config {
 
 sub to_date {
     my ( $self, $date ) = @_;
+    $date =~ s/T(\d\d:\d\d)([Z+-])/T$1:00$2/;
     $date =~ s/([+-]\d\d)(\d\d)/$1:$2/;
     return Mojo::Date->new($date);
 }
