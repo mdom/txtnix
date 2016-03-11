@@ -49,10 +49,11 @@ sub linkback {
                 }
                 else {
                     my $prefix = "Couldn't ping back to $url";
-                    my $err    = $tx->error;
-                    warn $err
-                      ? "$prefix: $err->{code} response: $err->{message}\n"
-                      : "$prefix: Connection error: $err->{message}\n";
+                    if ( my $err = $tx->error ) {
+                        warn $err->{code}
+                          ? "$prefix: $err->{code} response: $err->{message}\n"
+                          : "$prefix: Connection error: $err->{message}\n";
+                    }
                 }
                 $end->();
             }
