@@ -38,7 +38,16 @@ sub linkback {
         $app->ua->post(
             $url => form => { url => $app->twturl } => sub {
                 my ( $ua, $tx ) = @_;
-                warn "Couldn't ping back to $url\n" if !$tx->success;
+                if ( $tx->success ) {
+                    warn "Send ping back to $url.\n";
+                }
+                else {
+                    my $prefix = "Couldn't ping back to $url";
+                    my $err    = $tx->error;
+                    warn $err
+                      ? "$prefix: $err->{code} response: $err->{message}\n"
+                      : "$prefix: Connection error: $err->{message}\n";
+                }
                 $end->();
             }
         );
