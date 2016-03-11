@@ -24,13 +24,6 @@ sub run {
 
     $self->emit('pre_tweet');
 
-    my $twtfile  = shell_quote( $self->twtfile );
-    my $pre_hook = $self->pre_tweet_hook;
-    if ( $self->hooks && $pre_hook ) {
-        $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
-        system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
-    }
-
     my @lines;
     if ( $self->text ) {
         push @lines, $self->text;
@@ -64,12 +57,6 @@ sub run {
 
     $self->emit( 'post_tweet', @tweets );
 
-    my $post_hook = $self->post_tweet_hook;
-    if ( $self->hooks && $post_hook ) {
-        $post_hook =~ s/\Q{twtfile}/$twtfile/ge;
-        system($post_hook) == 0
-          or die "Can't call post_tweet_hook $post_hook.\n";
-    }
     return 0;
 }
 
