@@ -14,9 +14,9 @@ sub linkback {
 
     my $config = $app->read_config;
 
-    my $store_config = $config->{'LinkBack'};
+    my $plugin_config = $config->{'LinkBack'};
 
-    return if !$store_config;
+    return if !$plugin_config;
     return if !$app->twturl;
 
     my @mentions;

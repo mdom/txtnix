@@ -15,13 +15,13 @@ sub store {
 
     my $config = $app->read_config;
 
-    my $store_config = $config->{'GistStore'};
+    my $plugin_config = $config->{'GistStore'};
 
-    return if !$store_config;
+    return if !$plugin_config;
 
-    my $token    = $store_config->{access_token};
-    my $username = $store_config->{user};
-    my $id       = $store_config->{id};
+    my $token    = $plugin_config->{access_token};
+    my $username = $plugin_config->{user};
+    my $id       = $plugin_config->{id};
 
     my $url =
       Mojo::URL->new("https://api.github.com/gists")
