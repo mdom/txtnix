@@ -39,6 +39,7 @@
             "Mojo::Base" : "0",
             "Mojo::ByteStream" : "0",
             "Mojo::Date" : "0",
+            "Mojo::IOLoop::Delay" : "0",
             "Mojo::JSON" : "0",
             "Mojo::Loader" : "0",
             "Mojo::Template" : "0",
