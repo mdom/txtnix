@@ -17,7 +17,11 @@ sub linkback {
     my $plugin_config = $config->{'LinkBack'};
 
     return if !$plugin_config;
-    return if !$app->twturl;
+
+    if ( !$app->twturl ) {
+        warn "Cannot send ping back without twturl.\n";
+        return;
+    }
 
     my @mentions;
     for my $tweet (@tweets) {
