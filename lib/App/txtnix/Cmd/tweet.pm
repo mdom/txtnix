@@ -22,6 +22,8 @@ sub run {
     die "Can't parse --created-at " . $self->created_at . " as rfc3339.\n"
       if !defined $time->epoch;
 
+    $self->emit('pre_tweet');
+
     my $twtfile  = shell_quote( $self->twtfile );
     my $pre_hook = $self->pre_tweet_hook;
     if ( $self->hooks && $pre_hook ) {
@@ -59,6 +61,8 @@ sub run {
     for my $tweet (@tweets) {
         $self->twtfile->append_utf8( $tweet->to_string . "\n" );
     }
+
+    $self->emit( 'post_tweet', @tweets );
 
     my $post_hook = $self->post_tweet_hook;
     if ( $self->hooks && $post_hook ) {
