@@ -28,6 +28,8 @@ sub linkback {
         push @mentions, $tweet->text =~ m/@<(?:\w+ )?(.*?)>/g;
     }
 
+    return if !@mentions;
+
     my %linkback;
     for my $tweet ( $app->get_tweets(@mentions) ) {
         if ( $tweet->text =~ m{//\s+linkback\s+(.*?)\s*$} ) {
