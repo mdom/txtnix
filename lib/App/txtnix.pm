@@ -251,8 +251,10 @@ sub get_tweets {
                             }
                         );
                     }
-                    my $source =
-                      App::txtnix::Source->new( url => $url, nick => $nick );
+                    my $source = App::txtnix::Source->new(
+                        url  => $url,
+                        nick => $nick
+                    );
                     push @tweets, $self->parse_twtfile( $source, $body );
 
                 }
@@ -281,10 +283,12 @@ sub get_tweets {
         );
     }
 
-        my $end = $delay->begin;
-        my $registry =
-          App::txtnix::Registry->new( url => $self->registry, ua => $self->ua );
     if ( !@source && $self->registry && $self->twturl ) {
+        my $end      = $delay->begin;
+        my $registry = App::txtnix::Registry->new(
+            url => $self->registry,
+            ua  => $self->ua
+        );
         my @mentions = $registry->get_mentions(
             $self->twturl => sub {
                 my (@results) = @_;
@@ -292,8 +296,10 @@ sub get_tweets {
                     my ( $nick, $url ) =
                       $result->[0] =~ /\@<(?:(\w+) )?([^>]+)>/;
                     next if $url and $urls{$url};
-                    my $source =
-                      App::txtnix::Source->new( url => $url, nick => $nick );
+                    my $source = App::txtnix::Source->new(
+                        url  => $url,
+                        nick => $nick
+                    );
                     my $timestamp = $self->to_date( $result->[1] );
                     next if !defined $timestamp->epoch;
                     push @tweets,
@@ -351,7 +357,8 @@ sub filter_tweets {
 
     @tweets = values %seen_tweets;
 
-    @tweets = sort { $b->timestamp->epoch <=> $a->timestamp->epoch } @tweets;
+    @tweets =
+      sort { $b->timestamp->epoch <=> $a->timestamp->epoch } @tweets;
 
     my $limit = $self->limit;
     return sort {
