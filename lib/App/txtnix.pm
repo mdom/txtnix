@@ -1,13 +1,13 @@
 package App::txtnix;
 
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 use 5.14.0;
 use Config::Tiny;
 use Path::Tiny;
 use Mojo::Date;
 use Mojo::UserAgent;
 use Mojo::URL;
-use Mojo::Loader qw(data_section);
+use Mojo::Loader qw(data_section find_modules load_class);
 use Mojo::Template;
 use App::txtnix::Tweet;
 use App::txtnix::Source;
@@ -110,7 +110,17 @@ sub new {
         $args->{$path} = path( $args->{$path} ) if exists $args->{$path};
     }
 
-    return bless {%$args}, ref $class || $class;
+    my $self = bless {%$args}, ref $class || $class;
+
+    my @plugins = find_modules('App::txtnix::Plugin');
+    for my $plugin (@plugins) {
+        if ( my $e = load_class $plugin) {
+            die ref $e ? "Exception: $e" : 'Not found!';
+        }
+        $plugin->new( app => $self )->register;
+    }
+
+    return $self;
 }
 
 sub _build_ua {
