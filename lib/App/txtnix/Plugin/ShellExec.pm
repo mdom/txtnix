@@ -3,34 +3,36 @@ use Mojo::Base 'App::txtnix::Plugin';
 use String::ShellQuote qw(shell_quote);
 
 has handlers => sub {
-    {
-        pre_tweet  => \&pre_tweet,
-        post_tweet => \&post_tweet,
-    };
+    my $handlers = {};
+    for my $prefix (qw(tweet follow unfollow)) {
+        for my $suffix (qw(pre post)) {
+            $handlers->{"${suffix}_${prefix}"} = \&exec_hook;
+        }
+    }
+    return $handlers;
 };
 
-sub pre_tweet {
-    my $app = shift;
+sub exec_hook {
+    my ( $self, $event ) = @_;
 
-    my $twtfile  = shell_quote( $app->twtfile );
-    my $pre_hook = $app->pre_tweet_hook;
-    if ( $app->hooks && $pre_hook ) {
-        $pre_hook =~ s/\Q{twtfile}/$twtfile/ge;
-        system($pre_hook) == 0 or die "Can't call pre_tweet_hook $pre_hook.\n";
+    my $app = $self->app;
+
+    my $cmd = $self->config->{"${event}_cmd"};
+
+    if ( !$cmd && $event =~ /(pre|post)_tweet/ ) {
+        return if !$app->hooks;
+        my $attribute = "${event}_hook";
+        $cmd = $app->$attribute;
     }
-    return;
-}
-
-sub post_tweet {
-    my $app = shift;
-
-    my $twtfile   = shell_quote( $app->twtfile );
-    my $post_hook = $app->post_tweet_hook;
-    if ( $app->hooks && $post_hook ) {
-        $post_hook =~ s/\Q{twtfile}/$twtfile/ge;
-        system($post_hook) == 0
-          or die "Can't call post_tweet_hook $post_hook.\n";
+    else {
     }
+
+    return if !$cmd;
+
+    my $twtfile = shell_quote( $app->twtfile );
+    $cmd =~ s/\Q{twtfile}/$twtfile/ge;
+    system($cmd) == 0 or die "Can't call ${event}_hook $cmd.\n";
+
     return;
 }
 
