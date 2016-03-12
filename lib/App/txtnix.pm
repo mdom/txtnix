@@ -1,6 +1,6 @@
 package App::txtnix;
 
-use Mojo::Base 'Mojo::EventEmitter';
+use Mojo::Base -base;
 use 5.14.0;
 use Config::Tiny;
 use Path::Tiny;
@@ -47,7 +47,8 @@ has wrap_text         => sub { 1 };
 has character_limit   => sub { 1024 };
 
 has [
-    qw( colors twturl pre_tweet_hook post_tweet_hook config force registry key_file cert_file )
+    qw( colors twturl pre_tweet_hook post_tweet_hook config
+      force registry key_file cert_file plugins )
 ];
 
 sub new {
@@ -113,15 +114,27 @@ sub new {
 
     my $self = bless {%$args}, ref $class || $class;
 
-    my @plugins = find_modules('App::txtnix::Plugin');
-    for my $plugin (@plugins) {
-        if ( my $e = load_class $plugin) {
+    my @plugins;
+    my @modules = find_modules('App::txtnix::Plugin');
+    for my $module (@modules) {
+        if ( my $e = load_class $module) {
             die ref $e ? "Exception: $e" : 'Not found!';
         }
-        $plugin->new( app => $self )->register;
+        push @plugins, $module->new( app => $self );
     }
+    $self->plugins( \@plugins );
 
     return $self;
+}
+
+sub emit {
+    my ( $self, $event ) = ( shift, shift );
+    foreach my $plugin ( @{ $self->plugins } ) {
+        next if !$plugin->is_enabled;
+        my $method = $plugin->can($event);
+        next if !$method;
+        $plugin->$method( $event, @_ );
+    }
 }
 
 sub _build_ua {

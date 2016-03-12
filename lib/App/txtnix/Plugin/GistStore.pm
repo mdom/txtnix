@@ -1,15 +1,9 @@
 package App::txtnix::Plugin::GistStore;
-use strict;
-use warnings;
 use Mojo::Base 'App::txtnix::Plugin';
 use Path::Tiny;
 use Mojo::JSON qw(true false);
 
-has handlers => sub {
-    { post_tweet => \&store };
-};
-
-sub store {
+sub post_tweet {
     my $self = shift;
     my $app  = $self->app;
     my $ua   = $app->ua;

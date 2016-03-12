@@ -2,15 +2,14 @@ package App::txtnix::Plugin::ShellExec;
 use Mojo::Base 'App::txtnix::Plugin';
 use String::ShellQuote qw(shell_quote);
 
-has handlers => sub {
-    my $handlers = {};
+BEGIN {
+    no strict 'refs';
     for my $prefix (qw(tweet follow unfollow)) {
         for my $suffix (qw(pre post)) {
-            $handlers->{"${suffix}_${prefix}"} = \&exec_hook;
+            *{"${suffix}_${prefix}"} = \&exec_hook;
         }
     }
-    return $handlers;
-};
+}
 
 sub exec_hook {
     my ( $self, $event ) = @_;

@@ -4,11 +4,7 @@ use warnings;
 use Mojo::Base 'App::txtnix::Plugin';
 use Mojo::IOLoop::Delay;
 
-has handlers => sub {
-    { post_tweet => \&linkback };
-};
-
-sub linkback {
+sub post_tweet {
     my ( $self, $event, @tweets ) = @_;
     my $app = $self->app;
 

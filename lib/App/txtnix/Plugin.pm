@@ -19,19 +19,4 @@ sub is_enabled {
     return defined $self->config && $self->config->{enabled};
 }
 
-sub register {
-    my $self = shift;
-    for my $key ( keys %{ $self->handlers } ) {
-        $self->app->on(
-            $key => sub {
-                return if !$self->is_enabled;
-                my $app    = shift;
-                my $method = $self->handlers->{$key};
-                $self->$method( $key, @_ );
-            }
-        );
-    }
-    return;
-}
-
 1;
