@@ -10,18 +10,13 @@ has handlers => sub {
 };
 
 sub store {
-    my $app = shift;
-    my $ua  = $app->ua;
+    my $self = shift;
+    my $app  = $self->app;
+    my $ua   = $app->ua;
 
-    my $config = $app->read_config;
-
-    my $plugin_config = $config->{'GistStore'};
-
-    return if !$plugin_config;
-
-    my $token    = $plugin_config->{access_token};
-    my $username = $plugin_config->{user};
-    my $id       = $plugin_config->{id};
+    my $token    = $self->config->{access_token};
+    my $username = $self->config->{user};
+    my $id       = $self->config->{id};
 
     my $url =
       Mojo::URL->new("https://api.github.com/gists")
@@ -48,6 +43,7 @@ sub store {
     if ( my $res = $tx->success ) {
         print "Uploaded gist.\n";
         if ( !$id ) {
+            my $config = $app->read_config;
             $config->{'Store::Gist'}->{id} = $res->json->{id};
             $config->write( $app->config, 'utf8' );
         }

@@ -9,11 +9,6 @@ has handlers => sub {
 };
 
 sub linkback {
-    my $config = $app->read_config;
-
-    my $plugin_config = $config->{'LinkBack'};
-
-    return if !$plugin_config;
     my ( $self, $event, @tweets ) = @_;
     my $app = $self->app;
 
