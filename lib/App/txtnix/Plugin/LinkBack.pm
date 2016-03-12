@@ -9,14 +9,13 @@ has handlers => sub {
 };
 
 sub linkback {
-    my $app    = shift;
-    my @tweets = @_;
-
     my $config = $app->read_config;
 
     my $plugin_config = $config->{'LinkBack'};
 
     return if !$plugin_config;
+    my ( $self, $event, @tweets ) = @_;
+    my $app = $self->app;
 
     if ( !$app->twturl ) {
         warn "Cannot send ping back without twturl.\n";

@@ -9,7 +9,13 @@ has handlers => sub { {} };
 sub register {
     my $self = shift;
     for my $key ( keys %{ $self->handlers } ) {
-        $self->app->on( $key => $self->handlers->{$key} );
+        $self->app->on(
+            $key => sub {
+                my $app    = shift;
+                my $method = $self->handlers->{$key};
+                $self->$method( $key, @_ );
+            }
+        );
     }
     return;
 }
