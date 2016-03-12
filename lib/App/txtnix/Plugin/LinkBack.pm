@@ -1,6 +1,4 @@
 package App::txtnix::Plugin::LinkBack;
-use strict;
-use warnings;
 use Mojo::Base 'App::txtnix::Plugin';
 use Mojo::IOLoop::Delay;
 
