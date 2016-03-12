@@ -6,7 +6,11 @@ has 'url';
 
 sub run {
     my ($self) = @_;
+
     my $nick = $self->nickname;
+
+    $self->emit('pre_follow');
+
     if (    $self->following->{$nick}
         and $self->following->{$nick} eq $self->url )
     {
@@ -26,6 +30,9 @@ sub run {
     $self->sync;
     $self->add_metadata( 'follow', $self->nickname, $self->url )
       if $self->write_metadata;
+
+    $self->emit('post_follow');
+
     return 0;
 }
 
