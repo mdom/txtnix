@@ -295,6 +295,11 @@ arg search_term => (
     comment => 'Search term.',
 );
 
+for ( my $i = 0 ; $i < @timeline_opts ; $i += 2 ) {
+    my ( $i, $j ) = @timeline_opts[ $i, $i + 1 ];
+    opt $i, %$j;
+}
+
 subcmd
   cmd     => 'register',
   comment => 'Register at your registry.';
