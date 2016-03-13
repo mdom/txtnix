@@ -20,8 +20,8 @@ sub post_tweet {
 
     my %linkback;
     for my $tweet ( $app->get_tweets(@mentions) ) {
-        if ( $tweet->text =~ m{^\s*//\s+linkback\s+(.*?)\s*$} ) {
-            $linkback{ $tweet->source->url } = $1;
+        if ( $tweet->is_metadata && $tweet->command->[0] eq 'linkback' ) {
+            $linkback{ $tweet->source->url } = $tweet->command->[1];
         }
     }
     my @linkbacks = values %linkback;

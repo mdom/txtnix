@@ -358,7 +358,7 @@ sub filter_tweets {
 
     @tweets =
       grep {
-             !( $self->hide_metadata && index( $_->text, '//' ) == 0 )
+             !( $self->hide_metadata && $_->is_metadata )
           && $_->timestamp->epoch >= $self->since->epoch
           && $_->timestamp->epoch <= $self->until->epoch
       } @tweets;
