@@ -47,7 +47,7 @@ has wrap_text         => sub { 1 };
 has character_limit   => sub { 1024 };
 
 has [
-    qw( colors twturl pre_tweet_hook post_tweet_hook config
+    qw( colors twturl pre_tweet_hook post_tweet_hook config_file
       force registry key_file cert_file plugins )
 ];
 
@@ -65,8 +65,10 @@ sub new {
         $args->{ $translate{$_} } = delete $args->{$_} if exists $args->{$_};
     }
 
-    $args->{config} =
-      $args->{config} ? path( $args->{config} ) : $class->_build_config_file;
+    $args->{config_file} =
+      $args->{config}
+      ? path( delete $args->{config} )
+      : $class->_build_config_file;
 
     for (qw(since until)) {
         if ( exists $args->{$_} ) {
@@ -86,8 +88,8 @@ sub new {
         $args->{sorting} = $_ if exists $args->{$_} && $args->{$_};
     }
 
-    if ( $args->{config}->exists ) {
-        my $config = $class->read_config( $args->{config} );
+    if ( $args->{config_file}->exists ) {
+        my $config = $class->read_config( $args->{config_file} );
         if ( $config->{twtxt} ) {
             $args = { %{ $config->{twtxt} }, %$args };
         }
@@ -169,19 +171,19 @@ sub _build_config_file {
 
 sub write_config {
     my ( $self, $config ) = @_;
-    $config->write( $self->config, 'utf8' );
+    $config->write( $self->config_file, 'utf8' );
     return;
 }
 
 sub read_config {
     my ( $self, $file ) = @_;
-    $file = path( $file || $self->config );
+    $file = path( $file || $self->config_file );
     if ( !$file->exists ) {
         $file->parent->mkpath;
         $file->touch;
     }
     my $config =
-      Config::Tiny->read( $file || $self->config->stringify, 'utf8' );
+      Config::Tiny->read( $file || $self->config_file->stringify, 'utf8' );
     die "Could not read configuration file: $Config::Tiny::errstr\n"
       if !defined $config;
     return $config;
