@@ -45,6 +45,7 @@ has last_timeline     => sub { 0 };
 has use_colors        => sub { 0 };
 has wrap_text         => sub { 1 };
 has character_limit   => sub { 1024 };
+has expand_me         => sub { 0 };
 
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config_file
@@ -454,11 +455,16 @@ sub display_tweets {
             $ENV{ANSI_COLORS_DISABLED} = 0;
         }
 
+        my $content = $self->collapse_mentions( $tweet->text || '' );
+        if ( $tweet->source->nick && $self->expand_me ) {
+            $content =~ s{^/me(?=\s)}{'@'.$tweet->source->nick}e;
+        }
+
         print {$fh} b(
             $mt->process(
                 {
                     nick    => $tweet->source->to_string,
-                    content => $self->collapse_mentions( $tweet->text || '' ),
+                    content => $content,
                     time    => $tweet->strftime( $self->time_format ),
                     app     => $self,
                 }

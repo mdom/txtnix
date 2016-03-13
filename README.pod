@@ -211,6 +211,10 @@ If to wrap text in pretty display. Defaults to true.
 Number of characters a remote tweet can have. Setting it to zero will
 disable this security precaution. Defaults to 1024.
 
+=item expand_me
+
+Expand I</me> at the start of a tweet's text to nickname. Defaults to false.
+
 =back
 
 =head2 followings
