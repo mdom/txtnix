@@ -52,69 +52,78 @@ subcmd
   cmd     => 'timeline',
   comment => 'Retrieve your personal timeline.';
 
-opt cache => (
-    isa     => 'Bool',
-    comment => 'Cache remote twtxt files locally.',
+my @timeline_opts = (
+    cache => {
+        isa     => 'Bool',
+        comment => 'Cache remote twtxt files locally.',
+    },
+    cache_dir => {
+        isa     => 'Str',
+        comment => 'Directory for saving twtxt files locally.',
+    },
+    timeout => {
+        isa     => 'Int',
+        comment => 'Maximum time requests are allowed to take.',
+    },
+    pager => {
+        isa     => 'Bool',
+        comment => 'Use a pager to display content.',
+        alias   => 'p',
+    },
+    time_format => {
+        isa     => 'Str',
+        comment => 'Format to display timestamps.',
+        alias   => 'f',
+    },
+    limit => {
+        isa     => 'Int',
+        comment => 'Limit total number of shown tweets.',
+        alias   => 'l',
+    },
+    ascending => {
+        isa     => 'Bool',
+        comment => 'Sort timeline in ascending order.',
+        alias   => 'a',
+    },
+    descending => {
+        isa     => 'Bool',
+        comment => 'Sort timeline in descending order.',
+        alias   => 'd',
+    },
+    since => {
+        isa     => 'Str',
+        comment => 'Only display tweets written after the supplied datetime.',
+        alias   => 's',
+    },
+    until => {
+        isa     => 'Str',
+        comment => 'Only display tweets written until the supplied datetime.',
+        alias   => 'u',
+    },
+    pretty => {
+        isa     => 'Bool',
+        comment => 'Display tweets in a less dense way.',
+    },
+    simple => {
+        isa     => 'Bool',
+        comment => 'Display tweets line in one line.',
+    },
 );
-opt cache_dir => (
-    isa     => 'Str',
-    comment => 'Directory for saving twtxt files locally.',
-);
-opt timeout => (
-    isa     => 'Int',
-    comment => 'Maximum time requests are allowed to take.',
-);
-opt pager => (
-    isa     => 'Bool',
-    comment => 'Use a pager to display content.',
-    alias   => 'p',
-);
-opt time_format => (
-    isa     => 'Str',
-    comment => 'Format to display timestamps.',
-    alias   => 'f',
-);
-opt limit => (
-    isa     => 'Int',
-    comment => 'Limit total number of shown tweets.',
-    alias   => 'l',
-);
-opt ascending => (
-    isa     => 'Bool',
-    comment => 'Sort timeline in ascending order.',
-    alias   => 'a',
-);
-opt descending => (
-    isa     => 'Bool',
-    comment => 'Sort timeline in descending order.',
-    alias   => 'd',
-);
-opt since => (
-    isa     => 'Str',
-    comment => 'Only display tweets written after the supplied datetime.',
-    alias   => 's',
-);
-opt until => (
-    isa     => 'Str',
-    comment => 'Only display tweets written until the supplied datetime.',
-    alias   => 'u',
-);
+
+for ( my $i = 0 ; $i < @timeline_opts ; $i += 2 ) {
+    my ( $i, $j ) = @timeline_opts[ $i, $i + 1 ];
+    opt $i, %$j;
+}
+
 opt new => (
     isa     => 'Bool',
     comment => 'Only display new tweets.',
 );
+
 opt me => (
     isa     => 'Bool',
     comment => 'Only display your tweets and all replies and mentions.',
     alias   => 'm',
-);
-opt pretty => (
-    isa     => 'Bool',
-    comment => 'Display tweets in a less dense way.',
-);
-opt simple => (
-    isa     => 'Bool',
-    comment => 'Display tweets line in one line.',
 );
 
 subcmd
@@ -127,61 +136,10 @@ arg source => (
     required => 1,
 );
 
-opt cache => (
-    isa     => 'Bool',
-    comment => 'Cache remote twtxt files locally.',
-);
-opt cache_dir => (
-    isa     => 'Str',
-    comment => 'Directory for saving twtxt files locally.',
-);
-opt timeout => (
-    isa     => 'Int',
-    comment => 'Maximum time requests are allowed to take.',
-);
-opt pager => (
-    isa     => 'Bool',
-    comment => 'Use a pager to display content.',
-    alias   => 'p',
-);
-opt time_format => (
-    isa     => 'Str',
-    comment => 'Format to display timestamps.',
-    alias   => 'f',
-);
-opt limit => (
-    isa     => 'Int',
-    comment => 'Limit total number of shown tweets.',
-    alias   => 'l',
-);
-opt ascending => (
-    isa     => 'Bool',
-    comment => 'Sort timeline in ascending order.',
-    alias   => 'a',
-);
-opt descending => (
-    isa     => 'Bool',
-    comment => 'Sort timeline in descending order.',
-    alias   => 'd',
-);
-opt since => (
-    isa     => 'Str',
-    comment => 'Only display tweets written after the supplied datetime.',
-    alias   => 's',
-);
-opt until => (
-    isa     => 'Str',
-    comment => 'Only display tweets written until the supplied datetime.',
-    alias   => 'u',
-);
-opt pretty => (
-    isa     => 'Bool',
-    comment => 'Display tweets in a less dense way.',
-);
-opt simple => (
-    isa     => 'Bool',
-    comment => 'Display tweets line in one line.',
-);
+for ( my $i = 0 ; $i < @timeline_opts ; $i += 2 ) {
+    my ( $i, $j ) = @timeline_opts[ $i, $i + 1 ];
+    opt $i, %$j;
+}
 
 subcmd
   cmd     => 'follow',
