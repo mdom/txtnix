@@ -219,6 +219,16 @@ arg nickname => (
 );
 
 subcmd
+  cmd     => 'info',
+  comment => 'Show metadata of given source.';
+
+arg source => (
+    isa      => 'Str',
+    comment  => 'Nick or URL to view.',
+    required => 1,
+);
+
+subcmd
   cmd     => 'config',
   comment => 'Get or set config item.';
 
