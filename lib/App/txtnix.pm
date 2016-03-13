@@ -165,7 +165,7 @@ sub _build_config_file {
         : $^O eq "MSWin32"      ? $ENV{APPDATA}
         : $^O eq 'darwin'       ? '~/Library/Application Support'
         :                         '~/.config/'
-    )->child('twtxt');
+    )->child('txtnix');
     $dir->mkpath if !$dir->exists;
     return $dir->child('config');
 }

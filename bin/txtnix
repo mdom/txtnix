@@ -74,7 +74,7 @@ easy way, the following commands will install txtnix and all dependencies to
 =head1 CONFIGURATION FILE
 
 twtxt uses a simple INI-like configuration file. It checks
-~/.config/twtxt/config for its configuration, but you can overwrite it
+~/.config/txtnix/config for its configuration, but you can overwrite it
 with the command line switch I<--config>.
 
 Here's an example conf file, showing every currently supported option:
