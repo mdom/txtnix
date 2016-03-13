@@ -200,7 +200,7 @@ Use ANSI-colors for the I<pretty> layout. Defaults to true.
 
 In which format to display your timeline. I<txtnix> defines two different
 layout: I<simple> is a line oriented very basic layout. I<pretty> looks
-less dense and supports ANSI colors and text wrapping. Defaults to simple.
+less dense and supports ANSI colors and text wrapping. Defaults to I<pretty>.
 
 =item wrap_text
 
