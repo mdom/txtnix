@@ -374,6 +374,9 @@ sub filter_tweets {
 
     @tweets = values %seen_tweets;
 
+    @tweets =
+      sort { $b->timestamp->epoch <=> $a->timestamp->epoch } @tweets;
+
     my $limit = $self->limit;
     return sort {
             $self->sorting eq 'descending'
