@@ -4,9 +4,8 @@ use warnings;
 use Mojo::Base -base;
 
 has 'app';
-has handlers => sub { {} };
-has config   => sub { shift->_build_config };
-has name     => sub { my ($name) = ref( $_[0] ) =~ /^.*::(.*)$/; return $name };
+has config => sub { shift->_build_config };
+has name => sub { my ($name) = ref( $_[0] ) =~ /^.*::(.*)$/; return $name };
 
 sub _build_config {
     my $self = shift;
