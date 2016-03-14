@@ -22,6 +22,7 @@ sub run {
         use_pager      => 0,
         use_colors     => 0,
         following      => { bob => '/bob.txt', alice => '/alice.txt' },
+        nick           => 'test_runner',
         %$opts,
     };
     $class->new($opts)->run();
@@ -92,6 +93,11 @@ stdout_is( sub { run('following') }, qq{alice @ /alice2.0.txt\n} );
 
 stdout_is( sub { run( 'follow', 'bob', '/bob.txt' ) },
     qq{You're now following bob.\n} );
+
+stdout_is(
+    sub { run( 'follow', 'test_runner', '/test_runner.txt' ) },
+    qq{Your nickname is also test_runner. Please choose a different nick.\n}
+);
 
 stdout_is(
     sub { run( 'config', 'get', 'disclose_identity' ) },
