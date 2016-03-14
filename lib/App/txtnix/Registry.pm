@@ -11,7 +11,7 @@ sub register_user {
     my ( $self, $url, $nickname ) = @_;
 
     croak('Parameter url or nickname missing')
-      if !$url && !$nickname;
+      if !$url || !$nickname;
 
     my $endpoint = Mojo::URL->new( $self->url )->path('/api/plain/users')
       ->query( nickname => $nickname, url => $url );
