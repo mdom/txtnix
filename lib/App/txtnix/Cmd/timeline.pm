@@ -10,7 +10,10 @@ sub run {
 
     if ( $self->me ) {
         @tweets =
-          grep { $_->source->file || $_->text =~ /\@<(?:\w+ )?$url>/o } @tweets;
+          grep {
+                 $_->source->file eq $self->twtfile
+              || $_->text =~ /\@<(?:\w+ )?$url>/o
+          } @tweets;
     }
 
     @tweets = $self->filter_tweets(@tweets);
