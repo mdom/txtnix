@@ -13,7 +13,8 @@ sub post_tweet {
 
     my @mentions;
     for my $tweet (@tweets) {
-        push @mentions, $tweet->text =~ m/@<(?:\w+ )?(.*?)>/g;
+        push @mentions,
+          grep { $_ ne $app->twturl } $tweet->text =~ m/@<(?:\w+ )?(.*?)>/g;
     }
 
     return if !@mentions;
