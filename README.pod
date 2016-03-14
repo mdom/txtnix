@@ -237,6 +237,52 @@ I<nick>:
 
 Setting a value to I<clear> will disable coloring for that element.
 
+=head1 Plugins
+
+Plugins can provide functions that are called when events happen in I<txtnix>. See
+L<App::txtnix::Plugin> for a complete documentation how to write plugins.
+
+Plugins need to be enabled in the configuration file to handle events:
+
+  [MyPlugin]
+  enabled = 1
+
+I<txtnix> comes with three pre-installed plugins:
+
+=over 4
+
+=item * ShellExec
+
+Works like the old hook system, but can run commands for all events:
+
+  [ShellExec]
+  pre_follow = echo Another follower
+
+This plugin is always enabled as it implements the functionality of the
+configuration options I<pre_tweet_hook> and I<post_tweet_hook>.
+
+=item * GistStore
+
+Uploads your twtfile to L<https://gist.github.com>. Needs your username and a
+access token or your password (but really, please use a access token):
+
+  [GistStore]
+  enabled      = 1
+  access_token = asdfasdfasdf
+  user         = bob
+
+=item * LinkBack
+
+Any time you mention somebody in your tweet and LinkBack is enabled, it checks
+the mentioned users feed for a linkback command and posts your twturl as I<url>
+parameter to that address. As there is currently no standard way to declare
+metadata, it checks for a tweet with I<// linkback $url>.
+
+  [LinkBack]
+  enabled = 1
+
+=back
+
 =head1 Hooks
 
 I<pre_tweet_hook> and I<post_tweet_hook> are very useful if you want to
