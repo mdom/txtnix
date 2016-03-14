@@ -29,7 +29,9 @@ my $app = App::txtnix->new(
 # Silence
 app->log->level('fatal');
 
-get '/bob.txt'  => { text => "2016-02-03T00:00:00Z\t// linkback /bob.php" };
+get '/bob.txt' => { text => "2016-02-03T00:00:00Z\t// linkback /bob.php" };
+get '/charlie.txt' =>
+  { text => "2016-02-03T00:00:00Z\t// linkback /charlie.php" };
 post '/bob.php' => { text => "2016-02-03T00:00:00Z\t// linkback /bob.php" };
 
 stderr_is(
@@ -58,6 +60,19 @@ stderr_is(
     },
     <<EOF );
 Send ping back to /bob.php.
+EOF
+
+stderr_is(
+    sub {
+        $app->emit(
+            'post_tweet',
+            App::txtnix::Tweet->new(
+                text => "2016-02-03T00:00:00Z\tHi @<charlie /charlie.txt>"
+            )
+        );
+    },
+    <<EOF );
+Couldn't ping back to /charlie.php: 404 response: Not Found
 EOF
 
 done_testing;
