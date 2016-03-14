@@ -46,6 +46,7 @@ has use_colors        => sub { 0 };
 has wrap_text         => sub { 1 };
 has character_limit   => sub { 1024 };
 has expand_me         => sub { 0 };
+has hooks             => sub { 1 };
 
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config_file

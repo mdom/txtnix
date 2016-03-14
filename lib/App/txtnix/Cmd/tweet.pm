@@ -9,7 +9,6 @@ use IO::Interactive qw(is_interactive);
 
 has 'text';
 has 'created_at';
-has 'hooks' => sub { 1 };
 
 sub run {
     my ($self) = @_;
