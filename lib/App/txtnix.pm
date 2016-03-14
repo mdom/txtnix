@@ -160,12 +160,14 @@ sub _build_ua {
 }
 
 sub _build_config_file {
-    my $dir = path(
+    my $dir =
+      $ENV{TXTNIX_CONFIG_DIR} ? path( $ENV{TXTNIX_CONFIG_DIR} )
+      : path(
           $ENV{XDG_CONFIG_HOME} ? $ENV{XDG_CONFIG_HOME}
         : $^O eq "MSWin32"      ? $ENV{APPDATA}
         : $^O eq 'darwin'       ? '~/Library/Application Support'
         :                         '~/.config/'
-    )->child('txtnix');
+      )->child('txtnix');
     $dir->mkpath if !$dir->exists;
     return $dir->child('config');
 }
