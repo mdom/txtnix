@@ -62,6 +62,15 @@ $twtfile->spew('');
 run( 'tweet', '--created-at', '2016-02-03T00:00:00Z', 'Hello World' );
 is( $twtfile->slurp_utf8, "2016-02-03T00:00:00Z\tHello World\n" );
 
+stdout_is( sub { run('following') }, <<EOF );
+alice @ /alice2.0.txt
+bob @ /bob.txt
+EOF
+
+stdout_is( sub { run( 'following', 'bob' ) }, <<EOF );
+bob @ /bob.txt
+EOF
+
 stdout_is(
     sub { run( 'follow', 'bob', '/bob.txt' ) },
     qq{You're already following bob.\n}
