@@ -98,6 +98,14 @@ get '/tags/#q' => sub {
     return $c->render( text => join( "\n", map { join( "\t", @$_ ) } @data ) );
 };
 
+post '/users' => sub {
+    my $c = shift;
+    my ( $url, $nick ) = ( $c->param('url'), $c->param('nickname') );
+    return $c->render( text => 'Oops.', status => 400 )
+      if !$url || !$nick || $url eq '/evil';
+    return $c->render( text => 'Ok.', status => 200 );
+};
+
 my $registry = App::txtnix::Registry->new(
     ua  => Mojo::UserAgent->new,
     url => '/',
@@ -125,5 +133,15 @@ my $delay = Mojo::IOLoop::Delay->new;
 my $end   = $delay->begin;
 $registry->get_tweets( undef, sub { is( @_, 2 ); $end->() } );
 $delay->wait;
+
+ok( $registry->register_user( '/foo', 'bob' ) );
+
+eval { $registry->register_user('/foo') };
+
+like( $@, qr/Parameter url or nickname missing at/ );
+
+stderr_is( sub { $registry->register_user( '/evil', 'charlie' ) }, <<EOF);
+Can't add user: Bad Request
+EOF
 
 done_testing;
