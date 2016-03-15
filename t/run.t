@@ -56,8 +56,8 @@ stdout_is( sub { run( 'timeline', '--descending' ) }, <<'EOO');
 2016-02-02 00:00 alice: Tweet!
 EOO
 
-run( 'tweet', 'Hello World' );
-like( $twtfile->slurp_utf8, qr/[\d:TZ-]+\tHello World/ );
+run( 'tweet', 'Hello World @bob' );
+like( $twtfile->slurp_utf8, qr/[\d:TZ-]+\tHello World \@<bob \/bob.txt>$/ );
 
 $twtfile->spew('');
 run( 'tweet', '--created-at', '2016-02-03T00:00:00Z', 'Hello World' );
