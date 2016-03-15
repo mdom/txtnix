@@ -85,6 +85,7 @@
    },
    "version" : "0.07",
    "x_contributors" : [
+      "David Sterba <dsterba@suse.com>",
       "Mario Domgoergen <mdom@taz.de>"
    ]
 }
