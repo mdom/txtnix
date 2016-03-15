@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Path::Tiny;
 
 if ( $ARGV[0] ) {
-    path( $ARGV[0] )->spew_utf8( "Foo\n", "Bar\n" );
+    open( my $fh, '>', $ARGV[0] )
+      or die "Can't open $ARGV[0]: $!\n";
+    print $fh "Foo\n", "Bar\n";
+    close $fh;
 }
 
 exit 0;
