@@ -17,6 +17,7 @@ my %table = (
     'http://example.org/bar/../quux' => 'http://example.org/quux',
     'http://example.org/b%61r'       => 'http://example.org/bar',
     'http://example.org/b%6F%6f'     => 'http://example.org/boo',
+    'http://bob:s3cr3t@example.org/' => 'http://example.org',
 );
 
 while ( my ( $from, $to ) = each %table ) {

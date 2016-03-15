@@ -486,6 +486,7 @@ sub normalize_url {
     $url->path->leading_slash(0);
     $url->path->trailing_slash(0);
     $url->path->canonicalize;
+    $url->userinfo(undef);
     return $url;
 }
 
