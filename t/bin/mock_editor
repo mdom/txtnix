@@ -6,3 +6,5 @@ use Path::Tiny;
 if ( $ARGV[0] ) {
     path( $ARGV[0] )->spew_utf8( "Foo\n", "Bar\n" );
 }
+
+exit 0;
