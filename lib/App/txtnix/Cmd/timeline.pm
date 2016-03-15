@@ -11,7 +11,9 @@ sub run {
     if ( $self->me ) {
         @tweets =
           grep {
-                 $_->source->file eq $self->twtfile
+            (        $_->source->file
+                  && $self->twtfile
+                  && $_->source->file eq $self->twtfile )
               || $_->text =~ /\@<(?:\w+ )?$url>/o
           } @tweets;
     }
