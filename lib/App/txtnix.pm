@@ -477,11 +477,19 @@ sub display_tweets {
     return;
 }
 
+sub normalize_url {
+	my ($self, $url) = @_;
+	my $ret;
+	$ret = "hxxp:$1" if ($url =~ /https?:(.*)/);
+	#print STDERR "NORMALIZE: $url -> $ret\n";
+	return $ret;
+}
+
 sub url_to_nick {
     my ( $self, $url ) = @_;
     my $known_users = $self->known_users;
-    my %urls = map { $known_users->{$_} => $_ } keys %{$known_users};
-    return $urls{$url};
+    my %urls = map { $self->normalize_url($known_users->{$_}) => $_ } keys %{$known_users};
+    return $urls{$self->normalize_url($url)};
 }
 
 sub collapse_mentions {
