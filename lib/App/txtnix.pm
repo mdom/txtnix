@@ -478,18 +478,24 @@ sub display_tweets {
 }
 
 sub normalize_url {
-	my ($self, $url) = @_;
-	my $ret;
-	$ret = "hxxp:$1" if ($url =~ /https?:(.*)/);
-	#print STDERR "NORMALIZE: $url -> $ret\n";
-	return $ret;
+    my ( $self, $url ) = @_;
+    $url = Mojo::URL->new($url);
+    $url->scheme('http');
+    $url->port(undef)
+      if $url->port && ( $url->port == 80 || $url->port == 443 );
+    $url->path->leading_slash(0);
+    $url->path->trailing_slash(0);
+    $url->path->canonicalize;
+    return $url;
 }
 
 sub url_to_nick {
     my ( $self, $url ) = @_;
     my $known_users = $self->known_users;
-    my %urls = map { $self->normalize_url($known_users->{$_}) => $_ } keys %{$known_users};
-    return $urls{$self->normalize_url($url)};
+    my %urls =
+      map { $self->normalize_url( $known_users->{$_} ) => $_ }
+      keys %{$known_users};
+    return $urls{ $self->normalize_url($url) };
 }
 
 sub collapse_mentions {
