@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
 use Path::Tiny;
@@ -18,9 +19,6 @@ my $app = App::txtnix::Cmd::tweet->new(
 );
 
 $app->twtfile->touch;
-
-my $input = Path::Tiny->tempfile;
-$input->spew_utf8( 'Foo', 'Bar' );
 
 $ENV{EDITOR} = "$Bin/bin/mock_editor";
 
