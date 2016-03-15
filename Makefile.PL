@@ -51,6 +51,7 @@ my %WriteMakefileArgs = (
     "Mojo::UserAgent::Server" => 0,
     "Mojo::Util" => 0,
     "Mojolicious::Lite" => 0,
+    "Path::Tiny" => 0,
     "Test::More" => 0,
     "Test::Output" => 0
   },
