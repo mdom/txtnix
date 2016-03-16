@@ -10,7 +10,9 @@ sub run {
     my $registry =
       App::txtnix::Registry->new( url => $self->registry, ua => $self->ua );
 
-    my @results = $registry->get_mentions( $self->search_term );
+    my $url = $self->following->{ $self->search_term };
+
+    my @results = $registry->get_mentions( $url || $self->search_term );
 
     $self->display_tweets( 1, $self->query_result_to_tweets(@results) );
 
