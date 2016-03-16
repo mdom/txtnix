@@ -397,6 +397,8 @@ sub filter_tweets {
     @tweets =
       sort { $b->timestamp->epoch <=> $a->timestamp->epoch } @tweets;
 
+    $self->emit( 'filter_tweets', \@tweets );
+
     my $limit = $self->limit;
     return sort {
             $self->sorting eq 'descending'
