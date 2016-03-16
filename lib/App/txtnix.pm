@@ -90,8 +90,9 @@ sub new {
         $args->{sorting} = $_ if exists $args->{$_} && $args->{$_};
     }
 
+    my $config;
     if ( $args->{config_file}->exists ) {
-        my $config = $class->read_config( $args->{config_file} );
+        $config = $class->read_config( $args->{config_file} );
         if ( $config->{twtxt} ) {
             $args = { %{ $config->{twtxt} }, %$args };
         }
@@ -124,9 +125,22 @@ sub new {
         if ( my $e = load_class $module) {
             die ref $e ? "Exception: $e" : 'Not found!';
         }
-        push @plugins, $module->new( app => $self );
+        my ($name) = $module =~ /^.*::(.*)$/;
+        my $plugin_config = $config->{$name} || {};
+        push @plugins,
+          $module->new(
+            app    => $self,
+            name   => $name,
+            config => $plugin_config,
+            %$plugin_config
+          );
     }
-    $self->plugins( \@plugins );
+    $self->plugins(
+        [
+            sort { $a->priority <=> $b->priority || $a->name cmp $b->name }
+              @plugins
+        ]
+    );
 
     return $self;
 }
