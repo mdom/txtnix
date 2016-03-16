@@ -237,6 +237,10 @@ arg key => (
 );
 
 subcmd
+  cmd     => [qw( config backup)],
+  comment => 'Backup configuration file.';
+
+subcmd
   cmd     => 'query',
   comment => 'Query your registry.';
 
