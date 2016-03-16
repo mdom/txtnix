@@ -127,8 +127,6 @@ is( $registry->get_tweets,            2 );
 is( $registry->get_tweets('Morning'), 1 );
 is( $registry->get_tweets('bob'),     0 );
 
-my @tweets;
-
 my $delay = Mojo::IOLoop::Delay->new;
 my $end   = $delay->begin;
 $registry->get_tweets( undef, sub { is( @_, 2 ); $end->() } );

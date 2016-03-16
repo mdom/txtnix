@@ -18,10 +18,6 @@ sub run {
         @results = grep { not exists $following{ $_->[0] } } @results;
     }
 
-    if ( $self->limit && @results > $self->limit ) {
-        @results = @results[ 0 .. $self->limit - 1 ];
-    }
-
     for my $result (@results) {
         my ( $url, undef, $nick ) = @$result;
         print "$nick @ $url\n";
