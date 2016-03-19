@@ -308,4 +308,13 @@ subcmd
   cmd     => 'register',
   comment => 'Register at your registry.';
 
+subcmd
+  cmd     => 'watch',
+  comment => 'Register at your registry.';
+
+arg url => (
+    isa     => 'Str',
+    comment => 'Websocket endpoint.',
+);
+
 1;
