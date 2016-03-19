@@ -3,6 +3,7 @@ use Mojo::Base 'App::txtnix';
 use Mojo::JSON 'decode_json';
 use App::txtnix::Tweet;
 use App::txtnix::Source;
+use Mojo::ByteStream 'b';
 
 has 'url';
 
@@ -24,7 +25,7 @@ sub run {
             $tx->on(
                 message => sub {
                     my ( $tx, $msg ) = @_;
-                    my $data = decode_json($msg);
+                    my $data = decode_json( b($msg)->encode );
                     return if !$data;
                     my $tweet = App::txtnix::Tweet->new(
                         timestamp => Mojo::Date->new( $data->{time} ),
