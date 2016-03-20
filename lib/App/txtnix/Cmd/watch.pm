@@ -5,7 +5,7 @@ use App::txtnix::Tweet;
 use App::txtnix::Source;
 use Mojo::ByteStream 'b';
 
-has 'url';
+has 'url' => sub { "ws://roster.twtxt.org/stream" };
 
 sub run {
     my $self = shift;
