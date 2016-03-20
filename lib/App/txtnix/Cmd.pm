@@ -317,4 +317,9 @@ arg url => (
     comment => 'Websocket endpoint.',
 );
 
+opt alarm => (
+    isa     => 'Str',
+    comment => 'Ring visual bell with new "tweet" or "mention".',
+);
+
 1;

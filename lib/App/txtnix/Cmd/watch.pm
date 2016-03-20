@@ -5,7 +5,8 @@ use App::txtnix::Tweet;
 use App::txtnix::Source;
 use Mojo::ByteStream 'b';
 
-has 'url' => sub { "ws://roster.twtxt.org/stream" };
+has 'url'   => sub { "ws://roster.twtxt.org/stream" };
+has 'alarm' => sub { "mention" };
 
 sub run {
     my $self = shift;
@@ -37,6 +38,15 @@ sub run {
                     );
                     $self->display_tweets( 1, $tweet );
 
+                    if ( $self->alarm eq 'mention' ) {
+                        my $am_i_mentioned = grep { $_ eq $self->twturl }
+                          $tweet->text =~ m{\@<(?:\w+ )?([^>]+)>}g;
+                        print "\a" if $am_i_mentioned;
+                    }
+                    elsif ( $self->alarm eq 'tweet' ) {
+                        print "\a";
+                    }
+                    return;
                 }
             );
         }
