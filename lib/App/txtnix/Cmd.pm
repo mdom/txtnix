@@ -322,4 +322,9 @@ opt alarm => (
     comment => 'Ring visual bell with new "tweet" or "mention".',
 );
 
+opt filter => (
+    isa     => 'Str',
+    comment => 'Filter out bots and metadata. Defaults to true.',
+);
+
 1;

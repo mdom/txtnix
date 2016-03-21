@@ -5,8 +5,9 @@ use App::txtnix::Tweet;
 use App::txtnix::Source;
 use Mojo::ByteStream 'b';
 
-has 'url'   => sub { "ws://roster.twtxt.org/stream" };
-has 'alarm' => sub { "mention" };
+has url    => sub { "ws://roster.twtxt.org/stream" };
+has alarm  => sub { "mention" };
+has filter => sub { 1 };
 
 sub run {
     my $self = shift;
@@ -28,6 +29,11 @@ sub run {
                     my ( $tx, $msg ) = @_;
                     my $data = decode_json( b($msg)->encode );
                     return if !$data;
+
+                    return
+                      if $self->filter
+                      && ( $data->{is_bot} || $data->{is_metadata} );
+
                     my $tweet = App::txtnix::Tweet->new(
                         timestamp => Mojo::Date->new( $data->{time} ),
                         source    => App::txtnix::Source->new(
