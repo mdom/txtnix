@@ -323,7 +323,7 @@ opt alarm => (
 );
 
 opt filter => (
-    isa     => 'Str',
+    isa     => 'Bool',
     comment => 'Filter out bots and metadata. Defaults to true.',
 );
 
