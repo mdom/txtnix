@@ -12,6 +12,7 @@ has filter => sub { 1 };
 sub run {
     my $self = shift;
     $self->use_pager(0);
+    $self->time_format('%F %H:%M');
     $self->ua->inactivity_timeout(0);
     $self->ua->websocket(
         $self->url => sub {
