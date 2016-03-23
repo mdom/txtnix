@@ -10,7 +10,7 @@ has timestamp => sub { Mojo::Date->new() };
 
 has is_metadata => sub { !!@{ shift->command } };
 has command =>
-  sub { shift->text =~ m{^\s*//\s*(.*)} ? [ split( ' ', $1 ) ] : [] };
+  sub { shift->text =~ m{^\s*/twtxt (.*)} ? [ split( ' ', $1 ) ] : [] };
 
 sub strftime {
     my ( $self, $format ) = @_;

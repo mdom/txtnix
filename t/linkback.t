@@ -29,10 +29,10 @@ my $app = App::txtnix->new(
 # Silence
 app->log->level('fatal');
 
-get '/bob.txt' => { text => "2016-02-03T00:00:00Z\t// linkback /bob.php" };
+get '/bob.txt' => { text => "2016-02-03T00:00:00Z\t/twtxt linkback /bob.php" };
 get '/charlie.txt' =>
-  { text => "2016-02-03T00:00:00Z\t// linkback /charlie.php" };
-post '/bob.php' => { text => "2016-02-03T00:00:00Z\t// linkback /bob.php" };
+  { text => "2016-02-03T00:00:00Z\t/twtxt linkback /charlie.php" };
+post '/bob.php' => { text => "2016-02-03T00:00:00Z\t/twtxt linkback /bob.php" };
 
 stderr_is(
     sub {
