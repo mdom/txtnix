@@ -424,27 +424,14 @@ sub parse_twtfile {
     my ( $self, $source, $string ) = @_;
     my @tweets;
     for my $line ( split( /\n/, $string ) ) {
-        my ( $time, $sep, $text ) = $line =~ /(.+?)(\s+|#)(.+)/;
-        next unless $time && $sep && $text;
-        $text =~ s/\P{XPosixPrint}//g;
+        my $tweet = App::txtnix::Tweet->from_string( $line, $source );
+        if ($tweet) {
+            if ( $self->character_limit && $self->character_limit > 0 ) {
+                $tweet->text(
+                    substr( $tweet->text, 0, $self->character_limit ) );
+            }
 
-        if ( $self->character_limit && $self->character_limit > 0 ) {
-            $text = substr( $text, 0, $self->character_limit );
-        }
-
-        $time = $self->to_date($time);
-        next if !defined $time->epoch;
-
-        my $command = $sep eq '#' ? [ split( ' ', $text ) ] : [];
-
-        if ( $time and $text ) {
-            push @tweets, App::txtnix::Tweet->new(
-                source    => $source,
-                timestamp => $time,
-                text      => $text,
-                command   => $command,
-
-            );
+            push @tweets, $tweet;
         }
     }
     return @tweets;
