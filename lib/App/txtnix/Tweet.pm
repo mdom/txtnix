@@ -33,7 +33,7 @@ sub md5_hash {
 
 sub from_string {
     my ( $class, $line, $source ) = @_;
-    return unless $line && $source;
+    return unless $line;
     my ( $time, $sep, $text ) = $line =~ /(.+?)(\s+|#)(.+)/;
     return unless $time && $sep && $text;
     $text =~ s/\P{XPosixPrint}//g;
