@@ -233,7 +233,7 @@ sub config_set {
 sub add_metadata {
     my $self = shift;
     return $self->twtfile->append_utf8(
-        Mojo::Date->new()->to_datetime . "\t/twtxt " . join( ' ', @_ ) . "\n" );
+        Mojo::Date->new()->to_datetime . "#" . join( ' ', @_ ) . "\n" );
 }
 
 sub get_tweets {
@@ -430,8 +430,8 @@ sub parse_twtfile {
     my ( $self, $source, $string ) = @_;
     my @tweets;
     for my $line ( split( /\n/, $string ) ) {
-        my ( $time, $text ) = split( /\t/, $line, 2 );
-        next if not defined $text;
+        my ( $time, $sep, $text ) = $line =~ /(.+?)(\s+|#)(.+)/;
+        next unless $time && $sep && $text;
         $text =~ s/\P{XPosixPrint}//g;
 
         if ( $self->character_limit && $self->character_limit > 0 ) {
@@ -440,13 +440,17 @@ sub parse_twtfile {
 
         $time = $self->to_date($time);
         next if !defined $time->epoch;
+
+        my $command = $sep eq '#' ? [ split( ' ', $text ) ] : [];
+
         if ( $time and $text ) {
-            push @tweets,
-              App::txtnix::Tweet->new(
+            push @tweets, App::txtnix::Tweet->new(
                 source    => $source,
                 timestamp => $time,
                 text      => $text,
-              );
+                command   => $command,
+
+            );
         }
     }
     return @tweets;

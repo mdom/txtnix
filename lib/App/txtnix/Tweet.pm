@@ -9,8 +9,7 @@ has [qw(source text)];
 has timestamp => sub { Mojo::Date->new() };
 
 has is_metadata => sub { !!@{ shift->command } };
-has command =>
-  sub { shift->text =~ m{^\s*/twtxt (.*)} ? [ split( ' ', $1 ) ] : [] };
+has command     => sub { [] };
 
 sub strftime {
     my ( $self, $format ) = @_;
