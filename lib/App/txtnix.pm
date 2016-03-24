@@ -430,7 +430,6 @@ sub parse_twtfile {
     my ( $self, $source, $string ) = @_;
     my @tweets;
     for my $line ( split( /\n/, $string ) ) {
-        next if $line =~ /^#/;
         my ( $time, $text ) = split( /\t/, $line, 2 );
         next if not defined $text;
         $text =~ s/\P{XPosixPrint}//g;
