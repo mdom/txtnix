@@ -13,6 +13,7 @@ use App::txtnix::Tweet;
 use App::txtnix::Source;
 use App::txtnix::Cache;
 use App::txtnix::Registry;
+use App::txtnix::Date qw(to_date);
 use IO::Pager;
 use Mojo::ByteStream 'b';
 
@@ -74,7 +75,7 @@ sub new {
 
     for (qw(since until)) {
         if ( exists $args->{$_} ) {
-            $args->{$_} = $class->to_date( $args->{$_} );
+            $args->{$_} = to_date( $args->{$_} );
             die "Can't parse parameter $_ as rfc3339.\n"
               if !defined $args->{$_}->epoch;
         }
@@ -207,13 +208,6 @@ sub read_config {
     return $config;
 }
 
-sub to_date {
-    my ( $self, $date ) = @_;
-    $date =~ s/T(\d\d:\d\d)([Z+-])/T$1:00$2/;
-    $date =~ s/([+-]\d\d)(\d\d)/$1:$2/;
-    return Mojo::Date->new($date);
-}
-
 sub sync {
     my ($self) = @_;
     my $config = $self->read_config;
@@ -334,7 +328,7 @@ sub get_tweets {
                         url  => $url,
                         nick => $nick
                     );
-                    my $timestamp = $self->to_date( $result->[1] );
+                    my $timestamp = to_date( $result->[1] );
                     next if !defined $timestamp->epoch;
                     push @tweets,
                       App::txtnix::Tweet->new(

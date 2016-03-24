@@ -2,6 +2,7 @@ package App::txtnix::Cmd::tweet;
 use Mojo::Base 'App::txtnix';
 use Mojo::ByteStream 'b';
 use App::txtnix::Tweet;
+use App::txtnix::Date qw(to_date);
 use Path::Tiny;
 use String::ShellQuote qw(shell_quote);
 use Mojo::Date;
@@ -14,8 +15,8 @@ sub run {
     my ($self) = @_;
 
     my $time =
-        $self->created_at
-      ? $self->to_date( $self->created_at )
+      $self->created_at
+      ? to_date( $self->created_at )
       : Mojo::Date->new();
 
     die "Can't parse --created-at " . $self->created_at . " as rfc3339.\n"

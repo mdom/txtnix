@@ -2,6 +2,7 @@ package App::txtnix::Cmd::query;
 use Mojo::Base 'App::txtnix';
 use App::txtnix::Tweet;
 use App::txtnix::Source;
+use App::txtnix::Date qw(to_date);
 
 sub query_result_to_tweets {
     my ( $self, @results ) = @_;
@@ -14,7 +15,7 @@ sub query_result_to_tweets {
           App::txtnix::Tweet->new(
             source    => $source,
             text      => $text,
-            timestamp => $self->to_date($time)
+            timestamp => to_date($time),
           );
     }
     return @tweets;
