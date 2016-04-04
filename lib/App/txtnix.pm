@@ -48,10 +48,11 @@ has wrap_text         => sub { 1 };
 has character_limit   => sub { 1024 };
 has expand_me         => sub { 0 };
 has hooks             => sub { 1 };
+has registry          => sub { "https://roster.twtxt.org" };
 
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config_file
-      force registry key_file cert_file plugins )
+      force key_file cert_file plugins )
 ];
 
 sub new {
