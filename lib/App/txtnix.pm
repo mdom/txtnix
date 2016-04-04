@@ -511,11 +511,6 @@ sub collapse_mention {
     return $nick ? "\@$nick" : $user ? "\@<$user $url>" : "\@<$url>";
 }
 
-sub parse_mention {
-    my ( $self, $text ) = @_;
-    return $text =~ /\@<(?:(\w+) )?([^>]+)>/;
-}
-
 sub known_users {
     my $self = shift;
     if ( $self->nick and $self->twturl ) {

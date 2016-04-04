@@ -35,24 +35,23 @@ under '/api/plain/';
 my $data = {
     users => [
         [
-            'https://example.org/twtxt.txt', '2016-02-09T12:42:26.000Z',
-            'example'
+            'example', 'https://example.org/twtxt.txt',
+            '2016-02-09T12:42:26.000Z'
         ],
         [
-            'https://example.org/42.twtxt.txt', '2016-02-10T13:20:10.000Z',
-            'example42'
+            'example42', 'https://example.org/42.twtxt.txt',
+            '2016-02-10T13:20:10.000Z'
         ]
     ],
     tweets => [
         [
-            '@<buckket https://buckket.org/twtxt.txt>',
+            'buckket', 'https://buckket.org/twtxt.txt',
             '2016-02-09T12:42:26.000Z',
             'Do we need an IRC channel for #twtxt, @<bob /bob.txt>?'
         ],
         [
-            '@<buckket https://buckket.org/twtxt.txt>',
-            '2016-02-09T12:42:12.000Z',
-            'Good Morning, twtxt-world!'
+            'buckket',                  'https://buckket.org/twtxt.txt',
+            '2016-02-09T12:42:12.000Z', 'Good Morning, twtxt-world!'
         ]
     ],
 };
@@ -64,7 +63,7 @@ get '/users' => sub {
     if ($query) {
         for my $datum (@data) {
             return $c->render( text => join( "\t", @$datum ) )
-              if $datum->[2] eq $query;
+              if $datum->[0] eq $query;
         }
         return $c->render( text => '' );
     }
@@ -78,7 +77,7 @@ get '/tweets' => sub {
     if ($query) {
         for my $datum (@data) {
             return $c->render( text => join( "\t", @$datum ) )
-              if $datum->[2] =~ $query;
+              if $datum->[3] =~ $query;
         }
         return $c->render( text => '' );
     }
@@ -92,7 +91,7 @@ get '/mentions' => sub {
       if !$query;
     for my $datum ( @{ $data->{tweets} } ) {
         return $c->render( text => join( "\t", @$datum ) )
-          if $datum->[2] =~ /\@<\w+ $query>/;
+          if $datum->[3] =~ /\@<\w+ $query>/;
     }
     return $c->render( text => '' );
 };
@@ -104,7 +103,7 @@ get '/tags/#q' => sub {
     if ($query) {
         for my $datum (@data) {
             return $c->render( text => join( "\t", @$datum ) )
-              if $datum->[2] =~ /#$query/;
+              if $datum->[3] =~ /#$query/;
         }
         return $c->render( text => '' );
     }

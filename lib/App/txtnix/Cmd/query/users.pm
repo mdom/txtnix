@@ -15,11 +15,11 @@ sub run {
     my %following = map { $_ => 1 } values %{ $self->known_users };
 
     if ( $self->unfollowed ) {
-        @results = grep { not exists $following{ $_->[0] } } @results;
+        @results = grep { not exists $following{ $_->[1] } } @results;
     }
 
     for my $result (@results) {
-        my ( $url, undef, $nick ) = @$result;
+        my ( $nick, $url ) = @$result;
         print "$nick @ $url\n";
     }
 

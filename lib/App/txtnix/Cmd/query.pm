@@ -8,8 +8,7 @@ sub query_result_to_tweets {
     my ( $self, @results ) = @_;
     my @tweets;
     for my $result (@results) {
-        my ( $mention, $time, $text ) = @$result;
-        my ( $nick, $url ) = $self->parse_mention($mention);
+        my ( $nick, $url, $time, $text ) = @$result;
         my $source = App::txtnix::Source->new( nick => $nick, url => $url );
         push @tweets,
           App::txtnix::Tweet->new(
