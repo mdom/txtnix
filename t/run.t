@@ -7,8 +7,11 @@ use App::txtnix;
 use Mojolicious::Lite;
 use Mojo::UserAgent::Server;
 use OptArgs 'class_optargs';
+use POSIX qw();
 
 $ENV{TZ} = 'UTC';
+
+POSIX::tzset;
 
 my $config  = Path::Tiny->tempfile;
 my $twtfile = Path::Tiny->tempfile;
