@@ -10,6 +10,7 @@ use Mojo::URL;
 use Mojo::Loader qw(data_section find_modules load_class);
 use Mojo::Template;
 use App::txtnix::Tweet;
+use App::txtnix::URLQueue;
 use App::txtnix::Source;
 use App::txtnix::Cache;
 use App::txtnix::Registry;
@@ -26,7 +27,6 @@ has cache_dir         => sub { path('~/.cache/txtnix') };
 has use_pager         => sub { 0 };
 has sorting           => sub { "descending" };
 has timeout           => sub { 5 };
-has use_cache         => sub { 1 };
 has limit             => sub { 20 };
 has time_format       => sub { '%Y-%m-%d %H:%M' };
 has disclose_identity => sub { 0 };
@@ -52,7 +52,7 @@ has registry          => sub { "https://roster.twtxt.org" };
 
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config_file
-      force key_file cert_file plugins )
+      force key_file cert_file plugins cache )
 ];
 
 sub new {
@@ -60,7 +60,6 @@ sub new {
     my $args = ref $args[0] ? $args[0] : {@args};
 
     my %translate = (
-        cache => 'use_cache',
         pager => 'use_pager',
         new   => 'show_new',
     );
@@ -120,6 +119,9 @@ sub new {
     }
 
     my $self = bless {%$args}, ref $class || $class;
+
+    $self->cache = App::txtnix::Cache->new( cache_dir => $self->cache_dir )
+      if $self->cache && !ref $self->cache;
 
     my @plugins;
     my @modules = find_modules('App::txtnix::Plugin');
@@ -233,43 +235,35 @@ sub add_metadata {
 
 sub get_tweets {
     my ( $self, @source ) = @_;
-    my @tweets;
 
     my @urls = @source ? @source : values %{ $self->following };
     my %urls = map { $_ => 1 } @urls;
 
+    my @tweets;
+
     my $delay = Mojo::IOLoop->delay;
 
-    for my $url (@urls) {
-        my $nick = $self->url_to_nick($url);
-        my ( $cache, $params ) = ( undef, {} );
-        if ( $self->use_cache ) {
-            $cache = $self->cache->get($url);
-            if ($cache) {
-                $params = { "If-Modified-Since" => $cache->{last_modified} };
-            }
-        }
-        my $end = $delay->begin;
-        $self->ua->get(
-            $url => $params => sub {
-                my ( $ua, $tx ) = @_;
+    my $q = App::txtnix::URLQueue->new(
+        queue => \@urls,
+        ua    => $self->ua,
+        cache => $self->cache,
+        delay => $delay,
+    );
 
-                if ( my $res = $tx->success ) {
+    $q->on(
+        process => sub {
+            my ( $q, $tx, $url ) = @_;
+            my $nick = $self->url_to_nick($url);
 
-                    $self->check_for_moved_url( $tx, $nick ) if $nick;
+            if ( my $res = $tx->success ) {
 
-                    my $body = b( $res->body )->decode;
-                    if ( $res->code == 304 && $cache ) {
-                        $body = $cache->{body};
+                my $body = b( $res->body )->decode;
+
+                if ( $self->cache ) {
+                    if ( $res->code == 304 ) {
+                        $body = $self->cache->get($url)->{body};
                     }
-
-                    if ( !$body ) {
-                        warn "No $body for $url. Ignoring\n";
-                        next;
-                    }
-
-                    if (   $self->use_cache
-                        && $res->code == 200
+                    elsif ($res->code == 200
                         && $res->headers->last_modified )
                     {
                         $self->cache->set(
@@ -280,37 +274,41 @@ sub get_tweets {
                             }
                         );
                     }
-                    my $source = App::txtnix::Source->new(
-                        url  => $url,
-                        nick => $nick
-                    );
-                    push @tweets, $self->parse_twtfile( $source, $body );
+                }
 
-                }
-                else {
-                    my $err = $tx->error;
-                    my $source = $nick || $url;
-                    chomp( $err->{message} );
-                    warn "Failing to get tweets for $source: "
-                      . (
-                        $err->{code}
-                        ? "$err->{code} response: $err->{message}"
-                        : "Connection error: $err->{message}"
-                      ) . "\n";
-                    if (   $nick
-                        && $tx->res
-                        && $tx->res->code
-                        && $tx->res->code == 410
-                        && $self->rewrite_urls )
-                    {
-                        warn "Unfollow user $nick after 410 response.\n";
-                        delete $self->following->{$nick};
-                    }
-                }
-                $end->();
+                $self->check_for_moved_url( $tx, $nick ) if $nick;
+
+                my $source = App::txtnix::Source->new(
+                    url  => $url,
+                    nick => $nick
+                );
+                push @tweets, $self->parse_twtfile( $source, $body );
+
             }
-        );
-    }
+            else {
+                my $err = $tx->error;
+                my $source = $nick || $url;
+                chomp( $err->{message} );
+                warn "Failing to get tweets for $source: "
+                  . (
+                    $err->{code}
+                    ? "$err->{code} response: $err->{message}"
+                    : "Connection error: $err->{message}"
+                  ) . "\n";
+                if (   $nick
+                    && $tx->res
+                    && $tx->res->code
+                    && $tx->res->code == 410
+                    && $self->rewrite_urls )
+                {
+                    warn "Unfollow user $nick after 410 response.\n";
+                    delete $self->following->{$nick};
+                }
+            }
+        }
+    );
+
+    $q->start;
 
     if ( !@source && $self->registry && $self->twturl ) {
         my $end      = $delay->begin;
@@ -358,7 +356,7 @@ sub get_tweets {
         $self->sync;
 
         $self->cache->clean( values %{ $self->following } )
-          if $self->use_cache;
+          if $self->cache;
     }
 
     @tweets =
