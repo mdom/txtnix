@@ -161,10 +161,11 @@ subcmd
   cmd     => 'unfollow',
   comment => 'Remove an existing source from your followings.';
 
-arg nickname => (
-    isa      => 'Str',
-    comment  => 'Nick to unfollow.',
+arg nicknames => (
+    isa      => 'ArrayRef',
+    comment  => 'Nicks to unfollow.',
     required => 1,
+    greedy   => 1,
 );
 
 subcmd
