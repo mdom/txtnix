@@ -328,4 +328,8 @@ opt filter => (
     comment => 'Filter out bots and metadata. Defaults to true.',
 );
 
+subcmd
+  cmd     => 'mail',
+  comment => 'receive twtxt from mailfilter.';
+
 1;
