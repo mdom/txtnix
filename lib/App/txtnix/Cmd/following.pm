@@ -14,7 +14,7 @@ sub run {
         }
     }
     else {
-        for my $user ( keys %following ) {
+        for my $user ( sort keys %following ) {
             print "$user \@ " . $following{$user} . "\n";
         }
     }
