@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use App::txtnix::Plugin::GistStore;
+
 use App::txtnix;
 use Path::Tiny;
 use Test::More;
@@ -32,30 +32,32 @@ my $app = App::txtnix->new(
 
 $app->twtfile->touch;
 
-$app->plugins->[0]->url('/gists');
+my ($plugin) = grep { $_->name eq 'GistStore' } @{ $app->plugins };
+
+$plugin->url('/gists');
 
 $app->emit('post_tweet');
 
-$app->plugins->[0]->config->{user} = 'alice';
+$plugin->config->{user} = 'alice';
 
 stderr_is( sub { $app->emit('post_tweet') }, <<EOF );
 Error while uploading gist: 401 Unauthorized
 EOF
 
-$app->plugins->[0]->config->{user} = undef;
+$plugin->config->{user} = undef;
 
 stderr_is( sub { $app->emit('post_tweet') }, <<EOF );
 Missing parameter access_token or user for GistStore.
 EOF
 
-$app->plugins->[0]->config->{user}         = 'bob';
-$app->plugins->[0]->config->{access_token} = undef;
+$plugin->config->{user}         = 'bob';
+$plugin->config->{access_token} = undef;
 
 stderr_is( sub { $app->emit('post_tweet') }, <<EOF );
 Missing parameter access_token or user for GistStore.
 EOF
 
-$app->plugins->[0]->config->{user} = undef;
+$plugin->config->{user} = undef;
 
 stderr_is( sub { $app->emit('post_tweet') }, <<EOF );
 Missing parameter access_token or user for GistStore.
