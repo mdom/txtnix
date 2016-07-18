@@ -457,23 +457,21 @@ sub display_tweets {
     }
 
     for my $tweet (@tweets) {
-
-        my $content = $self->collapse_mentions( $tweet->text || '' );
+        $tweet->text( $self->collapse_mentions( $tweet->text || '' ) );
         if ( $tweet->source->nick && $self->expand_me ) {
-            $content =~ s{^/me(?=\s)}{'@'.$tweet->source->nick}e;
+            $tweet->text =~ s{^/me(?=\s)}{'@'.$tweet->source->nick}e;
         }
-
-        print {$fh} b(
-            $mt->process(
-                {
-                    nick    => $tweet->nick,
-                    content => $content,
-                    time    => $tweet->strftime( $self->time_format ),
-                    app     => $self,
-                }
-            )
-        )->encode;
     }
+
+    print {$fh} b(
+        $mt->process(
+            {
+                tweets => \@tweets,
+                app    => $self,
+            }
+        )
+    )->encode;
+
     return;
 }
 
@@ -549,18 +547,27 @@ __DATA__
 @@ pretty.txt
 % use Term::ANSIColor;
 % use Text::Wrap;
-% $content =~ s/(@\w+)/colored($1, $app->colors->{mention})/ge;
-% $content =~ s/(#\w+)/colored($1, $app->colors->{hashtag})/ge;
 %
-* <%= colored($nick, $app->colors->{nick}) %> (<%= colored($time, $app->colors->{time}) %>):
-% if ( $app->wrap_text ) {
-%= wrap('','',$content) . "\n"
-% } else {
-%= $content . "\n"
+% for my $tweet ( @$tweets ) {
+%   my $text = $tweet->text;
+%   $text =~ s/(@\w+)/colored($1, $app->colors->{mention})/ge;
+%   $text =~ s/(#\w+)/colored($1, $app->colors->{hashtag})/ge;
+%   my $time = $tweet->strftime( $app->time_format );
+%   my $nick = colored($tweet->nick, $app->colors->{nick});
+%
+* <%= $nick %> (<%= colored($time, $app->colors->{time}) %>):
+%   if ( $app->wrap_text ) {
+%=   wrap('','',$text) . "\n"
+%   } else {
+%=   $text . "\n"
+%   }
 % }
 
 @@ simple.txt
-<%= $time %> <%= $nick %>: <%= $content %>
+% for my $t ( @$tweets ) {
+%   my $time = $t->strftime( $app->time_format );
+<%= $time %> <%= $t->nick %>: <%= $t->text %>
+% }
 
 __END__
 
