@@ -449,7 +449,7 @@ sub display_tweets {
         $fh = \*STDOUT;
     }
     my $format        = $self->template;
-    my $template_name = "$format.txt";
+    my $template_name = "$format.mt";
 
     my $template = data_section( __PACKAGE__, $template_name );
     if ( !$template ) {
@@ -551,7 +551,7 @@ sub expand_mention {
 
 __DATA__
 
-@@ pretty.txt
+@@ pretty.mt
 % use Term::ANSIColor;
 % use Text::Wrap;
 %
@@ -570,7 +570,7 @@ __DATA__
 %   }
 % }
 
-@@ simple.txt
+@@ simple.mt
 % for my $t ( @$tweets ) {
 %   my $time = $t->strftime( $app->time_format );
 <%= $time %> <%= $t->nick %>: <%= $t->text %>
