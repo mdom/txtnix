@@ -36,7 +36,7 @@ has rewrite_urls      => sub { 1 };
 has embed_names       => sub { 1 };
 has check_following   => sub { 1 };
 has following         => sub { {} };
-has display_format    => sub { 'pretty' };
+has template          => sub { 'pretty' };
 has nick              => sub { $ENV{USER} };
 has since             => sub { Mojo::Date->new->epoch(0) };
 has until             => sub { Mojo::Date->new() };
@@ -83,8 +83,10 @@ sub new {
 
     $args->{colors} ||= {};
 
-    for (qw(pretty simple )) {
-        $args->{display_format} = $_ if exists $args->{$_} && $args->{$_};
+    if ( !$args->{template} ) {
+        for (qw(pretty simple )) {
+            $args->{template} = $_ if exists $args->{$_} && $args->{$_};
+        }
     }
 
     for (qw(ascending descending )) {
@@ -446,8 +448,9 @@ sub display_tweets {
     else {
         $fh = \*STDOUT;
     }
-    my $format        = $self->display_format;
-    my $template_name = $format eq 'pretty' ? 'pretty.txt' : 'simple.txt';
+    my $format        = $self->template;
+    my $template_name = "$format.txt";
+
     my $template      = data_section( __PACKAGE__, $template_name );
     my $mt =
       Mojo::Template->new( vars => 1, encoding => 'UTF-8' )->parse($template);

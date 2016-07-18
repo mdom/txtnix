@@ -104,6 +104,11 @@ my @timeline_opts = (
         isa     => 'Bool',
         comment => 'Display tweets in a less dense way.',
     },
+    template => {
+        isa     => 'Str',
+        comment => 'Template to use for display.',
+        alias   => 'T',
+    },
     simple => {
         isa     => 'Bool',
         comment => 'Display tweets line in one line.',

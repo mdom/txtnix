@@ -37,11 +37,11 @@ get '/api/plain/mentions' => sub {
 };
 
 my $app = App::txtnix::Cmd::timeline->new(
-    config         => Path::Tiny->tempfile,
-    twtfile        => Path::Tiny->tempfile,
-    twturl         => 'https://example.com/bob.txt',
-    registry       => '/',
-    display_format => 'simple',
+    config   => Path::Tiny->tempfile,
+    twtfile  => Path::Tiny->tempfile,
+    twturl   => 'https://example.com/bob.txt',
+    registry => '/',
+    template => 'simple',
 );
 
 stdout_is( sub { $app->run }, <<EOF);

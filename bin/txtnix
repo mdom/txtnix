@@ -207,7 +207,7 @@ Hide txtnix style metadata. Defaults to true.
 
 Use ANSI-colors for the I<pretty> layout. Defaults to true.
 
-=item display_layout
+=item template
 
 In which format to display your timeline. I<txtnix> defines two different
 layout: I<simple> is a line oriented very basic layout. I<pretty> looks

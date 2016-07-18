@@ -18,14 +18,14 @@ get '/alice.txt' => { text =>
 };
 
 my $app = App::txtnix::Cmd::timeline->new(
-    config         => Path::Tiny->tempfile,
-    twtfile        => Path::Tiny->tempfile,
-    twturl         => 'https://example.com/charlie.txt',
-    nick           => 'charlie',
-    registry       => '/',
-    display_format => 'simple',
-    me             => 1,
-    following      => { alice => '/alice.txt', bob => '/bob.txt' },
+    config    => Path::Tiny->tempfile,
+    twtfile   => Path::Tiny->tempfile,
+    twturl    => 'https://example.com/charlie.txt',
+    nick      => 'charlie',
+    registry  => '/',
+    template  => 'simple',
+    me        => 1,
+    following => { alice => '/alice.txt', bob => '/bob.txt' },
 );
 
 $app->twtfile->spew_utf8("2016-02-01T00:00:00Z\tHi");

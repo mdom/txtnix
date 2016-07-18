@@ -14,14 +14,14 @@ my $config = Path::Tiny->tempfile;
 sub run {
     my ( $class, $opts ) = class_optargs( 'App::txtnix::Cmd', @_ );
     $opts = {
-        config         => $config,
-        twtfile        => Path::Tiny->tempfile,
-        display_format => 'simple',
-        use_pager      => 0,
-        use_colors     => 0,
-        following      => { bob => '/bob.txt', alice => '/alice.txt' },
-        nick           => 'test_runner',
-        registry       => '/',
+        config     => $config,
+        twtfile    => Path::Tiny->tempfile,
+        template   => 'simple',
+        use_pager  => 0,
+        use_colors => 0,
+        following  => { bob => '/bob.txt', alice => '/alice.txt' },
+        nick       => 'test_runner',
+        registry   => '/',
         %$opts,
     };
     $class->new($opts)->run();
