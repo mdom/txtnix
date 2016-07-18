@@ -12,6 +12,10 @@ has timestamp => sub { Mojo::Date->new() };
 has is_metadata => sub { !!@{ shift->command } };
 has command     => sub { [] };
 
+sub nick {
+    shift->source->to_string;
+}
+
 sub strftime {
     my ( $self, $format ) = @_;
     if ( $format eq 'relative' ) {

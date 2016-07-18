@@ -466,7 +466,7 @@ sub display_tweets {
         print {$fh} b(
             $mt->process(
                 {
-                    nick    => $tweet->source->to_string,
+                    nick    => $tweet->nick,
                     content => $content,
                     time    => $tweet->strftime( $self->time_format ),
                     app     => $self,
