@@ -52,7 +52,7 @@ has registry          => sub { "https://roster.twtxt.org" };
 
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config_file
-      force key_file cert_file plugins cache )
+      force key_file cert_file plugins cache)
 ];
 
 sub new {
@@ -432,6 +432,8 @@ sub parse_twtfile {
                     substr( $tweet->text, 0, $self->character_limit ) );
             }
 
+            $tweet->formatted_time( $tweet->strftime( $self->time_format ) );
+
             push @tweets, $tweet;
         }
     }
@@ -559,10 +561,10 @@ __DATA__
 %   my $text = $tweet->text;
 %   $text =~ s/(@\w+)/colored($1, $app->colors->{mention})/ge;
 %   $text =~ s/(#\w+)/colored($1, $app->colors->{hashtag})/ge;
-%   my $time = $tweet->strftime( $app->time_format );
+%   my $time = colored($tweet->formatted_time,$app->colors->{time});
 %   my $nick = colored($tweet->nick, $app->colors->{nick});
 %
-* <%= $nick %> (<%= colored($time, $app->colors->{time}) %>):
+* <%= $nick %> (<%= $time %>):
 %   if ( $app->wrap_text ) {
 %=   wrap('','',$text) . "\n"
 %   } else {
