@@ -23,7 +23,7 @@ sub run {
     }
 
     @tweets = $self->filter_tweets(@tweets);
-    $self->display_tweets( 0, @tweets );
+    $self->display_tweets(@tweets);
     return 0;
 }
 

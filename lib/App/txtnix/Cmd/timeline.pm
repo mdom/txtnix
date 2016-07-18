@@ -19,7 +19,7 @@ sub run {
     }
 
     @tweets = $self->filter_tweets(@tweets);
-    $self->display_tweets( 1, @tweets );
+    $self->display_tweets(@tweets);
     $self->config_set( 'last_timeline', time );
     return 0;
 }

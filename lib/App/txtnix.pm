@@ -437,7 +437,7 @@ sub parse_twtfile {
 }
 
 sub display_tweets {
-    my ( $self, $display_nick, @tweets ) = @_;
+    my ( $self, @tweets ) = @_;
     return if !@tweets;
     my $fh;
     if ( $self->use_pager ) {

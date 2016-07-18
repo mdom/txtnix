@@ -12,7 +12,7 @@ sub run {
 
     my @results = $registry->get_tweets( $self->search_term );
 
-    $self->display_tweets( 1, $self->query_result_to_tweets(@results) );
+    $self->display_tweets( $self->query_result_to_tweets(@results) );
 
     return 0;
 }

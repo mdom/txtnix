@@ -43,7 +43,7 @@ sub run {
                         ),
                         text => $data->{tweet},
                     );
-                    $self->display_tweets( 1, $tweet );
+                    $self->display_tweets($tweet);
 
                     if ( $self->alarm eq 'mention' ) {
                         my $am_i_mentioned = grep { $_ eq $self->twturl }
