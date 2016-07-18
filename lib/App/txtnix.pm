@@ -451,11 +451,12 @@ sub display_tweets {
     my $template      = data_section( __PACKAGE__, $template_name );
     my $mt =
       Mojo::Template->new( vars => 1, encoding => 'UTF-8' )->parse($template);
-    for my $tweet (@tweets) {
 
-        if ( !$self->use_colors ) {
-            $ENV{ANSI_COLORS_DISABLED} = 0;
-        }
+    if ( !$self->use_colors ) {
+        $ENV{ANSI_COLORS_DISABLED} = 0;
+    }
+
+    for my $tweet (@tweets) {
 
         my $content = $self->collapse_mentions( $tweet->text || '' );
         if ( $tweet->source->nick && $self->expand_me ) {
