@@ -451,7 +451,11 @@ sub display_tweets {
     my $format        = $self->template;
     my $template_name = "$format.txt";
 
-    my $template      = data_section( __PACKAGE__, $template_name );
+    my $template = data_section( __PACKAGE__, $template_name );
+    if ( !$template ) {
+        die "Unknown template $format.\n";
+    }
+
     my $mt =
       Mojo::Template->new( vars => 1, encoding => 'UTF-8' )->parse($template);
 
