@@ -51,7 +51,7 @@ has hooks             => sub { 1 };
 has registry          => sub { "https://roster.twtxt.org" };
 
 has [
-    qw( colors twturl pre_tweet_hook post_tweet_hook config_file
+    qw( colors twturl pre_tweet_hook post_tweet_hook config_file config_dir
       force key_file cert_file plugins cache)
 ];
 
@@ -119,6 +119,8 @@ sub new {
     for my $path (qw(twtfile cache_dir)) {
         $args->{$path} = path( $args->{$path} ) if exists $args->{$path};
     }
+
+    $args->{config_dir} = $args->{config_file}->parent;
 
     my $self = bless {%$args}, ref $class || $class;
 
@@ -453,7 +455,16 @@ sub display_tweets {
     my $format        = $self->template;
     my $template_name = "$format.mt";
 
-    my $template = data_section( __PACKAGE__, $template_name );
+    my $template_file =
+      $self->config_dir->child('templates')->child($template_name);
+    my $template;
+    if ( $template_file->exists ) {
+        $template = $template_file->slurp_utf8;
+    }
+    else {
+        $template = data_section( __PACKAGE__, $template_name );
+    }
+
     if ( !$template ) {
         die "Unknown template $format.\n";
     }
@@ -574,8 +585,7 @@ __DATA__
 
 @@ simple.mt
 % for my $t ( @$tweets ) {
-%   my $time = $t->strftime( $app->time_format );
-<%= $time %> <%= $t->nick %>: <%= $t->text %>
+<%= $t->formatted_time %> <%= $t->nick %>: <%= $t->text %>
 % }
 
 __END__

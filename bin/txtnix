@@ -326,6 +326,15 @@ Update your git hosted twtfile before tweeting and push it afterwards:
   pre_tweet_hook = "cd ~/git/website && git pull --rebase --prune"
   post_tweet_hook = "cd ~/git/website && git commit -m tweet twtxt.txt && git push"
 
+=head1 Templates
+
+If you're not happy with the included templates, I<txtnix>
+will parse user-supplied templates. Simple copy a template under
+I<$config_dir/templates/> (for example ~/.config/templates/myown.mt
+on Linux) and call I<txtnix> with I<--template myown>. Templates are
+written with L<Mojo::Template>, you can find an example in the source
+package at I<templates/html.mt>.
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2015 Mario Domgoergen C<< <mario@domgoergen.com> >>
