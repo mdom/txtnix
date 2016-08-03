@@ -29,7 +29,6 @@ sub post_tweet {
     my $base = Mojo::URL->new( $self->api_url );
     my $add  = $base->clone->path('add');
 
-    warn "$add $file\n";
     my $tx = $ua->post(
         $add => form => {
             twtxt =>
