@@ -195,7 +195,7 @@ Hide txtnix style metadata. Defaults to true.
 
 Use ANSI-colors for the I<pretty> layout. Defaults to true.
 
-=item display_layout
+=item template
 
 In which format to display your timeline. I<txtnix> defines two different
 layout: I<simple> is a line oriented very basic layout. I<pretty> looks
@@ -270,6 +270,19 @@ access token or your password (but really, please use a access token):
   access_token = asdfasdfasdf
   user         = bob
 
+=item * FTP
+
+Uploads your twtfil to a ftp server. The only required parameter is the
+hostname of the ftp server. You can supply a username and a password, both
+defaults to values in I<~/.netrc>. If you do not give a remote file name, the
+basename of your twtfile is used.
+
+  [FTP]
+  enabled     = 1
+  user        = foo
+  password    = bar
+  remote_file = twtxt.txt
+
 =item * LinkBack
 
 Any time you mention somebody in your tweet and LinkBack is enabled, it checks
@@ -300,6 +313,15 @@ Update your git hosted twtfile before tweeting and push it afterwards:
 
   pre_tweet_hook = "cd ~/git/website && git pull --rebase --prune"
   post_tweet_hook = "cd ~/git/website && git commit -m tweet twtxt.txt && git push"
+
+=head1 Templates
+
+If you're not happy with the included templates, I<txtnix>
+will parse user-supplied templates. Simple copy a template under
+I<$config_dir/templates/> (for example ~/.config/templates/myown.mt
+on Linux) and call I<txtnix> with I<--template myown>. Templates are
+written with L<Mojo::Template>, you can find an example in the source
+package at I<templates/html.mt>.
 
 =head1 COPYRIGHT AND LICENSE
 
