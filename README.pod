@@ -152,6 +152,11 @@ code. Addresses that return 301 (moved permanently) are rewritten
 to their new url. Return code 410 (gone) results in unfollowing that
 address. Defaults to true. You get a warning if a url is rewritten.
 
+=item unfollow_codes
+
+Comma sperated list of http return codes. txtnix unfollows every url
+that return one of these return codes. Defaults to 410.
+
 =item embed_names
 
 I<txtnix> expands the local names in your tweets to their urls. So I<@bob>

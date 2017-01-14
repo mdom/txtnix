@@ -49,6 +49,8 @@ has expand_me         => sub { 0 };
 has hooks             => sub { 1 };
 has registry          => sub { "https://roster.twtxt.org" };
 
+has unfollow_codes => sub { { "410" => 1 } };
+
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config_file config_dir
       force key_file cert_file plugins cache)
@@ -114,6 +116,11 @@ sub new {
         hashtag => 'cyan',
         %{ $args->{colors} },
     };
+
+    if ( $args->{unfollow_codes} ) {
+        $args->{unfollow_codes} =
+          { map { $_ => 1 } split( ',', $args->{unfollow_codes} ) };
+    }
 
     for my $path (qw(twtfile cache_dir)) {
         $args->{$path} = path( $args->{$path} ) if exists $args->{$path};
@@ -301,11 +308,13 @@ sub get_tweets {
                 if (   $nick
                     && $tx->res
                     && $tx->res->code
-                    && $tx->res->code == 410
                     && $self->rewrite_urls )
                 {
-                    warn "Unfollow user $nick after 410 response.\n";
-                    delete $self->following->{$nick};
+                    my $code = $tx->res->code;
+                    if ( $self->unfollow_codes->{$code} ) {
+                        warn "Unfollow user $nick after $code response.\n";
+                        delete $self->following->{$nick};
+                    }
                 }
             }
         }
