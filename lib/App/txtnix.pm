@@ -34,7 +34,6 @@ has write_metadata    => sub { 0 };
 has hide_metadata     => sub { 1 };
 has rewrite_urls      => sub { 1 };
 has embed_names       => sub { 1 };
-has check_following   => sub { 1 };
 has following         => sub { {} };
 has template          => sub { 'pretty' };
 has nick              => sub { $ENV{USER} };

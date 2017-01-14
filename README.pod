@@ -72,7 +72,6 @@ Here's an example conf file, showing every currently supported option:
   nick = bob
   twtfile = ~/twtxt.txt
   twturl = http://example.org/twtxt.txt
-  check_following = 0
   use_pager = 0
   use_cache = 1
   disclose_identity = 0
