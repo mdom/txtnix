@@ -14,11 +14,15 @@ sub run {
     $self->use_pager(0);
     $self->time_format('%F %H:%M');
     $self->ua->inactivity_timeout(0);
+    my $exit = 0;
     $self->ua->websocket(
         $self->url => sub {
             my ( $ua, $tx ) = @_;
-            say 'WebSocket handshake failed!' and return
-              unless $tx->is_websocket;
+            if ( !$tx->is_websocket ) {
+                say 'WebSocket handshake failed!';
+                $exit = 1;
+                return;
+            }
             $tx->on(
                 finish => sub {
                     my ( $tx, $code, $reason ) = @_;
@@ -59,6 +63,7 @@ sub run {
         }
     );
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+    return $exit;
 }
 
 1;
