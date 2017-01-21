@@ -47,6 +47,7 @@
             "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
             "Mojolicious" : "6.54",
+            "Net::DNS::Native" : "0.11",
             "OptArgs" : "0",
             "POSIX" : "0",
             "Path::Tiny" : "0",
