@@ -22,6 +22,7 @@ txtnix - Client for twtxt, the minimalist microblogging service for hackers
     config      Get or set config item.
     query       Query your registry.
     register    Register at your registry.
+    search      Search twtxt.
 
 
     Options:

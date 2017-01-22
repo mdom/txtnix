@@ -341,4 +341,14 @@ subcmd
   cmd     => 'publish',
   comment => 'Upload twtxt file.';
 
+subcmd
+  cmd     => 'search',
+  comment => 'Search in tweets.';
+
+arg search => (
+    isa      => 'Str',
+    comment  => 'Search term',
+    required => 1,
+);
+
 1;
