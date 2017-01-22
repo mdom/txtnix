@@ -6,7 +6,7 @@ use Mojo::Base -base;
 has 'app';
 has config   => sub { shift->_build_config };
 has name     => sub { my ($name) = ref( $_[0] ) =~ /^.*::(.*)$/; return $name };
-has priority => sub { 0 };
+has priority => sub { 10 };
 
 sub _build_config {
     my $self = shift;
