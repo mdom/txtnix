@@ -337,4 +337,8 @@ subcmd
   cmd     => 'mail',
   comment => 'receive twtxt from mailfilter.';
 
+subcmd
+  cmd     => 'publish',
+  comment => 'Upload twtxt file.';
+
 1;
