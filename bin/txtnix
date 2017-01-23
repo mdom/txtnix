@@ -150,6 +150,14 @@ Path to TLS key file.
 
 Path to TLS cert file.
 
+=item http_proxy
+
+Use this proxy for http connections.
+
+=item https_proxy
+
+Use this proxy for https connections.
+
 =item disclose_identity
 
 Include nick and twturl in twtxt's user-agent. To respect your privacy this

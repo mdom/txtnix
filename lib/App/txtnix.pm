@@ -48,12 +48,13 @@ has character_limit   => sub { 1024 };
 has expand_me         => sub { 0 };
 has hooks             => sub { 1 };
 has registry          => sub { "https://roster.twtxt.org" };
+has sign              => sub { 0 };
 
 has unfollow_codes => sub { { "410" => 1 } };
 
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config_file config_dir
-      force key_file cert_file plugins cache pager)
+      force key_file cert_file plugins cache pager http_proxy https_proxy)
 ];
 
 sub new {
@@ -190,6 +191,12 @@ sub _build_ua {
     $ua->ca( $self->ca_file );
     $ua->cert( $self->cert_file ) if $self->cert_file;
     $ua->key( $self->key_file )   if $self->key_file;
+    if ( $self->http_proxy ) {
+	    $ua->proxy->http( $self->http_proxy );
+    }
+    if ( $self->https_proxy ) {
+	    $ua->proxy->https( $self->https_proxy );
+    }
     return $ua;
 }
 
