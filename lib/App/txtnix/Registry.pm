@@ -63,6 +63,17 @@ sub process_result {
             push @result, [ split /\t/, $line ];
         }
     }
+    else {
+        my $err = $tx->error;
+        chomp( $err->{message} );
+        die "Failing to query registry "
+          . $self->url . ": "
+          . (
+            $err->{code}
+            ? "$err->{code} response: $err->{message}"
+            : "Connection error: $err->{message}"
+          ) . "\n";
+    }
     return @result;
 }
 
