@@ -4,7 +4,7 @@
       "Mario Domgoergen C<< <mario@domgoergen.com> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -35,6 +35,7 @@
             "Carp" : "0",
             "Config::Tiny" : "0",
             "Data::Dumper" : "0",
+            "Exporter" : "0",
             "IO::Interactive" : "0",
             "IO::Pager" : "0",
             "Mojo::Base" : "0",
@@ -48,6 +49,7 @@
             "Mojo::UserAgent" : "0",
             "Mojolicious" : "6.54",
             "Net::DNS::Native" : "0.11",
+            "Net::FTP" : "0",
             "OptArgs" : "0",
             "POSIX" : "0",
             "Path::Tiny" : "0",
@@ -56,6 +58,7 @@
             "Text::Wrap" : "0",
             "Time::Duration" : "0",
             "Time::Local" : "1.2100",
+            "base" : "0",
             "perl" : "v5.14.0",
             "strict" : "0",
             "warnings" : "0"
@@ -89,6 +92,7 @@
    "x_contributors" : [
       "David Sterba <dsterba@suse.com>",
       "Mario Domgoergen <mdom@taz.de>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 
