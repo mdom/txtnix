@@ -11,9 +11,6 @@ sub compile_search {
         if ( $search =~ /\G ( && | \|\| | \( | \) | ! )/gcx ) {
             $code .= $1;
         }
-        elsif ( $search =~ /\G (\#\w+) /gcx ) {
-            $code .= "\$tweet->text =~ /\Q$1\E/";
-        }
         elsif ( $search =~ /\G \@(\w+) /gcx ) {
             $code .=
               "(\$tweet->text =~ /\Q\@$1\E/ || \$tweet->text =~ /\Q\@<$1\E/)";
