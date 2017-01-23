@@ -118,7 +118,14 @@ to disclose your identity.
 
 =item use_pager
 
-Use a pager (less) to display your timeline. Defaults to false.
+Use a pager (less) to display your timeline. Defaults to false. txtnix
+first tries to use the I<PAGER> environment variable and then checks a
+list of posible pagers until it finds one.
+
+=item pager
+
+Set pager program to use. It has no default value. This enables
+I<use_pager> if set.
 
 =item use_cache
 

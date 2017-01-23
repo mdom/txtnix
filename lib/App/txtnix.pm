@@ -53,7 +53,7 @@ has unfollow_codes => sub { { "410" => 1 } };
 
 has [
     qw( colors twturl pre_tweet_hook post_tweet_hook config_file config_dir
-      force key_file cert_file plugins cache)
+      force key_file cert_file plugins cache pager)
 ];
 
 sub new {
@@ -155,6 +155,11 @@ sub new {
               @plugins
         ]
     );
+
+    if ( $self->pager ) {
+        $ENV{PAGER} = $self->pager;
+        $self->use_pager(1);
+    }
 
     return $self;
 }
