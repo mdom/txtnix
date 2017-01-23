@@ -22,7 +22,6 @@ my $app = App::txtnix::Cmd::timeline->new(
     twtfile   => Path::Tiny->tempfile,
     twturl    => 'https://example.com/charlie.txt',
     nick      => 'charlie',
-    registry  => '/',
     template  => 'simple',
     me        => 1,
     following => { alice => '/alice.txt', bob => '/bob.txt' },
