@@ -44,7 +44,7 @@ sub post_tweet {
               $base->clone->path('name/publish')->query( arg => $hash );
             my $tx = $ua->post($publish);
             if ( my $res = $tx->success ) {
-                ...;
+                print "IPFS published";
             }
             else {
                 tx_error($tx);
