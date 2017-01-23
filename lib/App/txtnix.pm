@@ -192,10 +192,10 @@ sub _build_ua {
     $ua->cert( $self->cert_file ) if $self->cert_file;
     $ua->key( $self->key_file )   if $self->key_file;
     if ( $self->http_proxy ) {
-	    $ua->proxy->http( $self->http_proxy );
+        $ua->proxy->http( $self->http_proxy );
     }
     if ( $self->https_proxy ) {
-	    $ua->proxy->https( $self->https_proxy );
+        $ua->proxy->https( $self->https_proxy );
     }
     return $ua;
 }
