@@ -1,6 +1,9 @@
 package App::txtnix::Plugin::IPFS;
 use Mojo::Base 'App::txtnix::Plugin';
 use Mojo::JSON 'decode_json';
+use Mojo::UserAgent;
+
+has 'recursive';
 
 sub tx_error {
     my $tx  = shift;
@@ -18,7 +21,8 @@ sub post_tweet {
     my $self = shift;
     my $app  = $self->app;
 
-    my $ua   = $app->ua;
+    my $ua =
+      Mojo::UserAgent->new( inactivity_timeout => 0, request_timeout => 0 );
     my $file = $app->twtfile;
 
     if ( !$file || !$file->exists ) {
@@ -28,6 +32,14 @@ sub post_tweet {
 
     my $base = Mojo::URL->new( $self->api_url );
     my $add  = $base->clone->path('add');
+
+    if ( $self->recursive ) {
+        $add->query( recursive => 1 );
+        $file = $file->parent;
+    }
+    else {
+        $add->query( 'wrap-with-directory' => 'true' );
+    }
 
     my $tx = $ua->post(
         $add => form => {
@@ -39,7 +51,8 @@ sub post_tweet {
     if ( $res->is_success ) {
         my @json =
           grep { $_->{Hash} } map { decode_json($_) } split( "\n", $res->body );
-        my $hash = $json[0]->{Hash};
+        my $hash = $json[-1]->{Hash};
+        print "Uploaded twtxt file to /ipfs/$hash\n";
         if ( $self->publish ) {
             my $publish =
               $base->clone->path('name/publish')->query( arg => $hash );
@@ -52,7 +65,6 @@ sub post_tweet {
                 return;
             }
         }
-        print "Uploaded twtxt file to ipfs at $hash.\n";
     }
     else {
         tx_error($tx);
