@@ -6,12 +6,6 @@ This is the Perl distribution App-txtnix.
 
 Installing App-txtnix is straightforward.
 
-=head2 Getting the fatpacked script
-
-If you just want to run txtnix as easy as possible, you can always get
-the latest version at L<https://mdom.github.io/txtnix> as dependency
-free prepackaged script.
-
 =head2 Installation with cpanm
 
 If you have cpanm, you only need one line:
