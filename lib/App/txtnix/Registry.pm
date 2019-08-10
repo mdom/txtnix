@@ -18,7 +18,7 @@ sub register_user {
 
     my $tx = $self->ua->post($endpoint);
 
-    return 1 if $tx->success;
+    return 1 if $tx->result->is_success;
 
     warn "Can't add user: " . $tx->error->{message} . "\n";
     return 0;
@@ -58,7 +58,8 @@ sub get_mentions {
 sub process_result {
     my ( $self, $tx ) = @_;
     my @result;
-    if ( my $res = $tx->success ) {
+    my $res = $tx->result;
+    if ( $res->is_success ) {
         for my $line ( split /\n/, b( $res->body )->decode ) {
             push @result, [ split /\t/, $line ];
         }
