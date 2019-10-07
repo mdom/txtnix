@@ -4,6 +4,12 @@
 
 =for HTML <a href='https://coveralls.io/r/mdom/txtnix?branch=master'><img src='https://coveralls.io/repos/mdom/txtnix/badge.png?branch=master' alt='Coverage Status' /></a>
 
+=head1 WARNING
+
+This project is currently unmaintained. It seems to work fine for now
+but be warned. If you're looking for a maintained twtxt client take a
+look at L<txtnish|https://github.com/mdom/txtnish>.
+
 =head1 NAME
 
 txtnix - Client for twtxt, the minimalist microblogging service for hackers
