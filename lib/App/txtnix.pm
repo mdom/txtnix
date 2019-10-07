@@ -47,7 +47,7 @@ has wrap_text         => sub { 1 };
 has character_limit   => sub { 1024 };
 has expand_me         => sub { 0 };
 has hooks             => sub { 1 };
-has registry          => sub { "https://registry.twtxt.org" };
+has registry          => sub { "" };
 has sign              => sub { 0 };
 
 has unfollow_codes => sub { { "410" => 1 } };
