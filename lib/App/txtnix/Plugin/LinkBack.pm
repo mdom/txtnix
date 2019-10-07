@@ -33,7 +33,7 @@ sub post_tweet {
         $app->ua->post(
             $url => form => { url => $app->twturl } => sub {
                 my ( $ua, $tx ) = @_;
-                if ( $tx->success ) {
+                if ( $tx->result->is_success ) {
                     warn "Send ping back to $url.\n";
                 }
                 else {

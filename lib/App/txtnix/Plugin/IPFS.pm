@@ -35,7 +35,8 @@ sub post_tweet {
               { file => $file->stringify, 'Content-Type' => 'text/plain' }
         }
     );
-    if ( my $res = $tx->success ) {
+    my $res = $tx->result;
+    if ( $res->is_success ) {
         my @json =
           grep { $_->{Hash} } map { decode_json($_) } split( "\n", $res->body );
         my $hash = $json[0]->{Hash};
@@ -43,7 +44,7 @@ sub post_tweet {
             my $publish =
               $base->clone->path('name/publish')->query( arg => $hash );
             my $tx = $ua->post($publish);
-            if ( my $res = $tx->success ) {
+            if ( $tx->result->is_success ) {
                 print "IPFS published";
             }
             else {

@@ -44,7 +44,8 @@ sub post_tweet {
         }
     );
 
-    if ( my $res = $tx->success ) {
+    my $res = $tx->result;
+    if ( $res->is_success ) {
         print "Uploaded gist.\n";
         if ( !$id ) {
             my $config = $app->read_config;

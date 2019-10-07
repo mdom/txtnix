@@ -276,9 +276,8 @@ sub get_tweets {
         process => sub {
             my ( $q, $tx, $url ) = @_;
             my $nick = $self->url_to_nick($url);
-
-            if ( my $res = $tx->success ) {
-
+            my $res = $tx->result;
+            if ( $res->is_success ) {
                 my $body = b( $res->body )->decode;
 
                 if ( $self->cache ) {
